@@ -30,7 +30,6 @@ exec_build(){
 	cd $SH_DIR/$PKGNAME/qemu
 	meson subprojects download
 	cd $SH_DIR/$PKGNAME
-	make dsc || errlog "make dsc error"
         make deb || errlog "make deb error"
 }
 
