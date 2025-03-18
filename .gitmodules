@@ -215,3 +215,6 @@
 [submodule "packages/chrony/chrony"]
 	path = packages/chrony/chrony
 	url = https://salsa.debian.org/debian/chrony.git
+[submodule "packages/net-sriov-tools/net-sriov-tools"]
+	path = packages/net-sriov-tools/net-sriov-tools
+	url = https://github.com/jiangcuo/net-sriov-tools
