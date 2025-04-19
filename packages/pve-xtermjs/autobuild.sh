@@ -12,5 +12,6 @@ for i in xterm.js  termproxy;
 do
 	cd $SCRIPT_DIR/$PKGNAME/$i
 	exec_build_make
+	cp *.deb *.changes *.buildinfo *.tar.xz  *.dsc ../
 done
 
