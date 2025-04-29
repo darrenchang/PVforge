@@ -221,3 +221,6 @@
 [submodule "packages/frr/frr"]
 	path = packages/frr/frr
 	url = https://git.proxmox.com/git/frr.git
+[submodule "packages/perlmod/perlmod"]
+	path = packages/perlmod/perlmod
+	url = https://git.proxmox.com/git/perlmod.git
