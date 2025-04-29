@@ -218,3 +218,6 @@
 [submodule "packages/net-sriov-tools/net-sriov-tools"]
 	path = packages/net-sriov-tools/net-sriov-tools
 	url = https://github.com/jiangcuo/net-sriov-tools
+[submodule "packages/frr/frr"]
+	path = packages/frr/frr
+	url = https://git.proxmox.com/git/frr.git
