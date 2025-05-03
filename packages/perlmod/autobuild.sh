@@ -7,4 +7,4 @@ echo "This is $PKGNAME build scripts"
 . ../common.sh
 
 cd $SCRIPT_DIR/$PKGNAME/perlmod-bin
-exec_build_make
+exec_build_dpkg
