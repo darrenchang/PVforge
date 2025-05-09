@@ -3,6 +3,10 @@
 A fork of Proxmox VE for ARM and LoongArch architectures
 AGPL-3.0 Licensed | Community-Driven Project
 
+## NOTE!
+The original Proxmox-Port repository will be frozen, providing deb access but no ISO files.
+If you want to get updates, please visit docs.pxvirt.lierfang.com to get the latest documentation information!
+
 ## 📖 Overview
 
 PXVIRT is an open-source virtualization platform derived from Proxmox VE, specifically adapted to support ARM and LoongArch architectures. This project originally began as "Proxmox-Port" and has now evolved into a fully independent fork under the new name PXVIRT.
@@ -41,6 +45,13 @@ Container and KVM virtualization support
 Storage management integration
 Network configuration tools
 Note: Features are inherited from Proxmox VE and extended for target architectures.
+
+### Roadmap
+
+- Easy DPDK
+- Datacenter Manger 
+- Integrate more hardware tools, such as IPMI, StorCLI, etc., and provide access interfaces.
+- Integrate more system management tools, such as automatic diagnosis, SAN management, SR-IOV management，VIP,etc..
 
 ## ⚙️ Installation & Documentation
 
