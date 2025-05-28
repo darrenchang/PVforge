@@ -57,7 +57,7 @@ Note: Features are inherited from Proxmox VE and extended for target architectur
 
 For installation instructions and documentation, please refer to:
 
-PXVIRT Documentation ([Simple Chinese only](https://docs.pxvirt.lierfang.com))
+PXVIRT Documentation (https://docs.pxvirt.lierfang.com)
 
 ## ⚖️ Legal Disclaimer
 
