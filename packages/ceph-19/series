@@ -1,1 +1,3 @@
+patches/001-add-supprot-for-loongarch64.patch
 patches/002-remove-lintian.patch
+patches/003-add-spdk.patch
