@@ -15,6 +15,7 @@ if [ "$arch" == "loongarch64" ];then
 	done
 fi
 apt update
+apt install usr-is-merged usrmerge -y
 yes |mk-build-deps --install --remove
 cd $SCRIPT_DIR/$PKGNAME
 exec_build_make
