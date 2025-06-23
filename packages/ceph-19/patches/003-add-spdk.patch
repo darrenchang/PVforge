@@ -132,3 +132,21 @@ index f4df5c41b..4842fc15b 100755
  if [ -s scripts/posix.log ]; then
  	echo "POSIX includes detected. Please include spdk/stdinc.h instead."
  	cat scripts/posix.log
+diff --git a/ceph/src/boost/libs/config/checks/architecture/loongarch.cpp b/ceph/src/boost/libs/config/checks/architecture/loongarch.cpp
+new file mode 100644
+index 000000000..2bf81f7a9
+--- /dev/null
++++ b/ceph/src/boost/libs/config/checks/architecture/loongarch.cpp
+@@ -0,0 +1,12 @@
++// loongarch.cppAdd commentMore actions
++//
++// Copyright (c) 2012 Steven Watanabe
++//
++// Distributed under the Boost Software License Version 1.0. (See
++// accompanying file LICENSE_1_0.txt or copy at
++// http://www.boost.org/LICENSE_1_0.txt)
++
++#if !defined(__loongarch) && !defined(__loongarch__) && !defined(__loongarch64__) \
++    && !defined(__loong) && !defined(__LOONGARCH__)
++#error "Not LOONGARCH"
++#endif
