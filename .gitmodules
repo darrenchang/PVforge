@@ -230,3 +230,6 @@
 [submodule "packages/pve-vgpu-helper/pve-vgpu-helper"]
 	path = packages/pve-vgpu-helper/pve-vgpu-helper
 	url = https://git.proxmox.com/git/pve-vgpu-helper.git
+[submodule "packages/pxvirt-spdk/pxvirt-spdk"]
+	path = packages/pxvirt-spdk/pxvirt-spdk
+	url = https://github.com/jiangcuo/pxvirt-spdk
