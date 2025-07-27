@@ -4,8 +4,14 @@ A fork of Proxmox VE for ARM and LoongArch architectures
 AGPL-3.0 Licensed | Community-Driven Project
 
 ## NOTE!
-The original Proxmox-Port repository will be frozen, providing deb access but no ISO files.
+
+The project has received some donations, but these donations (please refer to the donation list in SUPPORT.md) are not sufficient to cover our expenses on warehouse servers, compilation servers, and other related costs. Therefore, we will stop the distribution of pveport's deb files and ISO images to free up more space for PXVIRT.
+
+The original Proxmox-Port repository will be cancelled.
 If you want to get updates, please visit docs.pxvirt.lierfang.com to get the latest documentation information!
+
+[English docs](https://docs.pxvirt.lierfang.com/en/README.html) | [中文文档](https://docs.pxvirt.lierfang.com/zh/README.html)
+
 
 ## 📖 Overview
 
@@ -21,7 +27,7 @@ Rebranding: Due to trademark restrictions ("Proxmox" is a registered trademark o
 
 ### Technical Value
 
-- 🖥️ Multi-Arch Support: Brings Proxmox VE's powerful virtualization tools to ARM64 and LoongArch platforms.We also provide x86 versions of the software to achieve compatibility among three different architectures within the same cluster.
+- 🖥️ Multi-Arch Support: Brings Proxmox VE's powerful virtualization tools to ARM64 and LoongArch platforms. We also provide x86 versions of the software to achieve compatibility among three different architectures within the same cluster.
 
 - 🔄 Upstream Sync: Maintains compatibility with Proxmox VE upstream features while adding architecture-specific optimizations.
 
@@ -49,19 +55,25 @@ Note: Features are inherited from Proxmox VE and extended for target architectur
 ### Roadmap
 
 - Easy DPDK
-- Datacenter Manger 
+- Datacenter Manager 
 - Integrate more hardware tools, such as IPMI, StorCLI, etc., and provide access interfaces.
-- Integrate more system management tools, such as automatic diagnosis, SAN management, SR-IOV management，VIP,etc..
+- Integrate more system management tools, such as automatic diagnosis, SAN management, SR-IOV management, VIP, etc.
 
 ## ⚙️ Installation & Documentation
 
 For installation instructions and documentation, please refer to:
 
-PXVIRT Documentation (https://docs.pxvirt.lierfang.com)
+[PXVIRT Documentation](https://docs.pxvirt.lierfang.com)
 
 ## ⚖️ Legal Disclaimer
 
-PXVIRT is not affiliated with Proxmox Server Solutions GmbH
-Proxmox® is a registered trademark of Proxmox Server Solutions GmbH
-Original Proxmox VE code is licensed under AGPLv3
-PXVIRT exists to expand virtualization accessibility, not replace Proxmox VE. Consider supporting both projects where appropriate.
+- PXVIRT is not affiliated with Proxmox Server Solutions GmbH
+- Proxmox® is a registered trademark of Proxmox Server Solutions GmbH
+- Original Proxmox VE code is licensed under AGPLv3
+- PXVIRT exists to expand virtualization accessibility, not replace Proxmox VE. Consider supporting both projects where appropriate.
+
+## 💰 Support & Donation
+
+For commercial support services and donation information, please see:
+
+📄 **[Support & Commercial Services](./SUPPORT.md)**
