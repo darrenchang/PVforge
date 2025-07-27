@@ -12,6 +12,11 @@ If you want to get updates, please visit docs.pxvirt.lierfang.com to get the lat
 
 [English docs](https://docs.pxvirt.lierfang.com/en/README.html) | [中文文档](https://docs.pxvirt.lierfang.com/zh/README.html)
 
+## Community
+
+- Discord: https://discord.gg/PxJAJQ6J
+
+- QQ 群组: 102166071/904754537/940488655/750937440
 
 ## 📖 Overview
 
