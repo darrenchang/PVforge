@@ -14,7 +14,7 @@ If you want to get updates, please visit docs.pxvirt.lierfang.com to get the lat
 
 ## Community
 
-- Discord: https://discord.gg/PxJAJQ6J
+- Discord: https://discord.gg/vEaQDA4A
 
 - QQ 群组: 102166071/904754537/940488655/750937440
 
