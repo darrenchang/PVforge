@@ -236,3 +236,6 @@
 [submodule "packages/proxmox-perltidy/proxmox-perltidy"]
 	path = packages/proxmox-perltidy/proxmox-perltidy
 	url = https://git.proxmox.com/git/proxmox-perltidy.git
+[submodule "packages/proxmox-rrd-migration-tool/proxmox-rrd-migration-tool"]
+	path = packages/proxmox-rrd-migration-tool/proxmox-rrd-migration-tool
+	url = https://git.proxmox.com/git/proxmox-rrd-migration-tool.git
