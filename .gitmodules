@@ -233,3 +233,6 @@
 [submodule "packages/pxvirt-spdk/pxvirt-spdk"]
 	path = packages/pxvirt-spdk/pxvirt-spdk
 	url = https://github.com/jiangcuo/pxvirt-spdk
+[submodule "packages/proxmox-perltidy/proxmox-perltidy"]
+	path = packages/proxmox-perltidy/proxmox-perltidy
+	url = https://git.proxmox.com/git/proxmox-perltidy.git
