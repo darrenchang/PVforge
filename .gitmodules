@@ -239,3 +239,6 @@
 [submodule "packages/proxmox-rrd-migration-tool/proxmox-rrd-migration-tool"]
 	path = packages/proxmox-rrd-migration-tool/proxmox-rrd-migration-tool
 	url = https://git.proxmox.com/git/proxmox-rrd-migration-tool.git
+[submodule "packages/proxmox-biome/proxmox-biome"]
+	path = packages/proxmox-biome/proxmox-biome
+	url = https://git.proxmox.com/git/proxmox-biome.git
