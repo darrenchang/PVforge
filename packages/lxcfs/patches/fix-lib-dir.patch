@@ -1,0 +1,12 @@
+diff --git a/Makefile b/Makefile
+index e3894f3..33ca5a4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -23,6 +23,7 @@ $(SRCDIR)/README: submodule
+ $(BUILDDIR): $(SRCDIR)/README debian
+        rm -rf $(BUILDDIR)
+        mkdir $(BUILDDIR)
++       sed -i "s/x86_64/$(DEB_HOST_GNU_CPU)/g" debian/lxcfs.links
+        cp -t $(BUILDDIR) -a $(SRCDIR)/. debian
+        echo "git clone git://git.proxmox.com/git/lxcfs.git\\ngit checkout $(GITVERSION)" > $(BUILDDIR)/debian/SOURCE
+ 
