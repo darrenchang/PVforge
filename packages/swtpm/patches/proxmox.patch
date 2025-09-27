@@ -1,28 +1,26 @@
-diff --git a/debian/changelog b/debian/changelog
-index 0217ca2..f324a61 100644
---- a/debian/changelog
-+++ b/debian/changelog
-@@ -1,3 +1,9 @@
-+swtpm (0.9.0+port) bookworm; urgency=medium
-+
-+  * Add Proxmox supoort 
-+
-+ -- jiangcuo <jiangcuo@lierfang.com>  Tue, 07 Jan 2025 12:08:49 +0800
-+
- swtpm (0.9.0) RELEASED; urgency=medium
- 
-   * Stable release
 diff --git a/debian/usr.bin.swtpm b/debian/usr.bin.swtpm
-index 0069f58..3038642 100644
+index a6e8a62..5cb1717 100644
 --- a/debian/usr.bin.swtpm
 +++ b/debian/usr.bin.swtpm
-@@ -24,18 +24,6 @@ profile swtpm /usr/bin/swtpm {
+@@ -1,6 +1,8 @@
+ # vim:syntax=apparmor
+ # AppArmor policy for swtpm
+ 
++abi <abi/3.0>,
++
+ #include <tunables/global>
+ 
+ profile swtpm /usr/bin/swtpm {
+@@ -26,21 +28,6 @@ profile swtpm /usr/bin/swtpm {
    unix (send, receive) type=stream addr=none peer=(label=libvirt-*),
  
    /usr/bin/swtpm rm,
 -
 -  /run/libvirt/qemu/swtpm/*.pid rwk,
 -  /run/libvirt/qemu/swtpm/*.sock rwk,
+-  /var/lib/libvirt/swtpm/** wk,
+-  /usr/share/swtpm/profiles/*.json r,  # distro profiles
+-  /etc/swtpm/profiles/*.json r,        # local profiles
 -  /tmp/** rwk,
 -
 -  owner /dev/vtpmx rw,
@@ -37,3 +35,48 @@ index 0069f58..3038642 100644
 +  # Proxmox VE allow to save states on many possible locations, so allow everything for now.
 +  /** rwk,
  }
+diff --git a/src/swtpm/ctrlchannel.c b/src/swtpm/ctrlchannel.c
+index 0beb0cc..04cf866 100644
+--- a/src/swtpm/ctrlchannel.c
++++ b/src/swtpm/ctrlchannel.c
+@@ -420,8 +420,17 @@ wait_chunk:
+         clock_gettime(CLOCK_REALTIME, &now);
+         timespec_diff(&deadline, &now, &timeout);
+ 
+-        if (timeout.tv_sec < 0)
++        if (timeout.tv_sec < 0){
++            const char *msg_start = "Error: ctrlchannel_recv_cmd: timed out waiting for chunk";
++            if (recvd >= offsetof(struct input, body)) {
++                logprintf(STDERR_FILENO, "%s for command 0x%08x\n", msg_start, be32toh(input->cmd));
++                SWTPM_PrintAll("Input body", "", input->body, recvd - offsetof(struct input, body));
++            } else {
++                logprintf(STDERR_FILENO, "%s before receiving full command\n", msg_start);
++            }
++
+             break;
++	}
+         to = timeout.tv_sec * 1000 + timeout.tv_nsec / 1E6;
+ 
+         /* wait for the next chunk */
+@@ -545,6 +554,7 @@ int ctrlchannel_process_fd(int fd,
+     SWTPM_PrintAll(" Ctrl Cmd:", " ", msg.msg_iov->iov_base, min(n, 1024));
+ 
+     if ((size_t)n < sizeof(input.cmd)) {
++	logprintf(STDERR_FILENO, "Error: ctrlchannel_process_fd: input too short\n");
+         goto err_bad_input;
+     }
+ 
+@@ -785,8 +795,12 @@ int ctrlchannel_process_fd(int fd,
+             goto err_io;
+ 
+         pss = (ptm_setstate *)input.body;
+-        if (n < (ssize_t)offsetof(ptm_setstate, u.req.data)) /* rw */
++        if (n < (ssize_t)offsetof(ptm_setstate, u.req.data)) { /* rw */
++            logprintf(STDERR_FILENO, "Error: ctrlchannel_process_fd: input too "
++                                     "short for CMD_SET_STATEBLOB\n");
++            SWTPM_PrintAll("Input body", "", input.body, n);
+             goto err_bad_input;
++        }
+ 
+         return ctrlchannel_receive_state(pss, n, fd);
+ 
