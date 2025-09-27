@@ -6,7 +6,7 @@ index b5a47eb..4180abd 100644
  build: $(BUILDDIR)
  $(BUILDDIR):
  	rm -rf $@ $@.tmp; mkdir $@.tmp
-+	sed -i "/x86_64/$(DEB_HOST_GNU_CPU)/g" debian/proxmox-firewall.install || true
++	sed -i "s/x86_64/$(DEB_HOST_GNU_CPU)/g" debian/proxmox-firewall.install || true
  	cp -a proxmox-firewall proxmox-nftables debian Cargo.toml Makefile defines.mk $@.tmp/
  	mv $@.tmp $@
  
