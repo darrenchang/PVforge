@@ -1,0 +1,31 @@
+diff --git a/debian/control b/debian/control
+index 5634344..dfa97d7 100644
+--- a/debian/control
++++ b/debian/control
+@@ -6,11 +6,13 @@ Build-Depends: cargo:native,
+                dh-cargo (>= 25),
+                librust-anyhow-1+default-dev,
+                librust-bindgen-0.71-dev,
++               librust-crossbeam-channel-dev,
+                librust-libc-0.2+default-dev (>= 0.2.107-~~),
+                librust-pico-args-0.5+default-dev,
+                librust-pkg-config-dev,
+                librust-pretty-assertions-dev,
+                librust-proxmox-async-0.5-dev,
++               librrd-dev,
+                libstd-rust-dev,
+                rrdtool,
+                rustc:native,
+diff --git a/src/main.rs b/src/main.rs
+index 799cde8..6c164fa 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -370,7 +370,7 @@ fn do_rrd_migration(
+         bail!("refusing to migrate metrics for {resource:?} - target already exists and 'force' not set!");
+     }
+ 
+-    let mut source: [*const i8; 2] = [std::ptr::null(); 2];
++    let mut source: [*const std::os::raw::c_char; 2] = [std::ptr::null(); 2];
+     source[0] = file.0.as_ptr();
+ 
+     let target_path = CString::new(target_path.to_str().unwrap()).unwrap();
