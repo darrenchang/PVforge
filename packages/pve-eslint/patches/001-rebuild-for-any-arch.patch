@@ -56,7 +56,7 @@ index b4c4090..830042a 100755
 +++ b/debian/rules
 @@ -1,7 +1,11 @@
  #!/usr/bin/make -f
-+MULTIARCH := $(shell dpkg-architecture -qDEB_BUILD_MULTIARCH)
++MULTIARCH := $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
  
  %:
  	dh $@ --with nodejs
