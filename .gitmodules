@@ -12,7 +12,7 @@
 	url = https://github.com/jiangcuo/pve-qemu.git
 [submodule "packages/pve-common/pve-common"]
 	path = packages/pve-common/pve-common
-	url = https://git.proxmox.com/git/pve-common
+	url = https://github.com/jiangcuo/pve-common
 [submodule "packages/pve-installer/pve-installer"]
 	path = packages/pve-installer/pve-installer
 	url = https://github.com/jiangcuo/pve-installer
