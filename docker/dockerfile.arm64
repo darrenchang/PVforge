@@ -45,19 +45,6 @@ RUN apt update && \
 RUN rm -f /var/lib/dpkg/info/pve-manager.postinst && \
     dpkg --configure -a
 
-WORKDIR /pxvirt-source
-COPY .gitmodules ./
-COPY packages/ ./packages/
-RUN git init && \
-    git config --file .gitmodules --get-regexp path | while read -r key path; do \
-        name=$(echo "$key" | sed 's/submodule\.\(.*\)\.path/\1/') && \
-        url=$(git config --file .gitmodules --get "submodule.$name.url") && \
-        if [ -n "$url" ]; then \
-            echo "Adding $name at $path..." && \
-            rm -r $path && \
-            git add "$path" 2>/dev/null || git submodule add --force "$url" "$path"; \
-        fi; \
-    done;
-
 ADD ./start.sh /
-CMD ["bash"]
+
+CMD ["bash","/start.sh"]
