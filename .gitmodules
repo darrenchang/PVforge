@@ -175,9 +175,6 @@
 [submodule "packages/pve-lxc-syscalld/pve-lxc-syscalld"]
   path = packages/pve-lxc-syscalld/pve-lxc-syscalld
   url = https://github.com/jiangcuo/pve-lxc-syscalld.git
-[submodule "packages/pve-edk2-firmware/pve-edk2-firmware"]
-  path = packages/pve-edk2-firmware/pve-edk2-firmware
-  url = https://github.com/jiangcuo/pve-edk2-firmware.git
 [submodule "packages/pixman/pixman"]
   path = packages/pixman/pixman
   url = https://salsa.debian.org/xorg-team/lib/pixman
@@ -244,3 +241,6 @@
 [submodule "packages/proxmox-network-interface-pinning/proxmox-network-interface-pinning"]
   path = packages/proxmox-network-interface-pinning/proxmox-network-interface-pinning
   url = https://git.proxmox.com/git/proxmox-network-interface-pinning.git
+[submodule "packages/pve-edk2-firmware/pve-edk2-firmware"]
+	path = packages/pve-edk2-firmware/pve-edk2-firmware
+	url = https://github.com/jiangcuo/pve-edk2-firmware.git
