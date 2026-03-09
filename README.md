@@ -65,10 +65,11 @@ Note: Features are inherited from Proxmox VE and extended for target architectur
 - Integrate more system management tools, such as automatic diagnosis, SAN management, SR-IOV management, VIP, etc.
 
 ## ⚙️ Installation & Documentation
-
 For installation instructions and documentation, please refer to:
-
 [PXVIRT Documentation](https://docs.pxvirt.lierfang.com)
+
+If you would like to build your own packages, please refer to:
+[Build.md](./BUILD.md)
 
 ## ⚖️ Legal Disclaimer
 
