@@ -13,6 +13,8 @@ if [ "$arch" == "loongarch64" ];then
 	for i in `cat $SCRIPT_DIR/series.loongarch64.ceph`;
 		do patch -p1 < ../../$i
 	done
+elif [ "$arch" == "aarch64" ]; then
+	patch -p1 -d "$SCRIPT_DIR/$PKGNAME" < "$SCRIPT_DIR/patches/002-remove-lintian.patch"
 fi
 apt update
 apt install usr-is-merged usrmerge -y

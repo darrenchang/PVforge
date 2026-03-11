@@ -1,1 +1,2 @@
 patches/002-remove-lintian.patch
+patches/003-fix-tracing-integerp-pointer-dereference.patch

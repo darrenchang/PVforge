@@ -13,6 +13,10 @@ if [ "$arch" == "loongarch64" ];then
 	for i in `cat $SCRIPT_DIR/series.loongarch64.ceph`;
 		do patch -p1 < ../../$i
 	done
+elif [ "$arch" == "aarch64" ]; then
+	for i in `cat $SCRIPT_DIR/series`;
+		do patch -p1 < ../../$i
+	done
 fi
 apt update
 yes |mk-build-deps --install --remove

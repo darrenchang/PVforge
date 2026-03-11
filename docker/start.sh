@@ -13,8 +13,7 @@ fi
 
 exec_build(){
 	echo "install depends"
-	apt update
-        yes |mk-build-deps --install --remove
+  yes |mk-build-deps --install --remove
 	mkdir /tmp/$PKGDIR -p
         if [ -f "Makefile" ];then
 		echo "clean "

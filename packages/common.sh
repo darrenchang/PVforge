@@ -5,7 +5,6 @@ copy_dir(){
 }
 
 exec_build_make(){
-        apt update
         yes |mk-build-deps --install --remove
         echo "clean "
         make clean || echo ok
@@ -13,11 +12,10 @@ exec_build_make(){
         if [ $dscflag == "dsc" ];then
                 make dsc ||  "dsc build error but it is not  fatal error"
         fi
-        DEB_BUILD_OPTIONS=nocheck  make deb || errlog "build deb error"
+        DEB_BUILD_OPTIONS=nocheck DEB_CFLAGS_APPEND="-Wno-error=int-conversion" make deb || errlog "build deb error"
 }
 
 exec_build_dpkg(){
-        apt update
         yes |mk-build-deps --install --remove
         echo "clean "
         make clean || echo ok

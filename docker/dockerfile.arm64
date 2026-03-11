@@ -37,14 +37,30 @@ RUN apt update && \
     dwarves \
     flex \
     meson \
-    equivs;
+    equivs && \
+    apt autoremove --purge -y && \
+    apt clean && \
+    rm -rf /var/lib/apt/lists/*;
+
+RUN apt update && \
+    apt -y install \
+    libgit2-dev \
+    # ceph-18 build dependencies
+    libopentracing-dev \
+    libthrift-dev \
+    liblttng-ust-dev \
+    default-jdk \
+    && \
+    apt autoremove --purge -y && \
+    apt clean && \
+    rm -rf /var/lib/apt/lists/*;
 
 RUN apt update && \
     apt-get -y --no-install-recommends install proxmox-ve || echo ok
 
 RUN rm -f /var/lib/dpkg/info/pve-manager.postinst && \
+    rm -f /var/lib/dpkg/info/proxmox-ve.postinst && \
     dpkg --configure -a
 
 ADD ./start.sh /
-
-CMD ["bash","/start.sh"]
+CMD ["/bin/bash"]
