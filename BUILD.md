@@ -6,6 +6,6 @@
 
 2. Build all .deb packages
     ```bash
-    /bin/bash -c './build_all.sh'
+    ./build_all.sh 2>&1 | tee log.txt
     ```
 
