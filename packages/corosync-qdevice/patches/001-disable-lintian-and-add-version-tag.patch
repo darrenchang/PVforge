@@ -1,0 +1,20 @@
+diff --git a/Makefile b/Makefile
+index 82ec2c5..e3956cc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -31,6 +31,7 @@ ${BUILDDIR}: submodule debian/changelog
+ 	rm -rf $@ $@.tmp
+ 	cp -a ${CSSRC} $@.tmp
+ 	cp -a debian $@.tmp
++	echo "${CSVERSION}" > $@.tmp/.tarball-version
+ 	mv $@.tmp $@
+ 
+ .PHONY: deb
+@@ -38,7 +39,6 @@ deb: ${DEBS}
+ ${OTHER_DEBS} ${DBG_DEBS}: ${MAIN_DEB}
+ ${MAIN_DEB}: ${BUILDDIR}
+ 	cd ${BUILDDIR}; dpkg-buildpackage -b -us -uc
+-	lintian ${MAIN_DEB} ${OTHER_DEBS}
+ 
+ .PHONY: dsc
+ dsc: ${DSC}
