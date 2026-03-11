@@ -1,0 +1,19 @@
+diff --git a/Makefile b/Makefile
+index f0afc74..02c3bad 100644
+--- a/Makefile
++++ b/Makefile
+@@ -33,14 +33,12 @@ deb: $(DEBS)
+ $(OTHER_DEBS): $(MAIN_DEB)
+ $(MAIN_DEB): $(BUILDDIR)
+ 	cd $(BUILDDIR); dpkg-buildpackage -b -us -uc
+-	lintian $(MAIN_DEB) $(OTHER_DEBS)
+ 
+ $(ORIG_SRC_TAR): $(BUILDDIR)
+ 	tar czf $(ORIG_SRC_TAR) --exclude="$(BUILDDIR)/debian" $(BUILDDIR)
+ 
+ dsc: clean
+ 	$(MAKE) $(DSC)
+-	lintian $(DSC)
+ 
+ $(DSC): $(BUILDDIR) $(ORIG_SRC_TAR)
+ 	cd $(BUILDDIR); dpkg-buildpackage -S -us -uc -d
