@@ -1,5 +1,11 @@
-1. Build `pvebuilder` Docker image
+1. Clone the repository and all the submodules
     ```bash
-    DEBIAN_APT=http://deb.debian.org \
-    docker buildx bake
+    git clone https://github.com/darrenchang/pxvirt.git; \
+    git submodule update --init --recursive
+    ``
+
+2. Build all .deb packages
+    ```bash
+    /bin/bash -c './build_all.sh'
     ```
+

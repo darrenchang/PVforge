@@ -21,3 +21,9 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 docker buildx bake
+docker run --rm -d --name pxvirt_builder pvebuilder /bin/sh -c "sleep infinity";
+docker cp ./ pxvirt_builder:/pxvirt
+docker exec -ti pxvirt_builder bash -c '/pxvirt/packages/build_all.sh';
+docker pxvirt_builder:/logs/ ./
+# docker stop pxvirt_builder;
+

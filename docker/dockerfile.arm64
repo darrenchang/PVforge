@@ -23,7 +23,6 @@ fi
 RUN apt update && \
     apt -y install \
     build-* \
-    git \
     devscripts \
     cargo \
     dh-cargo \
@@ -45,12 +44,11 @@ RUN apt update && \
 RUN apt update && \
     apt -y install \
     libgit2-dev \
-    # ceph-18 build dependencies
+    # ceph-18 build dependencies \
     libopentracing-dev \
     libthrift-dev \
     liblttng-ust-dev \
-    default-jdk \
-    && \
+    default-jdk && \
     apt autoremove --purge -y && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*;
