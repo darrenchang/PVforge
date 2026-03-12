@@ -50,11 +50,13 @@ if [[ ${PACKAGE_NAME} == "all" ]]; then
       git config --global --add safe.directory $PKGDIR
       log_build_name $PKGDIR
       sh -c '/start.sh'
+      # Install the compiled package
+      mkdir -p "/tmp/proxmox/${pkg_name}/"
+      for i in $(find /pxvirt/packages/${pkg_name}/ -name '*.deb'); do
+        cp $i "/tmp/proxmox/${pkg_name}/";
+      done
+      apt install -y --allow-downgrades /tmp/proxmox/${pkg_name}/*.deb;
     fi
-    mkdir -p "proxmox/${pkg_name}/"
-    for i $(find /pxvirt/packages/ceph-19/ -name *.deb); do
-      cp $i "proxmox/${pkg_name}/";
-    done
   done
 else
   # Build one specified package
@@ -63,6 +65,11 @@ else
     git config --global --add safe.directory $PKGDIR
     log_build_name $PKGDIR
     sh -c '/start.sh'
+    mkdir -p "/tmp/proxmox/${PACKAGE_NAME}/"
+    for i in $(find /pxvirt/packages/${PACKAGE_NAME}/ -name '*.deb'); do
+      cp $i "/tmp/proxmox/${PACKAGE_NAME}/";
+    done
+    apt install -y --allow-downgrades /tmp/proxmox/${PACKAGE_NAME}/*.deb;
   fi
 fi
 
