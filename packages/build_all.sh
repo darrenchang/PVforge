@@ -7,6 +7,14 @@ log_build_name(){
   echo "####################"
 }
 
+extract_subgraph_packages() {
+  local file="${1:-deptree.mmd}"
+  grep -vE '^\s*(%%|subgraph|end|graph|---|title)' "$file" \
+      | grep -E '^\s*\S' \
+      | awk '{print $NF}' \
+      | awk '!seen[$0]++'
+}
+
 export PACKAGE_NAME="all"
 
 # Parse named arguments
@@ -33,20 +41,11 @@ echo "DEBOPT: ${DEBOPT}"
 echo "PACKAGES_PATH: $PACKAGES_PATH"
 echo
 
-# Packages that doesn't need to be built
-SKIP_PACKAGES=("cargo" "debcargo-conf" "ceph-17" "ceph-18", "libgit2")
-
 if [[ ${PACKAGE_NAME} == "all" ]]; then
   # Build all packages, except for the ones that are listed in $SKIP_PACKAGES
-  for pkg_name in $(ls ${PACKAGES_PATH}/); do
-    export SKIP=0
-    for skip_package in "${SKIP_PACKAGES[@]}"; do
-      if [ $skip_package == $pkg_name ]; then
-        SKIP=1
-      fi
-    done
+  for pkg_name in $(extract_subgraph_packages "/pxvirt/packages/deptree.mmd"); do
     export PKGDIR="${PACKAGES_PATH}/${pkg_name}/${pkg_name}/"
-    if [[ -d $PKGDIR && $SKIP -eq 0 ]]; then
+    if [[ -d $PKGDIR ]]; then
       git config --global --add safe.directory $PKGDIR
       log_build_name $PKGDIR
       sh -c '/start.sh'

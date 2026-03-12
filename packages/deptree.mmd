@@ -1,0 +1,47 @@
+---
+title: pxvirt Package Compile Dependency tree
+---
+graph TD
+    %% Tier 0 - Foundations (no compile dependencies)
+    subgraph T0["Tier 0 – Foundations"]
+        debcargo-conf
+        ceph-19
+        chrony
+        corosync-pve
+        corosync-qdevice
+        debcargo-conf
+        extjs
+        fonts-font-logos
+        frr
+        ifupdown2
+        kronosnet
+        ksm-control-daemon
+        libarchive-perl
+        libgit2
+        libjs-qrcodejs
+        libpve-u2f-server-perl
+        libqb
+        perlmod
+    end
+
+    %% Tier 1
+    subgraph T1["Tier 1 – Cluster Infrastructure"]
+        perlmod --> proxmox-perl-rs
+    end
+
+    %% Tier 2
+    subgraph T2["Tier 2 – Cluster Infrastructure"]
+        proxmox-perl-rs --> pve-common
+    end
+
+    %% Tier 3
+    subgraph T3["Tier 3 – Cluster Infrastructure"]
+        pve-common --> pve-access-control
+    end
+
+    %% Tier 4
+    subgraph T4["Tier 4 – Cluster Infrastructure"]
+        ceph-19 --> librados2-perl
+        pve-access-control --> librados2-perl
+    end
+
