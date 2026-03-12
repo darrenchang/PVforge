@@ -169,9 +169,6 @@
 [submodule "packages/proxmox-backup-restore-image/proxmox-backup-restore-image"]
   path = packages/proxmox-backup-restore-image/proxmox-backup-restore-image
   url = https://github.com/jiangcuo/proxmox-backup-restore-image
-[submodule "packages/cargo/cargo"]
-  path = packages/cargo/cargo
-  url = https://git.proxmox.com/git/cargo
 [submodule "packages/pve-lxc-syscalld/pve-lxc-syscalld"]
   path = packages/pve-lxc-syscalld/pve-lxc-syscalld
   url = https://github.com/jiangcuo/pve-lxc-syscalld.git
@@ -244,3 +241,6 @@
 [submodule "packages/pve-edk2-firmware/pve-edk2-firmware"]
 	path = packages/pve-edk2-firmware/pve-edk2-firmware
 	url = https://git.proxmox.com/git/pve-edk2-firmware.git
+[submodule "packages/cargo/cargo"]
+	path = packages/cargo/cargo
+	url = https://github.com/rust-lang/cargo.git
