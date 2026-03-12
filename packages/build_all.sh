@@ -34,7 +34,7 @@ echo "PACKAGES_PATH: $PACKAGES_PATH"
 echo
 
 # Packages that doesn't need to be built
-SKIP_PACKAGES=("cargo" "debcargo-conf" "ceph-17" "ceph-18")
+SKIP_PACKAGES=("cargo" "debcargo-conf" "ceph-17" "ceph-18", "libgit2")
 
 if [[ ${PACKAGE_NAME} == "all" ]]; then
   # Build all packages, except for the ones that are listed in $SKIP_PACKAGES
@@ -51,6 +51,10 @@ if [[ ${PACKAGE_NAME} == "all" ]]; then
       log_build_name $PKGDIR
       sh -c '/start.sh'
     fi
+    mkdir -p "proxmox/${pkg_name}/"
+    for i $(find /pxvirt/packages/ceph-19/ -name *.deb); do
+      cp $i "proxmox/${pkg_name}/";
+    done
   done
 else
   # Build one specified package
