@@ -8,6 +8,7 @@ RUN rm /etc/apt/sources.list.d/*  \
 && echo "deb $DEBIAN_APT/debian  ${DEBIAN_VERSION} main contrib non-free non-free-firmware" >/etc/apt/sources.list \
 && echo "deb $DEBIAN_APT/debian  ${DEBIAN_VERSION}-updates main contrib non-free non-free-firmware" >> /etc/apt/sources.list \
 && echo "deb $DEBIAN_APT/debian  ${DEBIAN_VERSION}-backports main contrib non-free non-free-firmware" >> /etc/apt/sources.list \
+&& echo "deb $DEBIAN_APT/debian-debug ${DEBIAN_VERSION}-debug main" >> /etc/apt/sources.list \
 && echo "deb $DEBIAN_APT/debian-security  ${DEBIAN_VERSION}-security main contrib non-free non-free-firmware " >> /etc/apt/sources.list 
 
 RUN apt update && apt install -y wget nano curl gnupg  ca-certificates apt-utils
@@ -48,7 +49,15 @@ RUN apt update && \
     libopentracing-dev \
     libthrift-dev \
     liblttng-ust-dev \
-    default-jdk && \
+    default-jdk \
+    # pve-common build dependencies
+    libanyevent-perl \
+    libanyevent-perl \
+    libdevel-cycle-perl \
+    libfilesys-df-perl \
+    liblinux-inotify2-perl \
+    libnet-ip-perl \
+    libtest-mockmodule-perl && \
     apt autoremove --purge -y && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*;
