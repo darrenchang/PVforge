@@ -50,14 +50,26 @@ RUN apt update && \
     libthrift-dev \
     liblttng-ust-dev \
     default-jdk \
-    # pve-common build dependencies
-    libanyevent-perl \
+    # pve-common build dependencies \
     libanyevent-perl \
     libdevel-cycle-perl \
     libfilesys-df-perl \
     liblinux-inotify2-perl \
     libnet-ip-perl \
-    libtest-mockmodule-perl && \
+    libtest-mockmodule-perl \
+    # proxmox-perl-rs build dependencies \
+    librust-anyhow-dev \
+    librust-base32-dev \
+    librust-base64-dev \
+    librust-hex-dev \
+    librust-http-dev \
+    librust-http-0.2-dev \
+    # pve-xtermjs
+    librust-form-urlencoded-dev \
+    librust-mio-dev \
+    librust-nix-dev \
+    librust-pico-args-dev \
+    && \
     apt autoremove --purge -y && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*;
