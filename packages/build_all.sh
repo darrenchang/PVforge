@@ -54,7 +54,7 @@ if [[ ${PACKAGE_NAME} == "all" ]]; then
       for i in $(find /pxvirt/packages/${pkg_name}/ -name '*.deb'); do
         cp $i "/tmp/proxmox/${pkg_name}/";
       done
-      apt install -y --allow-downgrades /tmp/proxmox/${pkg_name}/*.deb;
+      apt install -y --allow-downgrades $(ls /tmp/proxmox/${pkg_name}/*.deb | grep -v -- '-dbgsym_\|zfs-dracut_\|-test_');
     fi
   done
 else
@@ -68,7 +68,7 @@ else
     for i in $(find /pxvirt/packages/${PACKAGE_NAME}/ -name '*.deb'); do
       cp $i "/tmp/proxmox/${PACKAGE_NAME}/";
     done
-    apt install -y --allow-downgrades /tmp/proxmox/${PACKAGE_NAME}/*.deb;
+    apt install -y --allow-downgrades $(ls /tmp/proxmox/${PACKAGE_NAME}/*.deb | grep -v -- '-dbgsym_\|zfs-dracut_\|-test_');
   fi
 fi
 
