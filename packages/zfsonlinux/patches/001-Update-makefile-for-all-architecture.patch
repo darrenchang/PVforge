@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 4f27fca07..f535acf77 100644
+index 96857f5dc..f088b9cc9 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -6,24 +6,25 @@ PACKAGE = zfs-linux
@@ -14,17 +14,17 @@ index 4f27fca07..f535acf77 100644
  ZFS_DEB_BINARY =				\
 -libpam-zfs_$(DEB_VERSION)_amd64.deb		\
 -libuutil3linux_$(DEB_VERSION)_amd64.deb		\
--libzfs6linux_$(DEB_VERSION)_amd64.deb		\
+-libzfs7linux_$(DEB_VERSION)_amd64.deb		\
 -libzfsbootenv1linux_$(DEB_VERSION)_amd64.deb	\
--libzpool6linux_$(DEB_VERSION)_amd64.deb		\
+-libzpool7linux_$(DEB_VERSION)_amd64.deb		\
 -zfs-test_$(DEB_VERSION)_amd64.deb			\
 -zfsutils-linux_$(DEB_VERSION)_amd64.deb		\
 -zfs-zed_$(DEB_VERSION)_amd64.deb
 +libpam-zfs_$(DEB_VERSION)_$(ARCH).deb		\
 +libuutil3linux_$(DEB_VERSION)_$(ARCH).deb		\
-+libzfs6linux_$(DEB_VERSION)_$(ARCH).deb		\
++libzfs7linux_$(DEB_VERSION)_$(ARCH).deb		\
 +libzfsbootenv1linux_$(DEB_VERSION)_$(ARCH).deb	\
-+libzpool6linux_$(DEB_VERSION)_$(ARCH).deb		\
++libzpool7linux_$(DEB_VERSION)_$(ARCH).deb		\
 +zfs-test_$(DEB_VERSION)_$(ARCH).deb			\
 +zfsutils-linux_$(DEB_VERSION)_$(ARCH).deb		\
 +zfs-zed_$(DEB_VERSION)_$(ARCH).deb
