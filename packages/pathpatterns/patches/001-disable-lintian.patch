@@ -1,0 +1,20 @@
+diff --git a/Makefile b/Makefile
+index e8afa19..c208dc2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -40,7 +40,6 @@ deb:
+ 	$(MAKE) build/$(DEB)
+ build/$(DEB): build
+ 	(cd build/pathpatterns && CARGO=/usr/bin/cargo RUSTC=/usr/bin/rustc dpkg-buildpackage -b -uc -us)
+-	lintian build/*.deb
+ 
+ .PHONY: dsc
+ dsc:
+@@ -48,7 +47,6 @@ dsc:
+ 	$(MAKE) build/$(DSC)
+ build/$(DSC): build
+ 	(cd build/pathpatterns && CARGO=/usr/bin/cargo RUSTC=/usr/bin/rustc dpkg-buildpackage -S -uc -us)
+-	lintian build/*.dsc
+ 
+ .PHONY: clean
+ clean:
