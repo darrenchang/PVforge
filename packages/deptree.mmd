@@ -38,12 +38,14 @@ graph LR
         pve-lxc-syscalld
         pve-vgpu-helper
         pxvirt-spdk
+        pxar
         unknown_pkg
     end
 
     %% Tier 1
     subgraph T1["Tier 1 – Cluster Infrastructure"]
         perlmod --> proxmox-perl-rs
+        unknown_pkg --> proxmox-perl-rs
         unknown_pkg --> pve-xtermjs
         unknown_pkg --> roxmox-backup
         unknown_pkg --> roxmox-backup-meta
@@ -66,7 +68,6 @@ graph LR
     subgraph T2["Tier 2 – Cluster Infrastructure"]
         proxmox-perl-rs --> pve-common
         unknown_pkg --> spiceterm
-        unknown_pkg --> pxar
     end
 
     %% Tier 3
