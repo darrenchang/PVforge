@@ -8,6 +8,13 @@ echo "This is $PKGNAME build scripts"
 
 cd $SCRIPT_DIR/$PKGNAME
 
+arch=`arch`
+if [[ "$arch" == "loongarch64" || "$arch" == "aarch64" ]];then
+  for i in `cat $SCRIPT_DIR/series`; do
+   patch -p1 < ../$i
+  done
+fi
+
 if [ "$(ls -di /)" != "$(ls -di /proc/1/root)" ]; then
 	export DEB_BUILD_OPTIONS=nocheck
 fi
