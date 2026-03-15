@@ -1,9 +1,0 @@
---- a/Makefile
-+++ b/Makefile
-@@ -33,6 +33,7 @@ build:
- 	    "$$(dpkg-parsechangelog -l "debian/changelog" -SVersion | sed -e 's/-.*//')"
- 	echo system >build/rust-toolchain
- 	rm -f build/pxar/Cargo.lock
- 	find build/pxar/debian -name '*.hint' -delete
-+	sed -i '/librust-endian-trait/d' build/pxar/debian/control
- 	cp build/pxar/debian/control debian/control
