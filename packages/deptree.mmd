@@ -2,9 +2,14 @@
 title: pxvirt Package Compile Dependency tree
 ---
 graph LR
-    %% Tier 0 - Foundations (no compile dependencies)
-    subgraph T0["Tier 0 – Foundations"]
-        ceph-19
+    %% Tier 0 - Foundations (rust libraries)
+    subgraph T0["Tier 0 – Foundations (rust libraries)"]
+        endian-trait-derive
+        endian-trait-derive --> endian-trait
+    end
+
+    %% Tier 1 - Foundations (no compile dependencies)
+    subgraph T1["Tier 1 – Foundations"]
         chrony
         corosync-pve
         corosync-qdevice
@@ -18,7 +23,6 @@ graph LR
         libjs-qrcodejs
         libpve-u2f-server-perl
         libqb
-        perlmod
         libseccomp
         libtpms
         libxdgmime-perl
@@ -38,19 +42,31 @@ graph LR
         pve-lxc-syscalld
         pve-vgpu-helper
         pxvirt-spdk
-        pxar
+        proxmox-widget-toolkit
+        endian-trait --> debcargo-conf
+        ceph-19
+        perlmod
         unknown_pkg
     end
 
-    %% Tier 1
-    subgraph T1["Tier 1 – Cluster Infrastructure"]
-        perlmod --> proxmox-perl-rs
-        unknown_pkg --> proxmox-perl-rs
+    %% Tier2
+    subgraph T2["Tier 2 – Cluster Infrastructure"]
+        debcargo-conf --> pxar
+        proxmox-widget-toolkit --> pve-docs
+        unknown_pkg --> pve-cluster
+        unknown_pkg --> pve-apiclient
+        unknown_pkg --> pve-guest-common
+        unknown_pkg --> pve-network
+        unknown_pkg --> pve-storage
+        unknown_pkg --> pve-edk2-firmware
+        unknown_pkg --> pve-firewall
+        unknown_pkg --> pve-ha-manager
+        unknown_pkg --> proxmox-firewall
+        unknown_pkg --> proxmox-archive-keyring
+        unknown_pkg --> proxmox-kernel-helper
+        unknown_pkg --> pve-manager
+        unknown_pkg --> pve-server
         unknown_pkg --> pve-xtermjs
-        unknown_pkg --> roxmox-backup
-        unknown_pkg --> roxmox-backup-meta
-        unknown_pkg --> roxmox-backup-qemu
-        unknown_pkg --> roxmox-backup-restore-image
         unknown_pkg --> roxmox-biome
         unknown_pkg --> roxmox-i18n
         unknown_pkg --> roxmox-mail-forward
@@ -60,52 +76,31 @@ graph LR
         unknown_pkg --> roxmox-perltidy
         unknown_pkg --> roxmox-rrd-migration-tool
         unknown_pkg --> roxmox-websocket-tunnel
-        unknown_pkg --> roxmox-widget-toolkit
         unknown_pkg --> ve-firmware
+        unknown_pkg --> proxmox-acme
+        unknown_pkg --> proxmox-ve-rs
     end
 
-    %% Tier 2
-    subgraph T2["Tier 2 – Cluster Infrastructure"]
-        proxmox-perl-rs --> pve-common
-        unknown_pkg --> spiceterm
-    end
-
-    %% Tier 3
+    %% Tier 3 
     subgraph T3["Tier 3 – Cluster Infrastructure"]
-        pve-common --> pve-access-control
-        unknown_pkg --> pve-access-control
-        unknown_pkg --> pve-access-control
-        pve-common --> proxmox-acme
-        pve-common --> pve-http-server
-        pve-common --> pve-installer
+        proxmox-acme --> roxmox-backup
+        proxmox-acme --> roxmox-backup-meta
+        proxmox-acme --> roxmox-backup-qemu
+        proxmox-acme --> roxmox-backup-restore-image
+        proxmox-acme --> proxmox-perl-rs
     end
 
     %% Tier 4
     subgraph T4["Tier 4 – Cluster Infrastructure"]
-        ceph-19 --> librados2-perl
-        pve-access-control --> pve-qemu
-        pve-access-control --> librados2-perl
-        unknown_pkg --> pve-cluster
-        unknown_pkg --> pve-apiclient
-        unknown_pkg --> pve-guest-common
-        unknown_pkg --> pve-network
-        unknown_pkg --> pve-storage
-        unknown_pkg --> pve-docs
-        unknown_pkg --> pve-edk2-firmware
-        unknown_pkg --> pve-firewall
-        unknown_pkg --> pve-ha-manager
-        unknown_pkg --> proxmox-firewall
-        unknown_pkg --> proxmox-archive-keyring
-        unknown_pkg --> proxmox-kernel-helper
-        unknown_pkg --> pve-manager
-        unknown_pkg --> pve-qemu
-        unknown_pkg --> pve-server
-        pve-access-control --> pve-container
+        proxmox-perl-rs --> pve-common
     end
 
     %% Tier 5
     subgraph T5["Tier 5 – Cluster Infrastructure"]
-        librados2-perl --> proxmox
+        pve-common --> pve-access-control
+        pve-common --> pve-http-server
+        pve-common --> pve-installer
+        perlmod --> proxmox-perl-rs
         pve-common --> qemu-server
         pve-guest-common --> qemu-server
         pve-apiclient --> qemu-server
@@ -117,11 +112,24 @@ graph LR
         pve-firewall --> qemu-server
         pve-ha-manager --> qemu-server
         proxmox-firewall --> qemu-server
+    end
+
+    %% Tier 6
+    subgraph T6["Tier 6 – Cluster Infrastructure"]
+        pve-access-control --> pve-qemu
+        ceph-19 --> librados2-perl
+        pve-access-control --> librados2-perl
+        pve-access-control --> pve-container
+    end
+
+    %% Tier7 
+    subgraph T7["Tier 7 – Cluster Infrastructure"]
         proxmox-archive-keyring --> proxmox-ve
         proxmox-kernel-helper --> proxmox-ve
         pve-manager --> proxmox-ve
         pve-qemu --> proxmox-ve
+        pve-qemu --> spiceterm
         pve-server --> proxmox-ve
-        unknown_pkg --> proxmox-ve-rs
+        librados2-perl --> proxmox
     end
 
