@@ -8,6 +8,13 @@ echo "This is $PKGNAME build scripts"
 
 cd $SCRIPT_DIR/$PKGNAME
 
+arch=`arch`
+if [[ "$arch" == "loongarch64" || "$arch" == "aarch64" ]];then
+  for i in `cat $SCRIPT_DIR/series`; do
+   patch -p1 < ../$i
+  done
+fi
+
 RUST_LIBS=(
     "endian-trait-derive"
     "endian-trait"

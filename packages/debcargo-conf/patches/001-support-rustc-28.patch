@@ -1,0 +1,12 @@
+diff --git a/vars.sh.frag b/vars.sh.frag
+index c4b1f292e9..5671a5580a 100644
+--- a/vars.sh.frag
++++ b/vars.sh.frag
+@@ -48,6 +48,7 @@ case $dcver in
+ 2.5.*)	true;;
+ 2.6.*)	true;;
+ 2.7.*)	true;;
++2.8.*)	true;;
+ *)	abort 1 "unsupported debcargo version: $dcver";;
+ esac
+ 
