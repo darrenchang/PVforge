@@ -244,6 +244,3 @@
 [submodule "packages/cargo/cargo"]
 	path = packages/cargo/cargo
 	url = https://github.com/rust-lang/cargo.git
-[submodule "packages/perlmod-rs/perlmod-rs"]
-	path = packages/perlmod-rs/perlmod-rs
-	url = https://github.com/proxmox/perlmod-rs.git

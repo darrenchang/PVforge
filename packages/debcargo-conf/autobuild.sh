@@ -16,14 +16,21 @@ if [[ "$arch" == "loongarch64" || "$arch" == "aarch64" ]];then
 fi
 
 RUST_LIBS=(
-    "cc"
-    "endian-trait-derive"
-    "endian-trait"
+    "cc:cc"
+    "openssl:openssl"
+    "openssl-probe:openssl-probe"
+    "url:url"
+    "serde:serde"
+    "serde-bytes:serde_bytes"
+    "endian-trait-derive:endian_trait_derive"
+    "endian-trait:endian_trait"
   )
 
-for rust_lib in "${RUST_LIBS[@]}"; do
+for entry in "${RUST_LIBS[@]}"; do
+  rust_lib="${entry%%:*}"
+  repackage_name="${entry##*:}"
   rm -rf ./build/*
-  ./repackage.sh ${rust_lib//-/_}
+  ./repackage.sh ${repackage_name}
   (
     cd build/${rust_lib}/
     pwd
