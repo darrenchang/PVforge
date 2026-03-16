@@ -4,6 +4,12 @@ title: pxvirt Package Compile Dependency tree
 graph LR
     %% Tier 0 - Foundations (rust libraries)
     subgraph T0["Tier 0 – Foundations (rust libraries)"]
+        cc
+        openssl
+        openssl-probe
+        url
+        serde
+        serde-bytes
         endian-trait-derive
         endian-trait-derive --> endian-trait
     end
@@ -43,6 +49,12 @@ graph LR
         pve-vgpu-helper
         pxvirt-spdk
         proxmox-widget-toolkit
+        cc --> debcargo-conf
+        openssl --> debcargo-conf
+        openssl-probe --> debcargo-conf
+        url --> debcargo-conf
+        serde --> debcargo-conf
+        endian-trait-derive --> debcargo-conf
         endian-trait --> debcargo-conf
         ceph-19
         perlmod
@@ -52,7 +64,6 @@ graph LR
     %% Tier2
     subgraph T2["Tier 2 – Cluster Infrastructure"]
         debcargo-conf --> pxar
-        perlmod --> perlmod-rs
         unknown_pkg --> proxmox-acme
         unknown_pkg --> pve-cluster
         unknown_pkg --> pve-apiclient
@@ -87,9 +98,9 @@ graph LR
         proxmox-acme --> roxmox-backup-meta
         proxmox-acme --> roxmox-backup-qemu
         proxmox-acme --> roxmox-backup-restore-image
-        perlmod-rs --> proxmox-perl-rs
         proxmox-acme --> proxmox-perl-rs
         debcargo-conf --> proxmox-perl-rs
+        perlmod --> proxmox-perl-rs
     end
 
     %% Tier 4
@@ -104,7 +115,6 @@ graph LR
         pve-common --> pve-access-control
         pve-common --> pve-http-server
         pve-common --> pve-installer
-        perlmod --> proxmox-perl-rs
     end
 
     %% Tier 6
