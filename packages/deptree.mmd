@@ -22,9 +22,11 @@ graph LR
         walkdir
         sync-wrapper
         tokio-openssl
+        tokio-stream
         textwarp
         serde
         serde-bytes
+        serde-plain
         endian-trait-derive
         endian-trait-derive --> endian-trait
         librust-proxmox-base64
@@ -37,6 +39,8 @@ graph LR
         librust-proxmox-schema --> librust-proxmox-router
         librust-proxmox-http --> librust-proxmox-router
         librust-proxmox-http-error --> librust-proxmox-router
+        serde-plain --> librust-proxmox-router
+        tokio-stream --> librust-proxmox-router
         librust-proxmox-sys --> librust-proxmox-product-config
         librust-proxmox-api-macro
         librust-proxmox-section-config
@@ -52,6 +56,13 @@ graph LR
         librust-proxmox-api-macro --> librust-proxmox-schema
         librust-proxmox-router --> librust-proxmox-schema
         librust-proxmox-schema --> librust-promxox-time-api
+        pbs-api-types
+        librust-proxmox-apt-api-types
+        proxmox-config-digest
+        proxmox-serde
+        proxmox-config-digest --> librust-proxmox-apt-api-types
+        proxmox-serde --> librust-proxmox-apt-api-types
+        librust-proxmox-apt-api-types --> pbs-api-types
         js-sys --> librust-proxmox-time
         librust-proxmox-lang --> librust-proxmox-async
         librust-proxmox-http-error
@@ -68,7 +79,9 @@ graph LR
         librust-proxmox-time --> librust-proxmox-compression
         librust-proxmox-async --> librust-proxmox-http
         librust-proxmox-io --> librust-proxmox-http
+        librust-proxmox-acme
         librust-proxmox-base64 --> librust-proxmox-acme
+        librust-proxmox-schema --> librust-proxmox-acme
         librust-proxmox-http --> librust-proxmox-acme
         http-body-util --> librust-proxmox-acme
         hyper --> librust-proxmox-acme
@@ -129,6 +142,8 @@ graph LR
         tokio-openssl --> debcargo-conf
         textwarp --> debcargo-conf
         serde --> debcargo-conf
+        serde-bytes --> debcargo-conf
+        serde-plain --> debcargo-conf
         endian-trait-derive --> debcargo-conf
         endian-trait --> debcargo-conf
         ceph-19
@@ -149,6 +164,7 @@ graph LR
         librust-proxmox-compression --> proxmox
         librust-proxmox-acme --> proxmox
         librust-proxmox-api-macro --> proxmox
+        librust-proxmox-apt-api-types --> proxmox
         unknown_pkg
     end
 
