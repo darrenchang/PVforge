@@ -52,7 +52,8 @@ graph LR
     %% Tier2
     subgraph T2["Tier 2 – Cluster Infrastructure"]
         debcargo-conf --> pxar
-        proxmox-widget-toolkit --> pve-docs
+        perlmod --> perlmod-rs
+        unknown_pkg --> proxmox-acme
         unknown_pkg --> pve-cluster
         unknown_pkg --> pve-apiclient
         unknown_pkg --> pve-guest-common
@@ -77,7 +78,6 @@ graph LR
         unknown_pkg --> roxmox-rrd-migration-tool
         unknown_pkg --> roxmox-websocket-tunnel
         unknown_pkg --> ve-firmware
-        unknown_pkg --> proxmox-acme
         unknown_pkg --> proxmox-ve-rs
     end
 
@@ -87,7 +87,9 @@ graph LR
         proxmox-acme --> roxmox-backup-meta
         proxmox-acme --> roxmox-backup-qemu
         proxmox-acme --> roxmox-backup-restore-image
+        perlmod-rs --> proxmox-perl-rs
         proxmox-acme --> proxmox-perl-rs
+        debcargo-conf --> proxmox-perl-rs
     end
 
     %% Tier 4
@@ -97,25 +99,27 @@ graph LR
 
     %% Tier 5
     subgraph T5["Tier 5 – Cluster Infrastructure"]
+        proxmox-widget-toolkit --> pve-docs
+        pve-common --> pve-docs
         pve-common --> pve-access-control
         pve-common --> pve-http-server
         pve-common --> pve-installer
         perlmod --> proxmox-perl-rs
+    end
+
+    %% Tier 6
+    subgraph T6["Tier 6 – Cluster Infrastructure"]
+        pve-docs --> qemu-server
         pve-common --> qemu-server
         pve-guest-common --> qemu-server
         pve-apiclient --> qemu-server
         pve-cluster --> qemu-server
         pve-network --> qemu-server
         pve-storage --> qemu-server
-        pve-docs --> qemu-server
         pve-edk2-firmware --> qemu-server
         pve-firewall --> qemu-server
         pve-ha-manager --> qemu-server
         proxmox-firewall --> qemu-server
-    end
-
-    %% Tier 6
-    subgraph T6["Tier 6 – Cluster Infrastructure"]
         pve-access-control --> pve-qemu
         ceph-19 --> librados2-perl
         pve-access-control --> librados2-perl
