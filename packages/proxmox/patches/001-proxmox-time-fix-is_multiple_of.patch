@@ -1,0 +1,12 @@
+diff --git a/proxmox-time/src/date_time_value.rs b/proxmox-time/src/date_time_value.rs
+--- a/proxmox-time/src/date_time_value.rs
++++ b/proxmox-time/src/date_time_value.rs
+@@ -16,7 +16,7 @@ impl DateTimeValue {
+                 if value >= *start {
+                     if *repetition > 0 {
+                         let offset = value - start;
+-                        let res = offset.is_multiple_of(*repetition);
++                        let res = offset % *repetition == 0;
+                         if let Some(end) = opt_end {
+                             res && value <= *end
+                         } else {

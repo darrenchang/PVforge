@@ -1,0 +1,7 @@
+patches/001-proxmox-time-fix-is_multiple_of.patch
+patches/002-proxmox-api-macro-skip-tests.patch
+patches/003-proxmox-schema-skip-tests.patch
+patches/005-proxmox-api-macro-use-rust-185-code.patch
+patches/006-proxmox-section-config-fix-unstable-let-expression.patch
+patches/007-proxmox-config-digest-fix-unstable-let-expression.patch
+

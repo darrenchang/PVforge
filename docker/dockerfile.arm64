@@ -45,6 +45,8 @@ RUN apt update && \
 RUN apt update && \
     apt -y install \
     libgit2-dev \
+    # librust-proxmox \
+    librust-ureq-dev \
     # ceph-18 build dependencies \
     libopentracing-dev \
     libthrift-dev \

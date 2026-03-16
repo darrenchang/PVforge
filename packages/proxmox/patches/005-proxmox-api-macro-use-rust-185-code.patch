@@ -1,0 +1,203 @@
+diff --git a/proxmox-api-macro/src/api/enums.rs b/proxmox-api-macro/src/api/enums.rs
+index 101a518b..1c239a53 100644
+--- a/proxmox-api-macro/src/api/enums.rs
++++ b/proxmox-api-macro/src/api/enums.rs
+@@ -140,17 +140,17 @@ fn handle_string_enum(
+             syn::LitStr::new(&name.to_string(), name.span())
+         };
+ 
+-        if derives_default
+-            && let Some(attr) = variant.attrs.iter().find(|a| a.path().is_ident("default"))
+-        {
+-            if let Some(default_value) = &default_value {
+-                error!(attr => "multiple default values defined");
+-                error!(default_value => "default previously defined here");
+-            } else {
+-                default_value = Some(variant_string.clone());
+-                if let Some(span) = has_default_attrib {
+-                    error!(attr => "#[default] attribute in use with 'default' #[api] key");
+-                    error!(span, "'default' also defined here");
++        if derives_default {
++            if let Some(attr) = variant.attrs.iter().find(|a| a.path().is_ident("default")) {
++                if let Some(default_value) = &default_value {
++                    error!(attr => "multiple default values defined");
++                    error!(default_value => "default previously defined here");
++                } else {
++                    default_value = Some(variant_string.clone());
++                    if let Some(span) = has_default_attrib {
++                        error!(attr => "#[default] attribute in use with 'default' #[api] key");
++                        error!(span, "'default' also defined here");
++                    }
+                 }
+             }
+         }
+diff --git a/proxmox-api-macro/src/api/method.rs b/proxmox-api-macro/src/api/method.rs
+index 980e4880..0fe2cf42 100644
+--- a/proxmox-api-macro/src/api/method.rs
++++ b/proxmox-api-macro/src/api/method.rs
+@@ -493,26 +493,28 @@ fn handle_function_signature(method_info: &mut MethodInfo) -> Result<Ident, Erro
+ }
+ 
+ fn is_api_method_type(ty: &syn::Type) -> bool {
+-    if let syn::Type::Reference(r) = ty
+-        && let syn::Type::Path(p) = &*r.elem
+-    {
+-        if p.qself.is_some() {
+-            return false;
+-        }
+-        if let Some(ps) = p.path.segments.last() {
+-            return ps.ident == "ApiMethod";
++    if let syn::Type::Reference(r) = ty {
++        if let syn::Type::Path(p) = &*r.elem {
++            if p.qself.is_some() {
++                return false;
++            }
++            if let Some(ps) = p.path.segments.last() {
++                return ps.ident == "ApiMethod";
++            }
+         }
+     }
+     false
+ }
+ 
+ fn is_rpc_env_type(ty: &syn::Type) -> bool {
+-    if let syn::Type::Reference(r) = ty
+-        && let syn::Type::TraitObject(t) = &*r.elem
+-        && let Some(syn::TypeParamBound::Trait(b)) = t.bounds.first()
+-        && let Some(ps) = b.path.segments.last()
+-    {
+-        return ps.ident == "RpcEnvironment";
++    if let syn::Type::Reference(r) = ty {
++        if let syn::Type::TraitObject(t) = &*r.elem {
++            if let Some(syn::TypeParamBound::Trait(b)) = t.bounds.first() {
++                if let Some(ps) = b.path.segments.last() {
++                    return ps.ident == "RpcEnvironment";
++                }
++            }
++        }
+     }
+     false
+ }
+@@ -943,16 +945,16 @@ struct DefaultParameters<'a>(&'a Schema);
+ 
+ impl VisitMut for DefaultParameters<'_> {
+     fn visit_expr_mut(&mut self, i: &mut syn::Expr) {
+-        if let syn::Expr::Macro(exprmac) = i
+-            && exprmac.mac.path.is_ident("api_get_default")
+-        {
+-            // replace api_get_default macros with the actual default found in the #[api]
+-            // macro.
+-            match self.get_default(mem::take(&mut exprmac.mac.tokens)) {
+-                Ok(expr) => *i = expr,
+-                Err(err) => {
+-                    *i = syn::Expr::Verbatim(err.to_compile_error());
+-                    return;
++        if let syn::Expr::Macro(exprmac) = i {
++            if exprmac.mac.path.is_ident("api_get_default") {
++                // replace api_get_default macros with the actual default found in the #[api]
++                // macro.
++                match self.get_default(mem::take(&mut exprmac.mac.tokens)) {
++                    Ok(expr) => *i = expr,
++                    Err(err) => {
++                        *i = syn::Expr::Verbatim(err.to_compile_error());
++                        return;
++                    }
+                 }
+             }
+         }
+diff --git a/proxmox-api-macro/src/serde.rs b/proxmox-api-macro/src/serde.rs
+index 345b3f2e..0412b945 100644
+--- a/proxmox-api-macro/src/serde.rs
++++ b/proxmox-api-macro/src/serde.rs
+@@ -229,10 +229,10 @@ impl FieldAttrib {
+     }
+ 
+     pub fn check_non_option_type(&self) {
+-        if let Some(span) = self.has_skip_serializing_if
+-            && !self.has_default
+-        {
+-            error!(span, "`skip_serializing_if` without `default`");
++        if let Some(span) = self.has_skip_serializing_if {
++            if !self.has_default {
++                error!(span, "`skip_serializing_if` without `default`");
++            }
+         }
+     }
+ }
+diff --git a/proxmox-api-macro/src/util.rs b/proxmox-api-macro/src/util.rs
+index db2acdf2..9ed3fa0b 100644
+--- a/proxmox-api-macro/src/util.rs
++++ b/proxmox-api-macro/src/util.rs
+@@ -434,17 +434,18 @@ pub fn derive_descriptions(
+ 
+     let mut parts = doc_comment.split("\nReturns:");
+ 
+-    if let Some(first) = parts.next()
+-        && input_schema.description.is_none()
+-    {
+-        input_schema.description = Maybe::Derived(syn::LitStr::new(first.trim(), doc_span));
++    if let Some(first) = parts.next() {
++        if input_schema.description.is_none() {
++            input_schema.description = Maybe::Derived(syn::LitStr::new(first.trim(), doc_span));
++        }
+     }
+ 
+     if let Some(second) = parts.next() {
+-        if let Some(returns_schema) = returns_schema
+-            && returns_schema.description.is_none()
+-        {
+-            returns_schema.description = Maybe::Derived(syn::LitStr::new(second.trim(), doc_span));
++        if let Some(returns_schema) = returns_schema {
++            if returns_schema.description.is_none() {
++                returns_schema.description =
++                    Maybe::Derived(syn::LitStr::new(second.trim(), doc_span));
++            }
+         }
+ 
+         if parts.next().is_some() {
+@@ -518,11 +519,12 @@ pub fn is_option_type(ty: &syn::Type) -> Option<&syn::Type> {
+             return None;
+         }
+ 
+-        if let syn::PathArguments::AngleBracketed(generic) = &segs.last().unwrap().arguments
+-            && generic.args.len() == 1
+-            && let syn::GenericArgument::Type(ty) = generic.args.first().unwrap()
+-        {
+-            return Some(ty);
++        if let syn::PathArguments::AngleBracketed(generic) = &segs.last().unwrap().arguments {
++            if generic.args.len() == 1 {
++                if let syn::GenericArgument::Type(ty) = generic.args.first().unwrap() {
++                    return Some(ty);
++                }
++            }
+         }
+     }
+     None
+@@ -745,19 +747,19 @@ where
+         for arg in std::mem::take(&mut args).into_pairs() {
+             match arg {
+                 Pair::Punctuated(item, punct) => {
+-                    if let syn::Meta::Path(path) = &item
+-                        && !func(path)
+-                    {
+-                        continue;
++                    if let syn::Meta::Path(path) = &item {
++                        if !func(path) {
++                            continue;
++                        }
+                     }
+                     args.push_value(item);
+                     args.push_punct(punct);
+                 }
+                 Pair::End(item) => {
+-                    if let syn::Meta::Path(path) = &item
+-                        && !func(path)
+-                    {
+-                        continue;
++                    if let syn::Meta::Path(path) = &item {
++                        if !func(path) {
++                            continue;
++                        }
+                     }
+                     args.push_value(item);
+                 }

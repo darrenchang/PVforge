@@ -1,0 +1,22 @@
+diff --git a/proxmox-schema/Cargo.toml b/proxmox-schema/Cargo.toml
+index 4844188c..9af39896 100644
+--- a/proxmox-schema/Cargo.toml
++++ b/proxmox-schema/Cargo.toml
+@@ -23,17 +23,14 @@ textwrap = "0.16"
+ libc = { workspace = true, optional = true }
+ nix = { workspace = true, optional = true, features = [ "feature" ] }
+ 
+-proxmox-api-macro = { workspace = true, optional = true }
+ 
+ [dev-dependencies]
+ url.workspace = true
+ serde = { workspace = true, features = [ "derive" ] }
+-proxmox-api-macro.workspace = true
+ 
+ [features]
+ default = []
+ 
+-api-macro = ["dep:proxmox-api-macro"]
+ upid-api-impl = [ "dep:libc", "dep:nix" ]
+ api-types = [ "dep:const_format" ]
+ 

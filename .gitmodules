@@ -244,3 +244,12 @@
 [submodule "packages/cargo/cargo"]
 	path = packages/cargo/cargo
 	url = https://github.com/rust-lang/cargo.git
+[submodule "packages/debcargo-conf/proxmox-acme-rs"]
+	path = packages/debcargo-conf/proxmox-acme-rs
+	url = https://git.proxmox.com/git/proxmox-acme-rs
+[submodule "packages/debcargo-conf/proxmox"]
+	path = packages/debcargo-conf/proxmox
+	url = https://git.proxmox.com/git/proxmox
+[submodule "packages/proxmox/proxmox"]
+	path = packages/proxmox/proxmox
+	url = https://git.proxmox.com/git/proxmox

@@ -8,10 +8,70 @@ graph LR
         openssl
         openssl-probe
         url
+        http-body-util
+        httparse
+        httparse --> hyper
+        hyper --> hyper-util
+        native-tls
+        futures
+        js-sys
+        zstd
+        const-format
+        env-logger
+        tar
+        walkdir
+        sync-wrapper
+        tokio-openssl
+        textwarp
         serde
         serde-bytes
         endian-trait-derive
         endian-trait-derive --> endian-trait
+        librust-proxmox-base64
+        librust-proxmox-io
+        librust-proxmox-lang
+        librust-proxmox-time
+        librust-proxmox-sys
+        zstd --> librust-proxmox-sys
+        env-logger --> librust-proxmox-router
+        librust-proxmox-schema --> librust-proxmox-router
+        librust-proxmox-http --> librust-proxmox-router
+        librust-proxmox-http-error --> librust-proxmox-router
+        librust-proxmox-sys --> librust-proxmox-product-config
+        librust-proxmox-api-macro
+        librust-proxmox-section-config
+        librust-proxmox-section-config --> librust-proxmox-api-macro
+        const-format --> librust-proxmox-schema
+        librust-proxmox-api-macro --> librust-proxmox-schema
+        textwrap --> librust-proxmox-schema
+        librust-proxmox-rate-limiter
+        librust-shared-memory
+        librust-shared-cache
+        librust-shared-memory --> librust-proxmox-rate-limiter
+        librust-proxmox-product-config --> librust-proxmox-schema
+        librust-proxmox-api-macro --> librust-proxmox-schema
+        librust-proxmox-router --> librust-proxmox-schema
+        librust-proxmox-schema --> librust-promxox-time-api
+        js-sys --> librust-proxmox-time
+        librust-proxmox-lang --> librust-proxmox-async
+        librust-proxmox-http-error
+        futures --> librust-proxmox-http
+        hyper-util --> librust-proxmox-http
+        native-tls --> librust-proxmox-http
+        sync-wrapper --> librust-proxmox-http
+        tokio-openssl --> librust-proxmox-http
+        librust-proxmox-http --> librust-proxmox-http-error
+        librust-proxmox-rate-limiter --> librust-proxmox-http
+        librust-proxmox-compression
+        walkdir --> librust-proxmox-compression
+        tar --> librust-proxmox-compression
+        librust-proxmox-time --> librust-proxmox-compression
+        librust-proxmox-async --> librust-proxmox-http
+        librust-proxmox-io --> librust-proxmox-http
+        librust-proxmox-base64 --> librust-proxmox-acme
+        librust-proxmox-http --> librust-proxmox-acme
+        http-body-util --> librust-proxmox-acme
+        hyper --> librust-proxmox-acme
     end
 
     %% Tier 1 - Foundations (no compile dependencies)
@@ -53,11 +113,42 @@ graph LR
         openssl --> debcargo-conf
         openssl-probe --> debcargo-conf
         url --> debcargo-conf
+        http-body-util --> debcargo-conf
+        httparse --> debcargo-conf
+        hyper --> debcargo-conf
+        hyper-util --> debcargo-conf
+        native-tls --> debcargo-conf
+        futures --> debcargo-conf
+        js-sys --> debcargo-conf
+        zstd --> debcargo-conf
+        const-format --> debcargo-conf
+        env-logger --> debcargo-conf
+        tar --> debcargo-conf
+        walkdir --> debcargo-conf
+        sync-wrapper --> debcargo-conf
+        tokio-openssl --> debcargo-conf
+        textwarp --> debcargo-conf
         serde --> debcargo-conf
         endian-trait-derive --> debcargo-conf
         endian-trait --> debcargo-conf
         ceph-19
         perlmod
+        librust-proxmox-base64 --> proxmox
+        librust-proxmox-io --> proxmox
+        librust-proxmox-lang --> proxmox
+        librust-proxmox-time --> proxmox
+        librust-promxox-time-api --> proxmox
+        librust-proxmox-sys --> proxmox
+        librust-proxmox-router --> proxmox
+        librust-proxmox-product-config --> proxmox
+        librust-proxmox-schema --> proxmox
+        librust-proxmox-http --> proxmox
+        librust-proxmox-http-error --> proxmox
+        librust-proxmox-rate-limiter --> proxmox
+        librust-proxmox-async --> proxmox
+        librust-proxmox-compression --> proxmox
+        librust-proxmox-acme --> proxmox
+        librust-proxmox-api-macro --> proxmox
         unknown_pkg
     end
 
@@ -136,7 +227,7 @@ graph LR
         pve-access-control --> pve-container
     end
 
-    %% Tier7 
+    %% Tier 7
     subgraph T7["Tier 7 – Cluster Infrastructure"]
         proxmox-archive-keyring --> proxmox-ve
         proxmox-kernel-helper --> proxmox-ve
@@ -144,6 +235,5 @@ graph LR
         pve-qemu --> proxmox-ve
         pve-qemu --> spiceterm
         pve-server --> proxmox-ve
-        librados2-perl --> proxmox
     end
 
