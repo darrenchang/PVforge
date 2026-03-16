@@ -1,0 +1,9 @@
+diff --git a/Makefile b/Makefile
+--- a/Makefile
++++ b/Makefile
+@@ -147,7 +147,7 @@ pve-admin-guide.epub: $(PVE_ADMIN_GUIDE_ADOCDEPENDS)
+ 	rm -rf $@.tmp $@
+ 	mkdir $@.tmp
+-	a2x -D $@.tmp -f epub --asciidoc-opts="$(PVE_DOCBOOK_CONF)" pve-admin-guide.adoc
++	a2x -D $@.tmp -f epub --no-xmllint --asciidoc-opts="$(PVE_DOCBOOK_CONF)" pve-admin-guide.adoc
+ 	mv $@.tmp/$@ $@

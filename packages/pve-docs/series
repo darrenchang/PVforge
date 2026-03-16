@@ -1,1 +1,2 @@
 patches/001-relax-dep-asciidoc-base.patch
+patches/002-epub-skip-xmllint.patch
