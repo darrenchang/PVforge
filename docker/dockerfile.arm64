@@ -64,11 +64,17 @@ RUN apt update && \
     librust-hex-dev \
     librust-http-dev \
     librust-http-0.2-dev \
-    # pve-xtermjs
+    # pve-xtermjs \
     librust-form-urlencoded-dev \
     librust-mio-dev \
     librust-nix-dev \
     librust-pico-args-dev \
+    # pve-doc \
+    asciidoc-dblatex \
+    asciidoc-base \
+    imagemagick-7.q16 \
+    librsvg2-bin \
+    source-highlight \
     && \
     apt autoremove --purge -y && \
     apt clean && \
