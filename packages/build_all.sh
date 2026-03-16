@@ -9,7 +9,8 @@ log_build_name(){
 
 extract_subgraph_packages() {
   local file="${1:-deptree.mmd}"
-  grep -vE '^\s*(%%|subgraph|end|graph|---|title)' "$file" \
+  awk '/subgraph T0\[/{skip=1} skip{if(/^\s*end\s*$/)skip=0; next} 1' "$file" \
+      | grep -vE '^\s*(%%|subgraph|end|graph|---|title)' \
       | grep -E '^\s*\S' \
       | awk '{print $NF}' \
       | awk '!seen[$0]++'
