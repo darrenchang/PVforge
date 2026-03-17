@@ -1,0 +1,14 @@
+diff --git a/src/wasm-bindgen/debian/changelog b/src/wasm-bindgen/debian/changelog
+index cf85b973af..c00c26c409 100644
+--- a/src/wasm-bindgen/debian/changelog
++++ b/src/wasm-bindgen/debian/changelog
+@@ -1,3 +1,9 @@
++rust-wasm-bindgen (0.2.114) unstable; urgency=medium
++
++  * Upgrade version
++
++ -- Darren <darrenchang951@gmail.com>  Tue, 17 Mar 2026 15:39:18 +0800
++
+ rust-wasm-bindgen (0.2.99-1) unstable; urgency=medium
+ 
+   * Team upload.

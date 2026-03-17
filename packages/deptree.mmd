@@ -27,6 +27,11 @@ graph LR
         serde
         serde-bytes
         serde-plain
+        tracing-journald
+        handlebars
+        serde-with
+        regex
+        pam
         endian-trait-derive
         endian-trait-derive --> endian-trait
         librust-proxmox-base64
@@ -51,18 +56,77 @@ graph LR
         librust-proxmox-rate-limiter
         librust-shared-memory
         librust-shared-cache
+        base64urlsafedata
+        compact-jwt
+        openssl-macros --> compact-jwt
+        openssl-sys --> compact-jwt
+        der-parser
+        serde-cbor
+        serde-cbor-2
+        webauthn-attestation-ca
+        serde-wasm-bindgen
+        rustversion
+        wasm-bindgen-macro-support
+        wasm-bindgen-macro
+        wasm-bindgen-macro-support --> wasm-bindgen-macro
+        wasm-bindgen-shared
+        wasm-bindgen-shared --> wasm-bindgen-macro-support
+        rustversion --> wasm-bindgen
+        wasm-bindgen-macro --> wasm-bindgen
+        wasm-bindgen-shared --> wasm-bindgen
+        wasm-bindgen
+        web-sys
+        js-sys
+        js-sys --> web-sys
+        serde-wasm-bindgen --> webauthn-rs-proto
+        wasm-bindgen --> webauthn-rs-proto
+        web-sys --> webauthn-rs-proto
+        x509-parser
+        webauthn-rs-core
+        x509-parser --> webauthn-rs-core
+        webauthn-attestation-ca --> webauthn-rs-core
+        webauthn-rs-proto --> webauthn-rs-core
+        serde-cbor --> webauthn-rs-core
+        serde-cbor-2 --> webauthn-rs-core
+        webauthn-attenstation-ca --> webauthn-rs-core
+        webauthn-rs
+        webauthn-rs-core --> webauthn-rs
         librust-shared-memory --> librust-proxmox-rate-limiter
         librust-proxmox-product-config --> librust-proxmox-schema
         librust-proxmox-api-macro --> librust-proxmox-schema
         librust-proxmox-router --> librust-proxmox-schema
         librust-proxmox-schema --> librust-promxox-time-api
-        pbs-api-types
+        librust-pbs-api-types
         librust-proxmox-apt-api-types
         proxmox-config-digest
-        proxmox-serde
+        librust-proxmox-serde
+        librust-proxmox-string
         proxmox-config-digest --> librust-proxmox-apt-api-types
-        proxmox-serde --> librust-proxmox-apt-api-types
-        librust-proxmox-apt-api-types --> pbs-api-types
+        librust-proxmox-serde --> librust-proxmox-apt-api-types
+        librust-proxmox-fixed-string --> librust-proxmox-apt-api-types
+        librust-proxmox-apt-api-types --> librust-pbs-api-types
+        librust-proxmox-log
+        librust-proxmox-daemon
+        librust-proxmox-network-types
+        librust-proxmox-worker-task
+        librust-proxmox-uuid
+        serde --> librust-proxmox-network-types
+        serde-with --> librust-proxmox-network-types
+        regex --> librust-proxmox-network-types
+        librust-proxmox-systemd
+        librust-proxmox-systemd --> librust-proxmox-daemon
+        tracing-journald --> librust-proxmox-log
+        librust-proxmox-rest-server
+        handlebars --> librust-proxmox-rest-server
+        librust-proxmox-worker-task --> librust-proxmox-rest-server
+        librust-proxmox-network-types --> librust-proxmox-rest-server
+        librust-proxmox-daemon --> librust-proxmox-rest-server
+        librust-proxmox-acme-api
+        librust-proxmox-rest-server --> librust-proxmox-acme-api
+        librust-proxmox-log --> librust-proxmox-acme-api
+        librust-proxmox-uuid --> librust-proxmox-acme-api
+        librust-proxmox-tfa
+        webauthn-rs --> librust-proxmox-tfa
         js-sys --> librust-proxmox-time
         librust-proxmox-lang --> librust-proxmox-async
         librust-proxmox-http-error

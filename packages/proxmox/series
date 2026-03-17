@@ -4,4 +4,10 @@ patches/003-proxmox-schema-skip-tests.patch
 patches/005-proxmox-api-macro-use-rust-185-code.patch
 patches/006-proxmox-section-config-fix-unstable-let-expression.patch
 patches/007-proxmox-config-digest-fix-unstable-let-expression.patch
+patches/008-proxmox-fixed-string-downgrade-rust-dep-version.patch
+patches/009-proxmox-fixed-string-use-old-syntax.patch
+patches/010-proxmox-apt-api-types-fix-depedency-version.patch
+patches/011-proxmox-network-types-fix-depedency-version.patch
+patches/012-proxmox-rest-server-fix-depedency.patch
+patches/013-proxmox-acme-api-fix-depedency.patch
 

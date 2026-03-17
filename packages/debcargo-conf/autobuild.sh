@@ -37,6 +37,29 @@ RUST_LIBS=(
     "serde:serde"
     "serde-bytes:serde_bytes"
     "serde-plain:serde_plain"
+    "tracing-journald:tracing-journald"
+    "handlebars:handlebars"
+    "serde-with:serde-with"
+    "regex:regex"
+    "base64urlsafedata:base64urlsafedata"
+    "openssl-macros:openssl-macros"
+    "openssl-sys:openssl-sys"
+    "compact-jwt:compact_jwt"
+    "der-parser:der-parser"
+    "serde-cbor:serde_cbor"
+    "serde-cbor-2:serde_cbor_2"
+    "webauthn-attestation-ca:webauthn-attestation-ca"
+    "serde-wasm-bindgen:serde-wasm-bindgen"
+    "rustversion:rustversion"
+    "wasm-bindgen-shared:wasm-bindgen-shared"
+    "wasm-bindgen-macro-support:wasm-bindgen-macro-support"
+    "wasm-bindgen-macro:wasm-bindgen-macro"
+    "wasm-bindgen:wasm-bindgen"
+    "js-sys:js-sys"
+    "web-sys:web-sys"
+    "webauthn-rs-proto:webauthn-rs-proto"
+    "webauthn-rs-core:webauthn-rs-core"
+    "webauthn-rs:webauthn-rs"
     "endian-trait-derive:endian_trait_derive"
     "endian-trait:endian_trait"
     "rustyline:rustyline"
@@ -50,7 +73,7 @@ for entry in "${RUST_LIBS[@]}"; do
   (
     cd build/${rust_lib}/
     pwd
-    yes |mk-build-deps --install --remove
+    yes |mk-build-deps --install --remove; \
     dpkg-buildpackage -b -us -uc
   )
   mkdir -p /tmp/${PKGNAME}-temp
@@ -58,7 +81,7 @@ for entry in "${RUST_LIBS[@]}"; do
   for deb_pkg in $(find $(pwd)/build/ -name *.deb); do
     cp ${deb_pkg} "/tmp/${PKGNAME}-temp/"
     cp ${deb_pkg} "/tmp/${PKGNAME}/"
-    apt install -y --allow-downgrades /tmp/${PKGNAME}-temp/*.deb --reinstall
+    apt install --reinstall -y --allow-downgrades $(ls /pxvirt/packages/debcargo-conf/debcargo-conf/build/librust-compact-jwt*.deb | grep -v -- 'compact-jwt+msextensions-dev\|-abcdtz_')
   done
   rm -rf /tmp/${PKGNAME}-temp
 done

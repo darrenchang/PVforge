@@ -1,0 +1,13 @@
+diff --git a/proxmox-acme/Cargo.toml b/proxmox-acme/Cargo.toml
+index 1d86ba3b..666f3da3 100644
+--- a/proxmox-acme/Cargo.toml
++++ b/proxmox-acme/Cargo.toml
+@@ -22,7 +22,7 @@ openssl = { workspace = true, optional = true }
+ http = { workspace = true, optional = true }
+ 
+ proxmox-base64 = { workspace = true, features = [ "serde" ] }
+-proxmox-schema = { workspace = true, optional = true, features = [ "api-macro" ] }
++proxmox-schema = { workspace = true, optional = true }
+ proxmox-http = { workspace = true, optional = true, features = [ "client" ] }
+ anyhow = { workspace = true, optional = true }
+ bytes = { workspace = true, optional = true }

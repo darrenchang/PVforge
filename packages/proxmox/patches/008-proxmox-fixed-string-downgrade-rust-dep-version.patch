@@ -1,0 +1,26 @@
+diff --git a/proxmox-fixed-string/Cargo.toml b/proxmox-fixed-string/Cargo.toml
+index 455160cf..ff56d9f6 100644
+--- a/proxmox-fixed-string/Cargo.toml
++++ b/proxmox-fixed-string/Cargo.toml
+@@ -7,7 +7,7 @@ license.workspace = true
+ repository.workspace = true
+ homepage.workspace = true
+ exclude.workspace = true
+-rust-version = "1.87"
++rust-version = "1.85"
+ 
+ [dependencies]
+ serde.workspace = true
+diff --git a/proxmox-fixed-string/debian/control b/proxmox-fixed-string/debian/control
+index 80d2eea4..301f6a26 100644
+--- a/proxmox-fixed-string/debian/control
++++ b/proxmox-fixed-string/debian/control
+@@ -4,7 +4,7 @@ Priority: optional
+ Build-Depends: debhelper-compat (= 13),
+  dh-sequence-cargo
+ Build-Depends-Arch: cargo:native <!nocheck>,
+- rustc:native (>= 1.87) <!nocheck>,
++ rustc:native (>= 1.85) <!nocheck>,
+  libstd-rust-dev <!nocheck>,
+  librust-serde-1+default-dev <!nocheck>,
+  librust-serde-plain-1+default-dev <!nocheck>

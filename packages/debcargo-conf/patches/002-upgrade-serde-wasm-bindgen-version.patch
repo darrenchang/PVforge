@@ -1,0 +1,14 @@
+diff --git a/src/serde-wasm-bindgen/debian/changelog b/src/serde-wasm-bindgen/debian/changelog
+index e49854db7b..0d7e1fa80c 100644
+--- a/src/serde-wasm-bindgen/debian/changelog
++++ b/src/serde-wasm-bindgen/debian/changelog
+@@ -1,3 +1,9 @@
++rust-serde-wasm-bindgen (0.6.5-1~bpo13+pve1) proxmox-rust; urgency=medium
++
++  * Upgrade verseion
++
++ -- Darren <darrenchang951@gmail.com>  Tue, 17 Mar 2026 15:01:08 +0800
++
+ rust-serde-wasm-bindgen (0.5.0-1~bpo13+pve1) proxmox-rust; urgency=medium
+ 
+   * Rebuild for Debian Trixie / Proxmox
