@@ -40,6 +40,7 @@ RUST_LIBS=(
     "tracing-journald:tracing-journald"
     "handlebars:handlebars"
     "serde-with:serde-with"
+    "pam:pam"
     "regex:regex"
     "base64urlsafedata:base64urlsafedata"
     "openssl-macros:openssl-macros"
