@@ -12,7 +12,7 @@ index 0ccdecc1fe..79ee787fb2 100644
  
    * Rebuild for Debian Trixie / Proxmox
 diff --git a/src/web-sys/debian/control b/src/web-sys/debian/control
-index caa80761a3..12dacd3c98 100644
+index caa80761a3..b8152b3073 100644
 --- a/src/web-sys/debian/control
 +++ b/src/web-sys/debian/control
 @@ -6,13 +6,9 @@ Build-Depends: debhelper-compat (= 13),
@@ -42,6 +42,43 @@ index caa80761a3..12dacd3c98 100644
   librust-wasm-bindgen-0.2-dev (>= 0.2.99-~~)
  Recommends:
   librust-web-sys+std-dev (= ${binary:Version})
+@@ -43,6 +37,36 @@ Provides:
+  librust-web-sys-0.3+addeventlisteneroptions-dev (= ${binary:Version}),
+  librust-web-sys-0.3+animationevent-dev (= ${binary:Version}),
+  librust-web-sys-0.3+attr-dev (= ${binary:Version}),
++ librust-web-sys-0.3+authenticationextensionsclientinputs-dev (= ${binary:Version}),
++ librust-web-sys-0.3+authenticationextensionsclientinputsjson-dev (= ${binary:Version}),
++ librust-web-sys-0.3+authenticationextensionsclientoutputs-dev (= ${binary:Version}),
++ librust-web-sys-0.3+authenticationextensionsclientoutputsjson-dev (= ${binary:Version}),
++ librust-web-sys-0.3+authenticationextensionsdevicepublickeyinputs-dev (= ${binary:Version}),
++ librust-web-sys-0.3+authenticationextensionsdevicepublickeyoutputs-dev (= ${binary:Version}),
++ librust-web-sys-0.3+authenticationextensionslargeblobinputs-dev (= ${binary:Version}),
++ librust-web-sys-0.3+authenticationextensionslargebloboutputs-dev (= ${binary:Version}),
++ librust-web-sys-0.3+authenticationextensionsprfinputs-dev (= ${binary:Version}),
++ librust-web-sys-0.3+authenticationextensionsprfoutputs-dev (= ${binary:Version}),
++ librust-web-sys-0.3+authenticationextensionsprfvalues-dev (= ${binary:Version}),
++ librust-web-sys-0.3+credential-dev (= ${binary:Version}),
++ librust-web-sys-0.3+credentialcreationoptions-dev (= ${binary:Version}),
++ librust-web-sys-0.3+credentialpropertiesoutput-dev (= ${binary:Version}),
++ librust-web-sys-0.3+credentialrequestoptions-dev (= ${binary:Version}),
++ librust-web-sys-0.3+credentialscontainer-dev (= ${binary:Version}),
++ librust-web-sys-0.3+publickeycredential-dev (= ${binary:Version}),
++ librust-web-sys-0.3+publickeycredentialcreationoptions-dev (= ${binary:Version}),
++ librust-web-sys-0.3+publickeycredentialcreationoptionsjson-dev (= ${binary:Version}),
++ librust-web-sys-0.3+publickeycredentialdescriptor-dev (= ${binary:Version}),
++ librust-web-sys-0.3+publickeycredentialdescriptorjson-dev (= ${binary:Version}),
++ librust-web-sys-0.3+publickeycredentialentity-dev (= ${binary:Version}),
++ librust-web-sys-0.3+publickeycredentialhints-dev (= ${binary:Version}),
++ librust-web-sys-0.3+publickeycredentialparameters-dev (= ${binary:Version}),
++ librust-web-sys-0.3+publickeycredentialrequestoptions-dev (= ${binary:Version}),
++ librust-web-sys-0.3+publickeycredentialrequestoptionsjson-dev (= ${binary:Version}),
++ librust-web-sys-0.3+publickeycredentialrpentity-dev (= ${binary:Version}),
++ librust-web-sys-0.3+publickeycredentialtype-dev (= ${binary:Version}),
++ librust-web-sys-0.3+publickeycredentialuserentity-dev (= ${binary:Version}),
++ librust-web-sys-0.3+publickeycredentialuserentityjson-dev (= ${binary:Version}),
+  librust-web-sys-0.3+audiobuffer-dev (= ${binary:Version}),
+  librust-web-sys-0.3+audiobuffersourcenode-dev (= ${binary:Version}),
+  librust-web-sys-0.3+audiocontext-dev (= ${binary:Version}),
 diff --git a/src/web-sys/debian/control.debcargo.hint b/src/web-sys/debian/control.debcargo.hint
 index 4885eefcc4..0dbb78041f 100644
 --- a/src/web-sys/debian/control.debcargo.hint
