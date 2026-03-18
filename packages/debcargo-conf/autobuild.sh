@@ -69,12 +69,17 @@ RUST_LIBS=(
     "rustyline:rustyline"
   )
 
+export CARGO=/usr/local/bin/cargo
+export RUSTC=/usr/local/bin/rustc
+
 for entry in "${RUST_LIBS[@]}"; do
   rust_lib="${entry%%:*}"
   repackage_name="${entry##*:}"
   echo "####################"
   echo "Build start..."
-  echo "Building rust library ${repackage_name}..."
+  echo "Building rust package ${repackage_name}..."
+  echo "CARGO: $($CARGO --version)"
+  echo "RUSTC: $($RUSTC --version)"
   rm -rf ./build/*
   ./repackage.sh ${repackage_name}
   (

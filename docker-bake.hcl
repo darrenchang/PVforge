@@ -19,5 +19,6 @@ target "pvebuilder" {
     BASE_IMAGE = "debian:trixie"
     DEBIAN_VERSION = "trixie"
     DEBIAN_APT = "${DEBIAN_APT}"
+    RUST_VERSION = "1.94.0"
   }
 }
