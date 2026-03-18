@@ -20,10 +20,14 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
+echo $DEBIAN_APT
+export BUILDER_NAME=builder
 docker buildx bake
-docker run --rm -d --name pxvirt_builder pvebuilder /bin/sh -c "sleep infinity";
-docker cp ./ pxvirt_builder:/pxvirt
-docker exec -ti pxvirt_builder bash -c '/pxvirt/packages/build_all.sh';
-docker pxvirt_builder:/logs/ ./
-# docker stop pxvirt_builder;
+docker run --rm -d --name ${BUILDER_NAME} pvebuilder /bin/sh -c "sleep infinity";
+echo "Copying $(du -sh ./) to the container ${BUILDER_NAME}..."
+docker exec ${BUILDER_NAME} bash -c "mkdir /pxvirt/"
+tar -cf - ./ | pv -f -s $(du -sb ./ | cut -f1) | docker exec -i ${BUILDER_NAME} bash -c "tar -xf - -C /pxvirt/"
+# docker exec -ti ${BUILDER_NAME} bash -c '/pxvirt/packages/build_all.sh';
+# docker cp ${BUILDER_NAME}:/logs/ ./
+# docker stop ${BUILDER_NAME};
 
