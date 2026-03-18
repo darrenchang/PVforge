@@ -39,7 +39,7 @@ RUST_LIBS=(
     "serde-plain:serde_plain"
     "tracing-journald:tracing-journald"
     "handlebars:handlebars"
-    "serde-with:serde-with"
+    "serde-with:serde_with"
     "pam:pam"
     "regex:regex"
     "base64urlsafedata:base64urlsafedata"
