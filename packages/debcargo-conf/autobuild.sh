@@ -72,11 +72,16 @@ RUST_LIBS=(
 export CARGO=/usr/local/bin/cargo
 export RUSTC=/usr/local/bin/rustc
 
+TOTAL=${#RUST_LIBS[@]}
+CURRENT=0
+BUILT=()
+FAILED=()
+
 for entry in "${RUST_LIBS[@]}"; do
   rust_lib="${entry%%:*}"
   repackage_name="${entry##*:}"
   echo "####################"
-  echo "Build start..."
+  echo "Build start... [${CURRENT}/${TOTAL}]"
   echo "Building rust package ${repackage_name}..."
   echo "CARGO: $($CARGO --version)"
   echo "RUSTC: $($RUSTC --version)"
@@ -96,6 +101,8 @@ for entry in "${RUST_LIBS[@]}"; do
     apt install --reinstall -y --allow-downgrades $(ls /pxvirt/packages/debcargo-conf/debcargo-conf/build/librust-compact-jwt*.deb | grep -v -- 'compact-jwt+msextensions-dev\|-abcdtz_')
   done
   rm -rf /tmp/${PKGNAME}-temp
-  echo "Build finished for rust library ${repackage_name}..."
+  BUILT+=("${repackage_name}")
+  CURRENT=$((CURRENT + 1))
+  echo "Build finished for rust library ${repackage_name}... [${CURRENT}/${TOTAL}]"
 done
 
