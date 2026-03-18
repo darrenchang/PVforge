@@ -1,7 +1,7 @@
 patches/001-support-rustc-28.patch
 patches/002-upgrade-serde-wasm-bindgen-version.patch
 patches/003-upgrade-js-sys.patch
-patches/004-upgrade-web-sys-version.patch
+patches/004-upgrade-web-sys.patch
 patches/005-upgrade-wasm-bindgen.patch
 patches/006-upgrade-rustversion.patch
 patches/007-upgrade-wasm-bindgen-macro.patch
