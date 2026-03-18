@@ -69,6 +69,9 @@ RUST_LIBS=(
 for entry in "${RUST_LIBS[@]}"; do
   rust_lib="${entry%%:*}"
   repackage_name="${entry##*:}"
+  echo "####################"
+  echo "Build start..."
+  echo "Building rust library ${repackage_name}..."
   rm -rf ./build/*
   ./repackage.sh ${repackage_name}
   (
@@ -85,5 +88,6 @@ for entry in "${RUST_LIBS[@]}"; do
     apt install --reinstall -y --allow-downgrades $(ls /pxvirt/packages/debcargo-conf/debcargo-conf/build/librust-compact-jwt*.deb | grep -v -- 'compact-jwt+msextensions-dev\|-abcdtz_')
   done
   rm -rf /tmp/${PKGNAME}-temp
+  echo "Build finished for rust library ${repackage_name}..."
 done
 
