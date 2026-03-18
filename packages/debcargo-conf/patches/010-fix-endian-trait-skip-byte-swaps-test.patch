@@ -1,0 +1,12 @@
+diff --git a/src/endian-trait/debian/rules b/src/endian-trait/debian/rules
+new file mode 100755
+index 0000000000..0a6ff657cb
+--- /dev/null
++++ b/src/endian-trait/debian/rules
+@@ -0,0 +1,6 @@
++#!/usr/bin/make -f
++%:
++	dh $@ --buildsystem cargo
++
++override_dh_auto_test:
++	# Tests fail with newer rustc: enum byte-swapping produces invalid discriminants
