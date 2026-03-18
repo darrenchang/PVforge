@@ -23,10 +23,30 @@ RUST_LIBS=(
     "openssl:openssl"
     "openssl-probe:openssl-probe"
     "url:url"
+    "futures-core:futures-core"
+    "futures-sink:futures-sink"
+    "futures-channel:futures-channel"
+    "futures-task:futures-task"
+    "futures-macro:futures-macro"
+    "pin-project-lite:pin-project-lite"
+    "slab:slab"
+    "futures-io:futures-io"
+    "futures-util:futures-util"
+    "num-cpus:num_cpus"
+    "futures-executor:futures-executor"
+    "futures:futures"
+    "http-body:http-body"
     "http-body-util:http-body-util"
+    "parking-lot:parking_lot"
+    "tracing-attributes:tracing-attributes"
+    "valuable-derive:valuable-derive"
+    "valuable:valuable"
+    "tracing-core:tracing-core"
+    "tracing:tracing"
+    "socket2:socket2"
+    "tokio:tokio"
     "hyper:hyper"
     "hyper-util:hyper-util"
-    "futures:futures"
     "js-sys:js-sys"
     "zstd:zstd"
     "const-format:const_format"
@@ -83,6 +103,7 @@ for entry in "${RUST_LIBS[@]}"; do
   echo "Building rust package ${repackage_name}..."
   echo "CARGO: $($CARGO --version)"
   echo "RUSTC: $($RUSTC --version)"
+  echo "DEBCARGO: $(debcargo --version)"
   rm -rf ./build/*
   ./repackage.sh ${repackage_name}
   (
@@ -97,7 +118,7 @@ for entry in "${RUST_LIBS[@]}"; do
     cp ${deb_pkg} "/tmp/${PKGNAME}-temp/"
     cp ${deb_pkg} "/tmp/${PKGNAME}/"
   done
-  apt install --reinstall -y --allow-downgrades $(ls /pxvirt/packages/debcargo-conf/debcargo-conf/build/librust-compact-jwt*.deb | grep -v -- 'compact-jwt+msextensions-dev\|-abcdtz_')
+  apt install --reinstall -y --allow-downgrades $(ls /tmp/${PKGNAME}-temp/*.deb | grep -v -- 'compact-jwt+msextensions-dev\|-abcdtz_')
   rm -rf /tmp/${PKGNAME}-temp
   CURRENT=$((CURRENT + 1))
   echo "Build finished for rust library ${repackage_name}... [${CURRENT}/${TOTAL}]"

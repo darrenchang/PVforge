@@ -10,10 +10,53 @@ graph LR
         url
         http-body-util
         httparse
+        tokio
+        hyper
+        socket2
+        tracing
+        tracing-attributes
+        tracing-core
+        tracing-attributes --> tracing
+        valuable-derive
+        valuable
+        valuable-derive --> valuable
+        valuable --> tracing-core
+        tracing-core -- tracing
+        tokio-macros
+        tokio-macros --> tokio
+        tracing --> tokio
+        socket2 --> tokio
+        parking-lot --> tokio
+        tokio --> hyper
         httparse --> hyper
         hyper --> hyper-util
         native-tls
+        slab
         futures
+        futures-core
+        futures-sink
+        futures-channel
+        futures-executor
+        futures-task
+        futures-util
+        futures-macro
+        pin-project-lite
+        futures-io
+        num-cpus
+        pin-project-lite --> futures-util
+        futures-io --> futures-util
+        slab --> futures-util
+        futures-macro --> futures-util
+        futures-task --> futures-executor
+        num-cpus --> futures-executor
+        futures-util --> futures-executor
+        futures-core --> futures-channel
+        futures-sink --> futures-channel
+        futures-channel --> futures
+        futures-executor --> futures
+        http-body
+        http-body --> http-body-util
+        futures --> http-body-util
         js-sys
         zstd
         const-format
@@ -50,6 +93,7 @@ graph LR
         librust-proxmox-api-macro
         librust-proxmox-section-config
         librust-proxmox-section-config --> librust-proxmox-api-macro
+        librust-proxmox-router --> librust-proxmox-api-macro
         const-format --> librust-proxmox-schema
         librust-proxmox-api-macro --> librust-proxmox-schema
         textwrap --> librust-proxmox-schema
