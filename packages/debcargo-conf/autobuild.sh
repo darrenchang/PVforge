@@ -74,8 +74,6 @@ export RUSTC=/usr/local/bin/rustc
 
 TOTAL=${#RUST_LIBS[@]}
 CURRENT=0
-BUILT=()
-FAILED=()
 
 for entry in "${RUST_LIBS[@]}"; do
   rust_lib="${entry%%:*}"
@@ -98,10 +96,9 @@ for entry in "${RUST_LIBS[@]}"; do
   for deb_pkg in $(find $(pwd)/build/ -name *.deb); do
     cp ${deb_pkg} "/tmp/${PKGNAME}-temp/"
     cp ${deb_pkg} "/tmp/${PKGNAME}/"
-    apt install --reinstall -y --allow-downgrades $(ls /pxvirt/packages/debcargo-conf/debcargo-conf/build/librust-compact-jwt*.deb | grep -v -- 'compact-jwt+msextensions-dev\|-abcdtz_')
   done
+  apt install --reinstall -y --allow-downgrades $(ls /pxvirt/packages/debcargo-conf/debcargo-conf/build/librust-compact-jwt*.deb | grep -v -- 'compact-jwt+msextensions-dev\|-abcdtz_')
   rm -rf /tmp/${PKGNAME}-temp
-  BUILT+=("${repackage_name}")
   CURRENT=$((CURRENT + 1))
   echo "Build finished for rust library ${repackage_name}... [${CURRENT}/${TOTAL}]"
 done
