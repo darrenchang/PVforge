@@ -21,12 +21,30 @@ graph LR
         valuable
         valuable-derive --> valuable
         valuable --> tracing-core
-        tracing-core -- tracing
+        tracing-core --> tracing
         tokio-macros
+        signal-hook-registry
         tokio-macros --> tokio
+        signal-hook-registry --> tokio
         tracing --> tokio
         socket2 --> tokio
         parking-lot --> tokio
+        httparse
+        httparse --> hyprr
+        httpdate
+        httpdate --> hyper
+        want
+        want --> hyper
+        h2
+        h2 --> hyper
+        ipnet
+        ipnet --> hyper-util
+        tower-service
+        tower-service --> hyper-util
+        atomic-waker --> h2
+        tokio-util
+        tokio-util --> h2
+        try-lock --> want
         tokio --> hyper
         httparse --> hyper
         hyper --> hyper-util
@@ -59,19 +77,67 @@ graph LR
         futures --> http-body-util
         js-sys
         zstd
+        zstd-safe
+        zstd-sys
+        zstd-sys --> zstd-safe
+        zstd-safe --> zstd
         const-format
+        xattr
+        const-format-proc-macros
+        const-format-proc-macros --> const-format
+        xattr --> const-format
         env-logger
         tar
         walkdir
+        same-file
+        winapi
+        winapi-util
+        winapi --> same-file
+        winapi-util --> winapi
+        same-file --> walkdir
         sync-wrapper
         tokio-openssl
         tokio-stream
-        textwarp
+        smawk
+        textwrap
+        unicode-linebreak
+        smawk --> textwrap
+        unicode-linebreak --> textwrap
         serde
         serde-bytes
         serde-plain
+        tracing-subscriber
         tracing-journald
+        sharded-slab
+        nu-ansi-term
+        thread-local
+        tracing-log
+        lru
+        chrono
+        matchers
+        tracing-serde
+        iana-time-zone
+        pure-rust-locales
+        valuable-serde
+        valuable-serde --> tracing-serde
+        pure-rust-locales --> chrono
+        iana-time-zone --> chrono
+        lru --> tracing-log
+        chrono --> tracing-subscriber
+        matchers --> tracing-subscriber
+        tracing-serde --> tracing-subscriber
+        tracing-log --> tracing-subscriber
+        thread-local --> tracing-subscriber
+        sharded-slab --> tracing-subscriber
+        nu-ansi-term --> tracing-subscriber
+        tracing-subscriber --> tracing-journald
+        pest
         handlebars
+        thiserror
+        thiserror1
+        thiserror --> pest
+        thiserror-1 --> pest
+        pest --> handlebars
         serde-with
         regex
         pam
@@ -249,7 +315,7 @@ graph LR
         walkdir --> debcargo-conf
         sync-wrapper --> debcargo-conf
         tokio-openssl --> debcargo-conf
-        textwarp --> debcargo-conf
+        textwrap --> debcargo-conf
         serde --> debcargo-conf
         serde-bytes --> debcargo-conf
         serde-plain --> debcargo-conf

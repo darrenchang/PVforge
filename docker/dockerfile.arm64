@@ -3,15 +3,19 @@ FROM debian:trixie
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG DEBIAN_VERSION=trixie
-ARG DEBIAN_APT=http://mirrors.ustc.edu.cn
-RUN rm /etc/apt/sources.list.d/*  \
-&& echo "deb $DEBIAN_APT/debian  ${DEBIAN_VERSION} main contrib non-free non-free-firmware" >/etc/apt/sources.list \
-&& echo "deb $DEBIAN_APT/debian  ${DEBIAN_VERSION}-updates main contrib non-free non-free-firmware" >> /etc/apt/sources.list \
-&& echo "deb $DEBIAN_APT/debian  ${DEBIAN_VERSION}-backports main contrib non-free non-free-firmware" >> /etc/apt/sources.list \
-&& echo "deb $DEBIAN_APT/debian-debug ${DEBIAN_VERSION}-debug main" >> /etc/apt/sources.list \
-&& echo "deb $DEBIAN_APT/debian-security  ${DEBIAN_VERSION}-security main contrib non-free non-free-firmware " >> /etc/apt/sources.list 
 
-RUN apt update && apt install -y wget nano curl gnupg  ca-certificates apt-utils
+RUN apt update && \
+    apt install -y \
+    wget \
+    nano \
+    curl \
+    gnupg \
+    ca-certificates \
+    apt-utils \
+    && \
+    apt autoremove --purge -y && \
+    apt clean && \
+    rm -rf /var/lib/apt/lists/*;
 
 ARG ARCH
 RUN ARCH=$(dpkg --print-architecture) \
@@ -45,6 +49,8 @@ RUN apt update && \
 RUN apt update && \
     apt -y install \
     libgit2-dev \
+    # librust-zstd \
+    libzstd-dev \
     # librust-proxmox \
     librust-ureq-dev \
     # ceph-18 build dependencies \

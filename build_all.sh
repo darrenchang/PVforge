@@ -2,14 +2,14 @@
 
 set -e
 
-export DEBIAN_APT="http://mirrors.ustc.edu.cn"
+export BUILDER_NAME="pve_builder"
 
 # Parse named arguments
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
-        --debian_apt) DEBIAN_APT="$2"; shift ;;
+        --builder_name) export BUILDER_NAME="$2"; shift ;;
         --help)
-            echo "Usage: $0 [--apt_proxy \"http://mirrors.ustc.edu.cn\"]"
+            echo "Usage: $0 [--builder_name \"pve_builder\"]"
             exit 0
             ;;
         *)
@@ -20,8 +20,6 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-echo $DEBIAN_APT
-export BUILDER_NAME=builder
 docker buildx bake
 docker run --rm -d --name ${BUILDER_NAME} pvebuilder /bin/sh -c "sleep infinity";
 echo "Copying $(du -sh ./) to the container ${BUILDER_NAME}..."

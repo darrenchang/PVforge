@@ -4,10 +4,6 @@ group "default" {
   ]
 }
 
-variable "DEBIAN_APT" {
-  default = "http://mirrors.ustc.edu.cn"
-}
-
 target "pvebuilder" {
   context    = "docker"
   dockerfile = "dockerfile.arm64"
@@ -18,7 +14,6 @@ target "pvebuilder" {
   args = {
     BASE_IMAGE = "debian:trixie"
     DEBIAN_VERSION = "trixie"
-    DEBIAN_APT = "${DEBIAN_APT}"
     RUST_VERSION = "1.94.0"
   }
 }
