@@ -2,8 +2,8 @@
 title: pxvirt Package Compile Dependency tree
 ---
 graph LR
-    %% Tier 0 - Foundations (rust libraries)
-    subgraph T0["Tier 0 – Foundations (rust libraries)"]
+    %% Tier 0.0 - Foundations (rust libraries)
+    subgraph T0.0["Tier 0.0 – Foundations (rust libraries)"]
         cc
         openssl
         openssl-probe
@@ -16,6 +16,7 @@ graph LR
         tracing
         tracing-attributes
         tracing-core
+        ucd-trie
         tracing-attributes --> tracing
         valuable-derive
         valuable
@@ -74,6 +75,41 @@ graph LR
         futures-executor --> futures
         http-body
         http-body --> http-body-util
+        base64urlsafedata
+        compact-jwt
+        openssl-macros --> compact-jwt
+        openssl-sys --> compact-jwt
+        der-parser
+        serde-cbor
+        serde-cbor-2
+        webauthn-attestation-ca
+        serde-wasm-bindgen
+        rustversion
+        wasm-bindgen-macro-support
+        wasm-bindgen-macro
+        wasm-bindgen-macro-support --> wasm-bindgen-macro
+        wasm-bindgen-shared
+        wasm-bindgen-shared --> wasm-bindgen-macro-support
+        rustversion --> wasm-bindgen
+        wasm-bindgen-macro --> wasm-bindgen
+        wasm-bindgen-shared --> wasm-bindgen
+        wasm-bindgen
+        web-sys
+        js-sys
+        js-sys --> web-sys
+        serde-wasm-bindgen --> webauthn-rs-proto
+        wasm-bindgen --> webauthn-rs-proto
+        web-sys --> webauthn-rs-proto
+        x509-parser
+        webauthn-rs-core
+        x509-parser --> webauthn-rs-core
+        webauthn-attestation-ca --> webauthn-rs-core
+        webauthn-rs-proto --> webauthn-rs-core
+        serde-cbor --> webauthn-rs-core
+        serde-cbor-2 --> webauthn-rs-core
+        webauthn-attenstation-ca --> webauthn-rs-core
+        webauthn-rs
+        webauthn-rs-core --> webauthn-rs
         futures --> http-body-util
         js-sys
         zstd
@@ -135,6 +171,32 @@ graph LR
         handlebars
         thiserror
         thiserror1
+        pest-meta
+        rhai
+        embed
+        rhai
+        rhai-codegen
+        embed
+        smartstring
+        proptest
+        bit-vec
+        bit-set
+        rand-xorshift
+        rand-core
+        rand-core --> rand-xorshift
+        bit-vec --> bit-set
+        rand-xorshift --> protest
+        bit-set --> protest
+        proptest --> smartstring
+        smartstring --> rhai
+        embed --> handlebars
+        rhai --> handlebars
+        rhai-codegen --> rhai
+        pest-meta --> pest
+        pest-generator
+        pest_derive --> pest
+        pest-generator --> pest
+        ucd-trie --> pest
         thiserror --> pest
         thiserror-1 --> pest
         pest --> handlebars
@@ -143,6 +205,10 @@ graph LR
         pam
         endian-trait-derive
         endian-trait-derive --> endian-trait
+    end
+
+    %% Tier 0.1 - Foundations (Proxmox rust libraries)
+    subgraph T0.1["Tier 0.1 – Foundations (Proxmox rust libraries)"]
         librust-proxmox-base64
         librust-proxmox-io
         librust-proxmox-lang
@@ -164,57 +230,22 @@ graph LR
         librust-proxmox-api-macro --> librust-proxmox-schema
         textwrap --> librust-proxmox-schema
         librust-proxmox-rate-limiter
-        librust-shared-memory
+        librust-proxmox-shared-memory
         librust-shared-cache
-        base64urlsafedata
-        compact-jwt
-        openssl-macros --> compact-jwt
-        openssl-sys --> compact-jwt
-        der-parser
-        serde-cbor
-        serde-cbor-2
-        webauthn-attestation-ca
-        serde-wasm-bindgen
-        rustversion
-        wasm-bindgen-macro-support
-        wasm-bindgen-macro
-        wasm-bindgen-macro-support --> wasm-bindgen-macro
-        wasm-bindgen-shared
-        wasm-bindgen-shared --> wasm-bindgen-macro-support
-        rustversion --> wasm-bindgen
-        wasm-bindgen-macro --> wasm-bindgen
-        wasm-bindgen-shared --> wasm-bindgen
-        wasm-bindgen
-        web-sys
-        js-sys
-        js-sys --> web-sys
-        serde-wasm-bindgen --> webauthn-rs-proto
-        wasm-bindgen --> webauthn-rs-proto
-        web-sys --> webauthn-rs-proto
-        x509-parser
-        webauthn-rs-core
-        x509-parser --> webauthn-rs-core
-        webauthn-attestation-ca --> webauthn-rs-core
-        webauthn-rs-proto --> webauthn-rs-core
-        serde-cbor --> webauthn-rs-core
-        serde-cbor-2 --> webauthn-rs-core
-        webauthn-attenstation-ca --> webauthn-rs-core
-        webauthn-rs
-        webauthn-rs-core --> webauthn-rs
-        librust-shared-memory --> librust-proxmox-rate-limiter
+        librust-proxmox-shared-memory --> librust-proxmox-rate-limiter
         librust-proxmox-product-config --> librust-proxmox-schema
         librust-proxmox-api-macro --> librust-proxmox-schema
         librust-proxmox-router --> librust-proxmox-schema
         librust-proxmox-schema --> librust-promxox-time-api
-        librust-pbs-api-types
+        librust-proxmox-pbs-api-types
         librust-proxmox-apt-api-types
-        proxmox-config-digest
+        librust-proxmox-config-digest
         librust-proxmox-serde
         librust-proxmox-string
-        proxmox-config-digest --> librust-proxmox-apt-api-types
+        librust-proxmox-config-digest --> librust-proxmox-apt-api-types
         librust-proxmox-serde --> librust-proxmox-apt-api-types
         librust-proxmox-fixed-string --> librust-proxmox-apt-api-types
-        librust-proxmox-apt-api-types --> librust-pbs-api-types
+        librust-proxmox-apt-api-types --> librust-proxmox-pbs-api-types
         librust-proxmox-log
         librust-proxmox-daemon
         librust-proxmox-network-types
