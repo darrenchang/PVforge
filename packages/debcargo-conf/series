@@ -8,3 +8,5 @@ patches/007-upgrade-wasm-bindgen-macro.patch
 patches/008-upgrade-wasm-bindgen-macro-support.patch
 patches/009-upgrade-wasm-bindgen-shared.patch
 patches/010-fix-endian-trait-skip-byte-swaps-test.patch
+patches/011-remove-moreutils-dep-from-librust-h2.patch
+

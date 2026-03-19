@@ -1,0 +1,26 @@
+diff --git a/src/h2/debian/debcargo.toml b/src/h2/debian/debcargo.toml
+index c612d6cc35..6b9813546e 100644
+--- a/src/h2/debian/debcargo.toml
++++ b/src/h2/debian/debcargo.toml
+@@ -3,8 +3,6 @@ uploaders = ["Wolfgang Silbermayr <wolfgang@silbermayr.at>"]
+ 
+ collapse_features = true
+ 
+-[source]
+-build_depends = ["moreutils"]
+ 
+ [packages.lib]
+ extra_lines = ["Breaks: librust-hyper-dev (<< 0.14.32)"]
+diff --git a/src/h2/debian/rules b/src/h2/debian/rules
+index f16a4065db..dade809da4 100755
+--- a/src/h2/debian/rules
++++ b/src/h2/debian/rules
+@@ -3,7 +3,7 @@
+ execute_before_dh_auto_configure:
+ 	rm -rf legacy
+ 	cp -a src legacy
+-	grep -v legacy legacy/lib.rs | sponge legacy/lib.rs
++	grep -v legacy legacy/lib.rs > legacy/lib.rs.tmp && mv legacy/lib.rs.tmp legacy/lib.rs
+ 	for FILE in `find legacy -name '*.rs'` ; do sed -i s/crate::/crate::legacy::/ $$FILE ; done
+ 	for FILE in `find legacy -name '*.rs'` ; do sed -i s/http::/http_02::/ $$FILE ; done
+ 
