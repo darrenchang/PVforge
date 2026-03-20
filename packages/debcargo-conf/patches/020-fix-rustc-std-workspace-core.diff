@@ -1,0 +1,17 @@
+diff --git a/src/rustc-std-workspace-core/debian/changelog b/src/rustc-std-workspace-core/debian/changelog
+index b5c0f23339..0830281d3d 100644
+--- a/src/rustc-std-workspace-core/debian/changelog
++++ b/src/rustc-std-workspace-core/debian/changelog
+@@ -1,5 +1,9 @@
+-rust-rustc-std-workspace-core (1.0.0-1) unstable; urgency=medium
++rust-rustc-std-workspace-core (1.0.1-1) unstable; urgency=medium
+ 
+-  * Package rustc-std-workspace-core 1.0.0 from crates.io using debcargo 2.2.9
++  * package rustc-std-workspace-core 1.0.0 from crates.io using debcargo 2.2.9
+ 
+- -- Wolfgang Silbermayr <wolfgang@silbermayr.at>  Sat, 15 Dec 2018 19:04:26 +0100
++ -- wolfgang silbermayr <wolfgang@silbermayr.at>  sat, 15 dec 2018 19:04:26 +0100rust-rustc-std-workspace-core (1.0.0-1) unstable; urgency=medium
++
++  * package rustc-std-workspace-core 1.0.0 from crates.io using debcargo 2.2.9
++
++ -- wolfgang silbermayr <wolfgang@silbermayr.at>  sat, 15 dec 2018 19:04:26 +0100

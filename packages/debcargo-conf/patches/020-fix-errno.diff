@@ -1,0 +1,27 @@
+diff --git a/src/errno/debian/changelog b/src/errno/debian/changelog
+index b5d5bc25f2..4ffd7de44e 100644
+--- a/src/errno/debian/changelog
++++ b/src/errno/debian/changelog
+@@ -1,3 +1,9 @@
++rust-errno (0.3.14-1) unstable; urgency=medium
++
++  * Update no-windows.patch for new upstream.
++
++ -- Peter Michael Green <plugwash@debian.org>  Sun, 14 Jan 2024 21:54:23 +0000
++
+ rust-errno (0.3.8-1) unstable; urgency=medium
+ 
+   * Package errno 0.3.8 from crates.io using debcargo 2.6.1
+diff --git a/src/errno/debian/patches/no-windows.patch b/src/errno/debian/patches/no-windows.patch
+index bdd8dbca20..3f63f6fb96 100644
+--- a/src/errno/debian/patches/no-windows.patch
++++ b/src/errno/debian/patches/no-windows.patch
+@@ -2,7 +2,7 @@
+ +++ b/Cargo.toml
+ @@ -45,6 +44,0 @@
+ -[target."cfg(windows)".dependencies.windows-sys]
+--version = "0.52"
++-version = ">=0.52, <0.62"
+ -features = [
+ -    "Win32_Foundation",
+ -    "Win32_System_Diagnostics_Debug",

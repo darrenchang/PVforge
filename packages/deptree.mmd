@@ -144,6 +144,11 @@ graph LR
         serde-plain
         tracing-subscriber
         tracing-journald
+        lazy-static
+        alloca
+        criterion-plot
+        criterion
+        spin
         sharded-slab
         nu-ansi-term
         thread-local
@@ -164,6 +169,11 @@ graph LR
         tracing-serde --> tracing-subscriber
         tracing-log --> tracing-subscriber
         thread-local --> tracing-subscriber
+        alloca --> criterion
+        criterion-plot --> criterion
+        criterion --> spin
+        spin --> lazy-static
+        lazy-static --> sharded-slab
         sharded-slab --> tracing-subscriber
         nu-ansi-term --> tracing-subscriber
         tracing-subscriber --> tracing-journald
@@ -183,7 +193,64 @@ graph LR
         bit-set
         rand-xorshift
         rand-core
+        rand-chacha
+        bitflags
+        errno
+        rustc-std-workspace-core
+        libc
+        linux-raw-sys
+        rustc-std-workspace-alloc
+        r-efi
+        wasip2
+        anyhow
+        prettyplease
+        syn
+        heck
+        foldhash
+        foldhash
+        id-arena
+        hashbrown
+        indexmap
+        wasmparser
+        wat
+        leb128fmt
+        wast
+        wasm-encoder
+        wit-parser
+        wit-bindgen-core
+        wit-bindgen-rust-macro
+        wit-bindgen
+        getrandom
+        tempfile
+        bitflags --> errno
+        errno --> rustc-std-workspace-core
+        rustc-std-workspace-core --> libc
+        libc --> linux-raw-sys
+        linux-raw-sys --> rustc-std-workspace-alloc
+        rustc-std-workspace-alloc --> getrandom
+        r-efi --> getrandom
+        wasip2 --> getrandom
+        anyhow --> wit-bindgen-rust-macro
+        prettyplease --> wit-bindgen-rust-macro
+        wit-bindgen-core --> wit-bindgen-rust-macro
+        heck --> wit-bindgen-core
+        id-arena --> hashbrown
+        foldhash --> hashbrown
+        foldhash --> hashbrown
+        hashbrown --> wit-parser
+        wasmparser --> wit-parser
+        leb128fmt --> wast
+        wasm-encoder --> wast
+        wast --> wat
+        wat --> wit-parser
+        indexmap --> wit-parser
+        wit-parser --> wit-bindgen-core
+        syn --> prettyplease
+        wit-bindgen-rust-macro --> wit-bindgen
+        wit-bindgen --> getrandom
+        getrandom --> tempfile
         rand-core --> rand-xorshift
+        rand-chacha --> rand
         bit-vec --> bit-set
         rand-xorshift --> protest
         bit-set --> protest
@@ -194,7 +261,7 @@ graph LR
         rhai-codegen --> rhai
         pest-meta --> pest
         pest-generator
-        pest_derive --> pest
+        pest-derive --> pest
         pest-generator --> pest
         ucd-trie --> pest
         thiserror --> pest

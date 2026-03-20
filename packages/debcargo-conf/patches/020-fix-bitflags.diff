@@ -1,0 +1,53 @@
+diff --git a/src/bitflags/debian/changelog b/src/bitflags/debian/changelog
+index ee68e90500..e3a947f917 100644
+--- a/src/bitflags/debian/changelog
++++ b/src/bitflags/debian/changelog
+@@ -1,3 +1,9 @@
++rust-bitflags (2.11.0-1) unstable; urgency=medium
++
++  * Team upload.
++
++ -- Peter Michael Green <plugwash@debian.org>  Thu, 06 Feb 2025 18:31:16 +0000
++
+ rust-bitflags (2.8.0-1) unstable; urgency=medium
+ 
+   * Team upload.
+diff --git a/src/bitflags/debian/patches/disable-zerocopy.patch b/src/bitflags/debian/patches/disable-zerocopy.patch
+deleted file mode 100644
+index d9561676ef..0000000000
+--- a/src/bitflags/debian/patches/disable-zerocopy.patch
++++ /dev/null
+@@ -1,26 +0,0 @@
+-Index: bitflags/Cargo.toml
+-===================================================================
+---- bitflags.orig/Cargo.toml
+-+++ bitflags/Cargo.toml
+-@@ -53,10 +53,6 @@ name = "custom_bits_type"
+- path = "examples/custom_bits_type.rs"
+- 
+- [[example]]
+--name = "custom_derive"
+--path = "examples/custom_derive.rs"
+--
+--[[example]]
+- name = "fmt"
+- path = "examples/fmt.rs"
+- 
+-@@ -117,10 +113,6 @@ version = "1.0.19"
+- [dev-dependencies.trybuild]
+- version = "1.0.18"
+- 
+--[dev-dependencies.zerocopy]
+--version = "0.8"
+--features = ["derive"]
+--
+- [features]
+- example_generated = []
+- rustc-dep-of-std = [
+diff --git a/src/bitflags/debian/patches/series b/src/bitflags/debian/patches/series
+deleted file mode 100644
+index 870ffd6718..0000000000
+--- a/src/bitflags/debian/patches/series
++++ /dev/null
+@@ -1 +0,0 @@
+-disable-zerocopy.patch

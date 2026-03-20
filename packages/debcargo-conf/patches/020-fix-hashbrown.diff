@@ -1,0 +1,215 @@
+diff --git a/src/hashbrown/debian/changelog b/src/hashbrown/debian/changelog
+index e01bd697f7..8e10d9d1c7 100644
+--- a/src/hashbrown/debian/changelog
++++ b/src/hashbrown/debian/changelog
+@@ -1,3 +1,9 @@
++rust-hashbrown (0.16.1-1) unstable; urgency=medium
++
++  * Team upload.
++
++ -- Peter Michael Green <plugwash@debian.org>  Thu, 23 May 2024 18:02:57 +0000
++
+ rust-hashbrown (0.14.5-5) unstable; urgency=medium
+ 
+   * Team upload.
+diff --git a/src/hashbrown/debian/patches/disable-alloc.diff b/src/hashbrown/debian/patches/disable-alloc.diff
+deleted file mode 100644
+index 9fc9099fc9..0000000000
+--- a/src/hashbrown/debian/patches/disable-alloc.diff
++++ /dev/null
+@@ -1,16 +0,0 @@
+---- hashbrown/Cargo.toml
+-+++ hashbrown/Cargo.toml
+-@@ -51,5 +51,0 @@
+--[dependencies.alloc]
+--version = "1.0.0"
+--optional = true
+--package = "rustc-std-workspace-alloc"
+--
+-@@ -107,7 +102,6 @@
+-     "nightly",
+-     "core",
+-     "compiler_builtins",
+--    "alloc",
+-     "rustc-internal-api",
+- ]
+- rustc-internal-api = []
+diff --git a/src/hashbrown/debian/patches/disable-nightly.diff b/src/hashbrown/debian/patches/disable-nightly.diff
+index d4da0f2ee1..1f01e22e49 100644
+--- a/src/hashbrown/debian/patches/disable-nightly.diff
++++ b/src/hashbrown/debian/patches/disable-nightly.diff
+@@ -1,28 +1,30 @@
+-Index: hashbrown/Cargo.toml
+-===================================================================
+---- hashbrown.orig/Cargo.toml
+-+++ hashbrown/Cargo.toml
+-@@ -36,7 +36,6 @@ repository = "https://github.com/rust-la
+- 
++diff --git a/Cargo.toml b/Cargo.toml
++index 5244399..d4c0bcc 100644
++--- a/Cargo.toml
+++++ b/Cargo.toml
++@@ -42,7 +42,6 @@ repository = "https://github.com/rust-lang/hashbrown"
++
+  [package.metadata.docs.rs]
+  features = [
+ -    "nightly",
+      "rayon",
+      "serde",
+-     "raw",
+-@@ -117,15 +116,5 @@ default = [
+-     "allocator-api2",
++     "raw-entry",
++@@ -59,17 +58,7 @@ default = [
+  ]
++ default-hasher = ["dep:foldhash"]
+  inline-more = []
+ -nightly = [
+--    "allocator-api2?/nightly",
++-    "foldhash?/nightly",
+ -    "bumpalo/allocator_api",
+ -]
+- raw = []
++ raw-entry = []
+ -rustc-dep-of-std = [
+ -    "nightly",
+ -    "core",
+--    "compiler_builtins",
++-    "alloc",
+ -    "rustc-internal-api",
+ -]
+  rustc-internal-api = []
++ serde = [
++     "dep:serde_core",
+diff --git a/src/hashbrown/debian/patches/disable-rkyv.diff b/src/hashbrown/debian/patches/disable-rkyv.diff
+deleted file mode 100644
+index 690dcec940..0000000000
+--- a/src/hashbrown/debian/patches/disable-rkyv.diff
++++ /dev/null
+@@ -1,17 +0,0 @@
+-Index: hashbrown/Cargo.toml
+-===================================================================
+---- hashbrown.orig/Cargo.toml
+-+++ hashbrown/Cargo.toml
+-@@ -71,12 +71,6 @@ default-features = false
+- version = "1.0"
+- optional = true
+- 
+--[dependencies.rkyv]
+--version = "0.7.42"
+--features = ["alloc"]
+--optional = true
+--default-features = false
+--
+- [dependencies.serde]
+- version = "1.0.25"
+- optional = true
+diff --git a/src/hashbrown/debian/patches/fix-tests-no-default-features.patch b/src/hashbrown/debian/patches/fix-tests-no-default-features.patch
+deleted file mode 100644
+index cacae43462..0000000000
+--- a/src/hashbrown/debian/patches/fix-tests-no-default-features.patch
++++ /dev/null
+@@ -1,94 +0,0 @@
+-This patch fixes the tests if the allocator-api2 feature is disabled.
+-
+-Index: hashbrown/src/map.rs
+-===================================================================
+---- hashbrown.orig/src/map.rs
+-+++ hashbrown/src/map.rs
+-@@ -6711,6 +6711,7 @@ mod test_map {
+-     use super::{HashMap, RawEntryMut};
+-     use alloc::string::{String, ToString};
+-     use alloc::sync::Arc;
+-+    #[cfg(feature="allocator-api2")]
+-     use allocator_api2::alloc::{AllocError, Allocator, Global};
+-     use core::alloc::Layout;
+-     use core::ptr::NonNull;
+-@@ -8590,6 +8656,7 @@ mod test_map {
+-         }
+-     }
+- 
+-+    #[cfg(feature="allocator-api2")]
+-     unsafe impl Allocator for MyAlloc {
+-         fn allocate(&self, layout: Layout) -> std::result::Result<NonNull<[u8]>, AllocError> {
+-             let g = Global;
+-@@ -8603,6 +8670,7 @@ mod test_map {
+-     }
+- 
+-     #[test]
+-+    #[cfg(all(feature="allocator-api2", feature="ahash"))]
+-     fn test_hashmap_into_iter_bug() {
+-         let dropped: Arc<AtomicI8> = Arc::new(AtomicI8::new(1));
+- 
+-@@ -8673,6 +8741,7 @@ mod test_map {
+-     ///
+-     /// This function does not panic, but returns an error as a `String`
+-     /// to distinguish between a test panic and an error in the input data.
+-+    #[cfg(all(feature="allocator-api2", feature="ahash"))]
+-     fn get_test_map<I, T, A>(
+-         iter: I,
+-         mut fun: impl FnMut(u64) -> T,
+-@@ -8768,6 +8837,7 @@ mod test_map {
+- 
+-     #[test]
+-     #[should_panic = "panic in clone"]
+-+    #[cfg(all(feature="allocator-api2", feature="ahash"))]
+-     fn test_clone_memory_leaks_and_double_drop_one() {
+-         let dropped: Arc<AtomicI8> = Arc::new(AtomicI8::new(2));
+- 
+-@@ -8794,6 +8864,7 @@ mod test_map {
+- 
+-     #[test]
+-     #[should_panic = "panic in drop"]
+-+    #[cfg(all(feature="allocator-api2", feature="ahash"))]
+-     fn test_clone_memory_leaks_and_double_drop_two() {
+-         let dropped: Arc<AtomicI8> = Arc::new(AtomicI8::new(2));
+- 
+-@@ -8828,6 +8899,7 @@ mod test_map {
+-     /// We check that we have a working table if the clone operation from another
+-     /// thread ended in a panic (when buckets of maps are equal to each other).
+-     #[test]
+-+    #[cfg(all(feature="allocator-api2", feature="ahash"))]
+-     fn test_catch_panic_clone_from_when_len_is_equal() {
+-         use std::thread;
+- 
+-@@ -8893,6 +8965,7 @@ mod test_map {
+-     /// We check that we have a working table if the clone operation from another
+-     /// thread ended in a panic (when buckets of maps are not equal to each other).
+-     #[test]
+-+    #[cfg(all(feature="allocator-api2", feature="ahash"))]
+-     fn test_catch_panic_clone_from_when_len_is_not_equal() {
+-         use std::thread;
+- 
+-Index: hashbrown/src/raw/mod.rs
+-===================================================================
+---- hashbrown.orig/src/raw/mod.rs
+-+++ hashbrown/src/raw/mod.rs
+-@@ -4671,9 +4673,11 @@ mod test_map {
+-     /// CHECKING THAT WE DON'T TRY TO DROP DATA IF THE `ITEMS`
+-     /// ARE ZERO, EVEN IF WE HAVE `FULL` CONTROL BYTES.
+-     #[test]
+-+    #[cfg(feature="allocator-api2")]
+-     fn test_catch_panic_clone_from() {
+-         use ::alloc::sync::Arc;
+-         use ::alloc::vec::Vec;
+-+        #[cfg(feature="allocator-api2")]
+-         use allocator_api2::alloc::{AllocError, Allocator, Global};
+-         use core::sync::atomic::{AtomicI8, Ordering};
+-         use std::thread;
+-@@ -4694,6 +4698,7 @@ mod test_map {
+-             }
+-         }
+- 
+-+        #[cfg(feature="allocator-api2")]
+-         unsafe impl Allocator for MyAlloc {
+-             fn allocate(&self, layout: Layout) -> std::result::Result<NonNull<[u8]>, AllocError> {
+-                 let g = Global;
+diff --git a/src/hashbrown/debian/patches/series b/src/hashbrown/debian/patches/series
+index 4e993495f7..54d08e11ff 100644
+--- a/src/hashbrown/debian/patches/series
++++ b/src/hashbrown/debian/patches/series
+@@ -1,4 +1 @@
+-disable-alloc.diff
+ disable-nightly.diff
+-disable-rkyv.diff
+-fix-tests-no-default-features.patch

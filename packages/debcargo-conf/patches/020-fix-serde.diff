@@ -1,0 +1,40 @@
+diff --git a/src/serde/debian/changelog b/src/serde/debian/changelog
+index 4ead5c5131..1a185ba718 100644
+--- a/src/serde/debian/changelog
++++ b/src/serde/debian/changelog
+@@ -1,3 +1,9 @@
++rust-serde (1.0.228-1) unstable; urgency=medium
++
++  * Team upload.
++
++ -- Daniel Kahn Gillmor <dkg@fifthhorseman.net>  Thu, 09 Jan 2025 16:35:15 -0500
++
+ rust-serde (1.0.217-1) unstable; urgency=medium
+ 
+   * Team upload.
+diff --git a/src/serde/debian/patches/fix-tests-no-default-features.patch b/src/serde/debian/patches/fix-tests-no-default-features.patch
+deleted file mode 100644
+index b66d017185..0000000000
+--- a/src/serde/debian/patches/fix-tests-no-default-features.patch
++++ /dev/null
+@@ -1,13 +0,0 @@
+-Index: serde/src/ser/impls.rs
+-===================================================================
+---- serde.orig/src/ser/impls.rs
+-+++ serde/src/ser/impls.rs
+-@@ -839,6 +839,8 @@ fn format_u8(mut n: u8, out: &mut [u8])
+- #[cfg(any(feature = "std", not(no_core_net)))]
+- #[test]
+- fn test_format_u8() {
+-+    extern crate alloc;
+-+    use alloc::string::ToString;
+-     let mut i = 0u8;
+- 
+-     loop {
+diff --git a/src/serde/debian/patches/series b/src/serde/debian/patches/series
+deleted file mode 100644
+index 41224411a3..0000000000
+--- a/src/serde/debian/patches/series
++++ /dev/null
+@@ -1 +0,0 @@
+-fix-tests-no-default-features.patch

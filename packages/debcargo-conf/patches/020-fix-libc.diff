@@ -1,0 +1,2399 @@
+diff --git a/src/libc/debian/changelog b/src/libc/debian/changelog
+index 21caffebc6..2f2ab869cb 100644
+--- a/src/libc/debian/changelog
++++ b/src/libc/debian/changelog
+@@ -1,3 +1,9 @@
++rust-libc (0.2.183-1) unstable; urgency=medium
++
++  * Fix defintion of struct stat on i386.
++
++ -- Peter Michael Green <plugwash@debian.org>  Sat, 28 Dec 2024 20:35:00 +0000
++
+ rust-libc (0.2.169-1) unstable; urgency=medium
+ 
+   * Team upload.
+diff --git a/src/libc/debian/patches/series b/src/libc/debian/patches/series
+deleted file mode 100644
+index 650f2c3c83..0000000000
+--- a/src/libc/debian/patches/series
++++ /dev/null
+@@ -1,20 +0,0 @@
+-time64-010-add-cfg-option.patch
+-time64-020-exclude-x32.patch
+-time64-025-exclude-i386.patch
+-time64-030-basic-file-and-time.patch
+-time64-035-timex_t.patch
+-time64-040-use-time64-symbols.patch
+-time64-050-update-struct-input_event.patch
+-time64-060-handle-tv_usec.patch
+-time64-080-socket-options.patch
+-time64-090-mips-rlim.patch
+-time64-100-shmid.patch
+-time64-105-stat.patch
+-time64-108-fix-stat-i386.patch
+-time64-110-msquid.patch
+-time64-120-semid.patch
+-time64-130-getlk.patch
+-time64-140-setlk.patch
+-time64-150-aiocb.patch
+-time64-160-timespec.patch
+-time64-190-fix-clock-nanosleep-i386.patch
+diff --git a/src/libc/debian/patches/time64-010-add-cfg-option.patch b/src/libc/debian/patches/time64-010-add-cfg-option.patch
+deleted file mode 100644
+index 7d5285ade9..0000000000
+--- a/src/libc/debian/patches/time64-010-add-cfg-option.patch
++++ /dev/null
+@@ -1,67 +0,0 @@
+-This patch is based on the commit described below, taken from upstream pull
+-request 3175, it was adapted for use in the Debian package by Peter Michael
+-Green.
+-
+-commit d0c905b147ad46c7e81a62199ba3c57935d66723
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Thu Sep 7 15:14:34 2023 +0200
+-
+-    Add cfg option gnu_time64_abi
+-
+-Index: libc/build.rs
+-===================================================================
+---- libc.orig/build.rs
+-+++ libc/build.rs
+-@@ -13,6 +13,7 @@ const ALLOWED_CFGS: &'static [&'static s
+-     "freebsd13",
+-     "freebsd14",
+-     "freebsd15",
+-+    "gnu_time64_abi",
+-     // FIXME(ctest): this config shouldn't be needed but ctest can't parse `const extern fn`
+-     "libc_const_extern_fn",
+-     "libc_deny_warnings",
+-@@ -79,6 +80,11 @@ fn main() {
+-         Some(_) | None => (),
+-     }
+- 
+-+    // Some ABIs need to redirect time related symbols to their time64 equivalents.
+-+    if is_gnu_time64_abi() {
+-+        set_cfg("gnu_time64_abi");
+-+    }
+-+
+-     // On CI: deny all warnings
+-     if libc_ci {
+-         set_cfg("libc_deny_warnings");
+-@@ -235,3 +241,32 @@ fn set_cfg(cfg: &str) {
+-     }
+-     println!("cargo:rustc-cfg={}", cfg);
+- }
+-+
+-+fn is_gnu_time64_abi() -> bool {
+-+    match env::var("CARGO_CFG_TARGET_ENV") {
+-+        Ok(target_env) => {
+-+            if target_env != "gnu" {
+-+                return false;
+-+            }
+-+        }
+-+        Err(_) => panic!("CARGO_CFG_TARGET_ENV not set"),
+-+    }
+-+    match env::var("CARGO_CFG_TARGET_OS") {
+-+        Ok(target_os) => {
+-+            if target_os != "linux" {
+-+                return false;
+-+            }
+-+        }
+-+        Err(_) => panic!("CARGO_CFG_TARGET_OS not set"),
+-+    }
+-+    match env::var("CARGO_CFG_TARGET_POINTER_WIDTH") {
+-+        Ok(bits) => {
+-+            if bits == "64" {
+-+                return false;
+-+            }
+-+            bits
+-+        }
+-+        Err(_) => panic!("CARGO_CFG_TARGET_POINTER_WIDTH not set"),
+-+    };
+-+    return true;
+-+}
+diff --git a/src/libc/debian/patches/time64-020-exclude-x32.patch b/src/libc/debian/patches/time64-020-exclude-x32.patch
+deleted file mode 100644
+index 6682ef71c1..0000000000
+--- a/src/libc/debian/patches/time64-020-exclude-x32.patch
++++ /dev/null
+@@ -1,27 +0,0 @@
+-commit 271d07eaca5f05324a9965f94e67287c31c3bc0d
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Tue Sep 12 14:06:10 2023 +0200
+-
+-    x86_64_x32 have 64 bit time_t
+-
+-diff --git a/build.rs b/build.rs
+-index 787c25cdd6..f5aff2024e 100644
+---- a/build.rs
+-+++ b/build.rs
+-@@ -236,5 +236,16 @@ fn is_gnu_time64_abi() -> bool {
+-         }
+-         Err(_) => panic!("CARGO_CFG_TARGET_POINTER_WIDTH not set"),
+-     };
+-+    // At this point, we _know_ it is *-*-linux-gnu* with 32 bit
+-+    // pointers. Some 64 bit arch still have 32 bit pointers though.
+-+    match env::var("TARGET") {
+-+        Ok(target) => {
+-+            // x86_64-unknown-linux-gnux32 and similar
+-+            if target.contains("x86_64") && target.contains("x32") {
+-+                return false;
+-+            }
+-+        }
+-+        Err(_) => panic!("TARGET not set"),
+-+    }
+-     return true;
+- }
+diff --git a/src/libc/debian/patches/time64-025-exclude-i386.patch b/src/libc/debian/patches/time64-025-exclude-i386.patch
+deleted file mode 100644
+index dede9aa3cd..0000000000
+--- a/src/libc/debian/patches/time64-025-exclude-i386.patch
++++ /dev/null
+@@ -1,19 +0,0 @@
+-Index: libc/build.rs
+-===================================================================
+---- libc.orig/build.rs
+-+++ libc/build.rs
+-@@ -303,6 +303,14 @@ fn set_cfg(cfg: &str) {
+- }
+- 
+- fn is_gnu_time64_abi() -> bool {
+-+    match env::var("CARGO_CFG_TARGET_ARCH") {
+-+        Ok(target_arch) => {
+-+            if target_arch == "x86" {
+-+                return false;
+-+            }
+-+        }
+-+        Err(_) => panic!("CARGO_CFG_TARGET_ARCH not set"),
+-+    }
+-     match env::var("CARGO_CFG_TARGET_ENV") {
+-         Ok(target_env) => {
+-             if target_env != "gnu" {
+diff --git a/src/libc/debian/patches/time64-030-basic-file-and-time.patch b/src/libc/debian/patches/time64-030-basic-file-and-time.patch
+deleted file mode 100644
+index 455921bfed..0000000000
+--- a/src/libc/debian/patches/time64-030-basic-file-and-time.patch
++++ /dev/null
+@@ -1,29 +0,0 @@
+-commit 91f04dfe1d93b8d2d383999ff5faf6411961caa1
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Fri Mar 17 09:54:34 2023 +0100
+-
+-    gnu: Handle basic file and time types for 32bit systems with time64
+-    
+-    32bit gnu types when _TIME_BITS=64 and _FILE_OFFSET_BITS=64
+-
+-diff --git a/src/unix/linux_like/linux/gnu/b32/mod.rs b/src/unix/linux_like/linux/gnu/b32/mod.rs
+-index 54c84fa617..7cc9fb08e7 100644
+---- a/src/unix/linux_like/linux/gnu/b32/mod.rs
+-+++ b/src/unix/linux_like/linux/gnu/b32/mod.rs
+-@@ -28,6 +28,16 @@ cfg_if! {
+-         pub type fsfilcnt_t = u64;
+-         pub type rlim_t = u64;
+-         pub type blksize_t = i64;
+-+    } else if #[cfg(gnu_time64_abi)] {
+-+        pub type time_t = i64;
+-+        pub type suseconds_t = i32;
+-+        pub type ino_t = u64;
+-+        pub type off_t = i64;
+-+        pub type blkcnt_t = i64;
+-+        pub type fsblkcnt_t = u64;
+-+        pub type fsfilcnt_t = u64;
+-+        pub type rlim_t = u64;
+-+        pub type blksize_t = i32;
+-     } else {
+-         pub type time_t = i32;
+-         pub type suseconds_t = i32;
+diff --git a/src/libc/debian/patches/time64-035-timex_t.patch b/src/libc/debian/patches/time64-035-timex_t.patch
+deleted file mode 100644
+index 4d512de1f1..0000000000
+--- a/src/libc/debian/patches/time64-035-timex_t.patch
++++ /dev/null
+@@ -1,295 +0,0 @@
+-This patch is based on the commit described below, taken from the upstream
+-time64 pull request, adapted for use in the Debian package by Peter Michael
+-Green.
+-
+-commit fc5c42dd8d00acd651a53950d44b6284a00979b0
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Fri Mar 17 15:20:29 2023 +0100
+-
+-    gnu: Move struct timex_t to gnu/b* and support _TIME_BITS=64
+-
+-Index: libc/src/unix/linux_like/linux/gnu/b32/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b32/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b32/mod.rs
+-@@ -1,6 +1,7 @@
+- //! 32-bit specific definitions for linux-like values
+- 
+- use crate::prelude::*;
+-+use crate::ntptimeval;
+- use crate::pthread_mutex_t;
+- 
+- pub type c_long = i32;
+-@@ -18,6 +19,7 @@ pub type fsblkcnt64_t = u64;
+- pub type fsfilcnt64_t = u64;
+- pub type __syscall_ulong_t = c_ulong;
+- 
+-+pub type __syscall_slong_t = c_long;
+- cfg_if! {
+-     if #[cfg(target_arch = "riscv32")] {
+-         pub type time_t = i64;
+-@@ -170,6 +172,92 @@ s! {
+-         __glibc_reserved3: crate::__syscall_ulong_t,
+-         __glibc_reserved4: crate::__syscall_ulong_t,
+-     }
+-+
+-+    pub struct timex {
+-+        pub modes: c_uint,
+-+
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub offset: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub __unused_pad1: i32,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub offset: c_longlong,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub freq: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub freq: c_longlong,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub maxerror: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub maxerror: c_longlong,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub esterror: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub esterror: c_longlong,
+-+        pub status: c_int,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub constant: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub __unused_pad2: i32,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub constant: c_longlong,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub precision: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub precision: c_longlong,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub tolerance: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub tolerance: c_longlong,
+-+        pub time: crate::timeval,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub tick: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub tick: c_longlong,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub ppsfreq: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub ppsfreq: c_longlong,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub jitter: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub jitter: c_longlong,
+-+        pub shift: c_int,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub stabil: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub __unused_pad3: i32,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub stabil: c_longlong,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub jitcnt: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub jitcnt: c_longlong,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub calcnt: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub calcnt: c_longlong,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub errcnt: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub errcnt: c_longlong,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub stbcnt: crate::__syscall_slong_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub stbcnt: c_longlong,
+-+        pub tai: c_int,
+-+        pub __unused1: i32,
+-+        pub __unused2: i32,
+-+        pub __unused3: i32,
+-+        pub __unused4: i32,
+-+        pub __unused5: i32,
+-+        pub __unused6: i32,
+-+        pub __unused7: i32,
+-+        pub __unused8: i32,
+-+        pub __unused9: i32,
+-+        pub __unused10: i32,
+-+        pub __unused11: i32,
+-+    }
+- }
+- 
+- pub const POSIX_FADV_DONTNEED: c_int = 4;
+-Index: libc/src/unix/linux_like/linux/gnu/b64/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b64/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b64/mod.rs
+-@@ -2,6 +2,8 @@
+- 
+- use crate::prelude::*;
+- 
+-+use crate::ntptimeval;
+-+
+- pub type ino_t = u64;
+- pub type off_t = i64;
+- pub type blkcnt_t = i64;
+-@@ -11,12 +13,17 @@ pub type msglen_t = u64;
+- pub type fsblkcnt_t = u64;
+- pub type fsfilcnt_t = u64;
+- pub type rlim_t = u64;
+--#[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--pub type __syscall_ulong_t = c_ulonglong;
+--#[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--pub type __syscall_ulong_t = c_ulong;
+- 
+- cfg_if! {
+-+    if #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))] {
+-+        pub type __syscall_ulong_t = c_ulonglong;
+-+        pub type __syscall_slong_t = c_longlong;
+-+    } else {
+-+        pub type __syscall_ulong_t = c_ulong;
+-+        pub type __syscall_slong_t = c_long;
+-+    }
+-+}
+-+cfg_if! {
+-     if #[cfg(all(target_arch = "aarch64", target_pointer_width = "32"))] {
+-         pub type clock_t = i32;
+-         pub type time_t = i32;
+-@@ -95,6 +102,46 @@ s! {
+-         __glibc_reserved3: crate::__syscall_ulong_t,
+-         __glibc_reserved4: crate::__syscall_ulong_t,
+-     }
+-+
+-+    pub struct timex {
+-+        pub modes: c_uint,
+-+        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+-+        pub __unused_pad1: i32,
+-+        pub offset: crate::__syscall_slong_t,
+-+        pub freq: crate::__syscall_slong_t,
+-+        pub maxerror: crate::__syscall_slong_t,
+-+        pub esterror: crate::__syscall_slong_t,
+-+        pub status: c_int,
+-+        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+-+        pub __unused_pad2: i32,
+-+        pub constant: crate::__syscall_slong_t,
+-+        pub precision: crate::__syscall_slong_t,
+-+        pub tolerance: crate::__syscall_slong_t,
+-+        pub time: crate::timeval,
+-+        pub tick: crate::__syscall_slong_t,
+-+        pub ppsfreq: crate::__syscall_slong_t,
+-+        pub jitter: crate::__syscall_slong_t,
+-+        pub shift: c_int,
+-+        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+-+        pub __unused_pad3: i32,
+-+        pub stabil: crate::__syscall_slong_t,
+-+        pub jitcnt: crate::__syscall_slong_t,
+-+        pub calcnt: crate::__syscall_slong_t,
+-+        pub errcnt: crate::__syscall_slong_t,
+-+        pub stbcnt: crate::__syscall_slong_t,
+-+        pub tai: c_int,
+-+        pub __unused1: i32,
+-+        pub __unused2: i32,
+-+        pub __unused3: i32,
+-+        pub __unused4: i32,
+-+        pub __unused5: i32,
+-+        pub __unused6: i32,
+-+        pub __unused7: i32,
+-+        pub __unused8: i32,
+-+        pub __unused9: i32,
+-+        pub __unused10: i32,
+-+        pub __unused11: i32,
+-+    }
+- }
+- 
+- pub const __SIZEOF_PTHREAD_RWLOCKATTR_T: usize = 8;
+-Index: libc/src/unix/linux_like/linux/gnu/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/mod.rs
+-@@ -170,85 +170,6 @@ s! {
+-         pub rt_irtt: c_ushort,
+-     }
+- 
+--    pub struct timex {
+--        pub modes: c_uint,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub offset: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub offset: c_long,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub freq: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub freq: c_long,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub maxerror: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub maxerror: c_long,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub esterror: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub esterror: c_long,
+--        pub status: c_int,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub constant: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub constant: c_long,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub precision: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub precision: c_long,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub tolerance: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub tolerance: c_long,
+--        pub time: crate::timeval,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub tick: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub tick: c_long,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub ppsfreq: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub ppsfreq: c_long,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub jitter: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub jitter: c_long,
+--        pub shift: c_int,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub stabil: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub stabil: c_long,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub jitcnt: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub jitcnt: c_long,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub calcnt: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub calcnt: c_long,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub errcnt: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub errcnt: c_long,
+--        #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+--        pub stbcnt: i64,
+--        #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+--        pub stbcnt: c_long,
+--        pub tai: c_int,
+--        pub __unused1: i32,
+--        pub __unused2: i32,
+--        pub __unused3: i32,
+--        pub __unused4: i32,
+--        pub __unused5: i32,
+--        pub __unused6: i32,
+--        pub __unused7: i32,
+--        pub __unused8: i32,
+--        pub __unused9: i32,
+--        pub __unused10: i32,
+--        pub __unused11: i32,
+--    }
+--
+-     pub struct ntptimeval {
+-         pub time: crate::timeval,
+-         pub maxerror: c_long,
+diff --git a/src/libc/debian/patches/time64-040-use-time64-symbols.patch b/src/libc/debian/patches/time64-040-use-time64-symbols.patch
+deleted file mode 100644
+index 563bea3641..0000000000
+--- a/src/libc/debian/patches/time64-040-use-time64-symbols.patch
++++ /dev/null
+@@ -1,440 +0,0 @@
+-commit 3c3c01f9e5da55f8843e5d111a430bc75af4c600
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Fri Mar 17 08:44:44 2023 +0100
+-
+-    gnu: Use _TIME_BITS and _FILE_OFFSET_BITS=64 versions of glibc symbols
+-    
+-    Set the link names of relevant symbols to use be the same as when a C
+-    program is built against GNU libc with -D_TIME_BITS=64 and
+-    -D_FILE_OFFSET_BITS=64.
+-
+---- a/src/unix/linux_like/linux/gnu/b32/mod.rs
+-+++ b/src/unix/linux_like/linux/gnu/b32/mod.rs
+-@@ -340,2 +340,4 @@
+-     ) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__ntp_gettime64")]
+-+    pub fn ntp_gettime(buf: *mut ntptimeval) -> c_int;
+- }
+---- a/src/unix/linux_like/linux/gnu/b64/mod.rs
+-+++ b/src/unix/linux_like/linux/gnu/b64/mod.rs
+-@@ -103,2 +103,7 @@
+- 
+-+extern "C" {
+-+    #[link_name = "ntp_gettimex"]
+-+    pub fn ntp_gettime(buf: *mut crate::ntptimeval) -> c_int;
+-+}
+-+
+- cfg_if! {
+---- a/src/unix/linux_like/linux/gnu/mod.rs
+-+++ b/src/unix/linux_like/linux/gnu/mod.rs
+-@@ -1295,2 +1295,3 @@
+-     );
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__sendmmsg64")]
+-     pub fn sendmmsg(
+-@@ -1301,2 +1302,3 @@
+-     ) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__recvmmsg64")]
+-     pub fn recvmmsg(
+-@@ -1312,4 +1314,7 @@
+-         -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "getrlimit64")]
+-     pub fn getrlimit(resource: crate::__rlimit_resource_t, rlim: *mut crate::rlimit) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "setrlimit64")]
+-     pub fn setrlimit(resource: crate::__rlimit_resource_t, rlim: *const crate::rlimit) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "prlimit64")]
+-     pub fn prlimit(
+-@@ -1336,2 +1341,3 @@
+-     pub fn mallopt(param: c_int, value: c_int) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__gettimeofday64")]
+-     pub fn gettimeofday(tp: *mut crate::timeval, tz: *mut crate::timezone) -> c_int;
+-@@ -1341,6 +1347,7 @@
+- 
+-+    #[cfg_attr(gnu_time64_abi, link_name = "___adjtimex64")]
+-     pub fn adjtimex(buf: *mut timex) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "___adjtimex64")]
+-     pub fn ntp_adjtime(buf: *mut timex) -> c_int;
+--    #[link_name = "ntp_gettimex"]
+--    pub fn ntp_gettime(buf: *mut ntptimeval) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__clock_adjtime64")]
+-     pub fn clock_adjtime(clk_id: crate::clockid_t, buf: *mut crate::timex) -> c_int;
+-@@ -1354,2 +1361,3 @@
+-     ) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "preadv64v2")]
+-     pub fn preadv2(
+-@@ -1361,2 +1369,3 @@
+-     ) -> ssize_t;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "pwritev64v2")]
+-     pub fn pwritev2(
+-@@ -1397,2 +1406,3 @@
+-     pub fn backtrace(buf: *mut *mut c_void, sz: c_int) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__glob64_time64")]
+-     pub fn glob64(
+-@@ -1403,2 +1413,3 @@
+-     ) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__globfree64_time64")]
+-     pub fn globfree64(pglob: *mut glob64_t);
+-@@ -1469,2 +1480,3 @@
+-     pub fn asctime_r(tm: *const crate::tm, buf: *mut c_char) -> *mut c_char;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__ctime64_r")]
+-     pub fn ctime_r(timep: *const time_t, buf: *mut c_char) -> *mut c_char;
+---- a/src/unix/linux_like/linux/mod.rs
+-+++ b/src/unix/linux_like/linux/mod.rs
+-@@ -6007,7 +6007,12 @@
+-         extern "C" {
+-+            #[cfg_attr(gnu_time64_abi, link_name = "aio_read64")]
+-             pub fn aio_read(aiocbp: *mut aiocb) -> c_int;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "aio_write64")]
+-             pub fn aio_write(aiocbp: *mut aiocb) -> c_int;
+-             pub fn aio_fsync(op: c_int, aiocbp: *mut aiocb) -> c_int;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "aio_error64")]
+-             pub fn aio_error(aiocbp: *const aiocb) -> c_int;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "aio_return64")]
+-             pub fn aio_return(aiocbp: *mut aiocb) -> ssize_t;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "__aio_suspend_time64")]
+-             pub fn aio_suspend(
+-@@ -6017,3 +6022,5 @@
+-             ) -> c_int;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "aio_cancel64")]
+-             pub fn aio_cancel(fd: c_int, aiocbp: *mut aiocb) -> c_int;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "lio_listio64")]
+-             pub fn lio_listio(
+-@@ -6031,2 +6038,3 @@
+-         extern "C" {
+-+            #[cfg_attr(gnu_time64_abi, link_name = "pwritev64")]
+-             pub fn pwritev(
+-@@ -6037,2 +6045,3 @@
+-             ) -> ssize_t;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "preadv64")]
+-             pub fn preadv(
+-@@ -6072,2 +6081,3 @@
+-             ) -> isize;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "__futimes64")]
+-             pub fn futimes(fd: c_int, times: *const crate::timeval) -> c_int;
+-@@ -6104,2 +6114,3 @@
+-             ) -> ssize_t;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "__mq_timedreceive_time64")]
+-             pub fn mq_timedreceive(
+-@@ -6111,2 +6122,3 @@
+-             ) -> c_int;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "__mq_timedsend_time64")]
+-             pub fn mq_timedsend(
+-@@ -6161,2 +6173,3 @@
+- 
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__lutimes64")]
+-     pub fn lutimes(file: *const c_char, times: *const crate::timeval) -> c_int;
+-@@ -6182,2 +6195,3 @@
+-     pub fn shmdt(shmaddr: *const c_void) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__shmctl64")]
+-     pub fn shmctl(shmid: c_int, cmd: c_int, buf: *mut crate::shmid_ds) -> c_int;
+-@@ -6186,3 +6200,5 @@
+-     pub fn semop(semid: c_int, sops: *mut crate::sembuf, nsops: size_t) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__semctl64")]
+-     pub fn semctl(semid: c_int, semnum: c_int, cmd: c_int, ...) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__msgctl64")]
+-     pub fn msgctl(msqid: c_int, cmd: c_int, buf: *mut msqid_ds) -> c_int;
+-@@ -6201,3 +6217,5 @@
+- 
+-+    #[cfg_attr(gnu_time64_abi, link_name = "fallocate64")]
+-     pub fn fallocate(fd: c_int, mode: c_int, offset: off_t, len: off_t) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "posix_fallocate64")]
+-     pub fn posix_fallocate(fd: c_int, offset: off_t, len: off_t) -> c_int;
+-@@ -6251,3 +6269,5 @@
+-     pub fn timerfd_create(clockid: crate::clockid_t, flags: c_int) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__timerfd_gettime64")]
+-     pub fn timerfd_gettime(fd: c_int, curr_value: *mut itimerspec) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__timerfd_settime64")]
+-     pub fn timerfd_settime(
+-@@ -6308,2 +6328,3 @@
+- 
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__glob64_time64")]
+-     pub fn glob(
+-@@ -6314,2 +6335,3 @@
+-     ) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__globfree64_time64")]
+-     pub fn globfree(pglob: *mut crate::glob_t);
+-@@ -6339,2 +6361,3 @@
+-     ) -> ssize_t;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "mkstemps64")]
+-     pub fn mkstemps(template: *mut c_char, suffixlen: c_int) -> c_int;
+-@@ -6375,2 +6398,3 @@
+-     pub fn tee(fd_in: c_int, fd_out: c_int, len: size_t, flags: c_uint) -> ssize_t;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__settimeofday64")]
+-     pub fn settimeofday(tv: *const crate::timeval, tz: *const crate::timezone) -> c_int;
+-@@ -6390,3 +6414,5 @@
+- 
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__sched_rr_get_interval64")]
+-     pub fn sched_rr_get_interval(pid: crate::pid_t, tp: *mut crate::timespec) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__sem_timedwait64")]
+-     pub fn sem_timedwait(sem: *mut sem_t, abstime: *const crate::timespec) -> c_int;
+-@@ -6406,4 +6432,6 @@
+-     pub fn personality(persona: c_ulong) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__prctl_time64")]
+-     pub fn prctl(option: c_int, ...) -> c_int;
+-     pub fn sched_getparam(pid: crate::pid_t, param: *mut crate::sched_param) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__ppoll64")]
+-     pub fn ppoll(
+-@@ -6420,2 +6448,3 @@
+- 
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__pthread_mutex_timedlock64")]
+-     pub fn pthread_mutex_timedlock(
+-@@ -6454,2 +6483,10 @@
+-     pub fn sched_getscheduler(pid: crate::pid_t) -> c_int;
+-+    #[cfg_attr(
+-+        all(
+-+            target_env = "gnu",
+-+            target_pointer_width = "32",
+-+            not(target_arch = "x86_64")
+-+        ),
+-+        link_name = "__clock_nanosleep_time64"
+-+    )]
+-     pub fn clock_nanosleep(
+-@@ -6505,2 +6542,3 @@
+-     ) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "sendfile64")]
+-     pub fn sendfile(out_fd: c_int, in_fd: c_int, offset: *mut off_t, count: size_t) -> ssize_t;
+-@@ -6710,3 +6748,5 @@
+-     pub fn timer_getoverrun(timerid: crate::timer_t) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__timer_gettime64")]
+-     pub fn timer_gettime(timerid: crate::timer_t, curr_value: *mut crate::itimerspec) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__timer_settime64")]
+-     pub fn timer_settime(
+-@@ -6752,2 +6792,3 @@
+- 
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__ioctl_time64")]
+-     pub fn ioctl(fd: c_int, request: Ioctl, ...) -> c_int;
+---- a/src/unix/linux_like/mod.rs
+-+++ b/src/unix/linux_like/mod.rs
+-@@ -1751,4 +1751,7 @@
+- 
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__clock_getres64")]
+-     pub fn clock_getres(clk_id: crate::clockid_t, tp: *mut crate::timespec) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__clock_gettime64")]
+-     pub fn clock_gettime(clk_id: crate::clockid_t, tp: *mut crate::timespec) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__clock_settime64")]
+-     pub fn clock_settime(clk_id: crate::clockid_t, tp: *const crate::timespec) -> c_int;
+-@@ -1767,7 +1770,12 @@
+-     pub fn pipe2(fds: *mut c_int, flags: c_int) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "statfs64")]
+-     pub fn statfs(path: *const c_char, buf: *mut statfs) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "fstatfs64")]
+-     pub fn fstatfs(fd: c_int, buf: *mut statfs) -> c_int;
+-     pub fn memrchr(cx: *const c_void, c: c_int, n: size_t) -> *mut c_void;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "posix_fadvise64")]
+-     pub fn posix_fadvise(fd: c_int, offset: off_t, len: off_t, advise: c_int) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__futimens64")]
+-     pub fn futimens(fd: c_int, times: *const crate::timespec) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__utimensat64")]
+-     pub fn utimensat(
+-@@ -1822,2 +1830,3 @@
+-     pub fn setresuid(ruid: crate::uid_t, euid: crate::uid_t, suid: crate::uid_t) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__wait4_time64")]
+-     pub fn wait4(
+-@@ -1854,3 +1863,5 @@
+- 
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__sendmsg64")]
+-     pub fn sendmsg(fd: c_int, msg: *const crate::msghdr, flags: c_int) -> ssize_t;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__recvmsg64")]
+-     pub fn recvmsg(fd: c_int, msg: *mut crate::msghdr, flags: c_int) -> ssize_t;
+-@@ -1875,3 +1886,5 @@
+- 
+-+    #[cfg_attr(gnu_time64_abi, link_name = "mkostemp64")]
+-     pub fn mkostemp(template: *mut c_char, flags: c_int) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "mkostemps64")]
+-     pub fn mkostemps(template: *mut c_char, suffixlen: c_int, flags: c_int) -> c_int;
+---- a/src/unix/linux_like/linux/mod.rs
+-+++ b/src/unix/linux_like/linux/mod.rs
+-@@ -1875,2 +1886,3 @@
+-     pub fn dup3(oldfd: c_int, newfd: c_int, flags: c_int) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__sigtimedwait64")]
+-     pub fn sigtimedwait(
+---- a/src/unix/linux_like/mod.rs
+-+++ b/src/unix/linux_like/mod.rs
+-@@ -1891,3 +1905,5 @@
+-             pub fn creat64(path: *const c_char, mode: mode_t) -> c_int;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "__fstat64_time64")]
+-             pub fn fstat64(fildes: c_int, buf: *mut stat64) -> c_int;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "__fstatat64_time64")]
+-             pub fn fstatat64(
+-@@ -1900,2 +1916,3 @@
+-             pub fn lseek64(fd: c_int, offset: off64_t, whence: c_int) -> off64_t;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "__lstat64_time64")]
+-             pub fn lstat64(path: *const c_char, buf: *mut stat64) -> c_int;
+-@@ -1930,2 +1947,3 @@
+-             ) -> c_int;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "__stat64_time64")]
+-             pub fn stat64(path: *const c_char, buf: *mut stat64) -> c_int;
+---- a/src/unix/mod.rs
+-+++ b/src/unix/mod.rs
+-@@ -574,2 +574,3 @@
+-     )]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "fopen64")]
+-     pub fn fopen(filename: *const c_char, mode: *const c_char) -> *mut FILE;
+-@@ -579,2 +580,3 @@
+-     )]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "freopen64")]
+-     pub fn freopen(filename: *const c_char, mode: *const c_char, file: *mut FILE) -> *mut FILE;
+-@@ -585,2 +587,3 @@
+-     pub fn rename(oldname: *const c_char, newname: *const c_char) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "tmpfile64")]
+-     pub fn tmpfile() -> *mut FILE;
+-@@ -610,4 +613,6 @@
+-     #[cfg_attr(target_os = "netbsd", link_name = "__fgetpos50")]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "fgetpos64")]
+-     pub fn fgetpos(stream: *mut FILE, ptr: *mut fpos_t) -> c_int;
+-     #[cfg_attr(target_os = "netbsd", link_name = "__fsetpos50")]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "fsetpos64")]
+-     pub fn fsetpos(stream: *mut FILE, ptr: *const fpos_t) -> c_int;
+-@@ -761,2 +766,3 @@
+-     #[cfg_attr(target_os = "espidf", link_name = "lwip_setsockopt")]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__setsockopt64")]
+-     pub fn setsockopt(
+-@@ -823,2 +829,3 @@
+-     )]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__fstat64_time64")]
+-     pub fn fstat(fildes: c_int, buf: *mut stat) -> c_int;
+-@@ -836,2 +843,3 @@
+-     )]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__stat64_time64")]
+-     pub fn stat(path: *const c_char, buf: *mut stat) -> c_int;
+-@@ -850,2 +858,3 @@
+-     )]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "open64")]
+-     pub fn open(path: *const c_char, oflag: c_int, ...) -> c_int;
+-@@ -855,2 +864,3 @@
+-     )]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "creat64")]
+-     pub fn creat(path: *const c_char, mode: mode_t) -> c_int;
+-@@ -860,2 +870,3 @@
+-     )]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__fcntl_time64")]
+-     pub fn fcntl(fd: c_int, cmd: c_int, ...) -> c_int;
+-@@ -882,2 +893,3 @@
+-     )]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "readdir64")]
+-     pub fn readdir(dirp: *mut crate::DIR) -> *mut crate::dirent;
+-@@ -920,2 +932,3 @@
+-     )]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__fstatat64_time64")]
+-     pub fn fstatat(dirfd: c_int, pathname: *const c_char, buf: *mut stat, flags: c_int) -> c_int;
+-@@ -994,2 +1007,3 @@
+-     pub fn link(src: *const c_char, dst: *const c_char) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "lseek64")]
+-     pub fn lseek(fd: c_int, offset: off_t, whence: c_int) -> off_t;
+-@@ -1023,2 +1037,3 @@
+-     #[cfg_attr(target_os = "netbsd", link_name = "__nanosleep50")]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__nanosleep64")]
+-     pub fn nanosleep(rqtp: *const timespec, rmtp: *mut timespec) -> c_int;
+-@@ -1053,2 +1068,3 @@
+-     )]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "pread64")]
+-     pub fn pread(fd: c_int, buf: *mut c_void, count: size_t, offset: off_t) -> ssize_t;
+-@@ -1058,2 +1074,3 @@
+-     )]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "pwrite64")]
+-     pub fn pwrite(fd: c_int, buf: *const c_void, count: size_t, offset: off_t) -> ssize_t;
+-@@ -1065,2 +1082,3 @@
+-     #[cfg_attr(target_os = "netbsd", link_name = "__utime50")]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__utime64")]
+-     pub fn utime(file: *const c_char, buf: *const utimbuf) -> c_int;
+-@@ -1087,2 +1105,3 @@
+-     )]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "mmap64")]
+-     pub fn mmap(
+-@@ -1113,2 +1132,3 @@
+-     )]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__lstat64_time64")]
+-     pub fn lstat(path: *const c_char, buf: *mut stat) -> c_int;
+-@@ -1135,3 +1155,5 @@
+- 
+-+    #[cfg_attr(gnu_time64_abi, link_name = "truncate64")]
+-     pub fn truncate(path: *const c_char, length: off_t) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "ftruncate64")]
+-     pub fn ftruncate(fd: c_int, length: off_t) -> c_int;
+-@@ -1141,2 +1163,3 @@
+-     #[cfg_attr(target_os = "netbsd", link_name = "__getrusage50")]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__getrusage64")]
+-     pub fn getrusage(resource: c_int, usage: *mut rusage) -> c_int;
+-@@ -1216,2 +1239,3 @@
+-     )]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__pthread_cond_timedwait64")]
+-     pub fn pthread_cond_timedwait(
+-@@ -1272,2 +1296,3 @@
+-     #[cfg_attr(target_os = "espidf", link_name = "lwip_getsockopt")]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__getsockopt64")]
+-     pub fn getsockopt(
+-@@ -1282,2 +1307,3 @@
+-     #[cfg_attr(target_os = "netbsd", link_name = "__utimes50")]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__utimes64")]
+-     pub fn utimes(filename: *const c_char, times: *const crate::timeval) -> c_int;
+-@@ -1332,2 +1358,3 @@
+-     // FIXME: for `time_t`
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__gmtime64_r")]
+-     pub fn gmtime_r(time_p: *const time_t, result: *mut tm) -> *mut tm;
+-@@ -1336,2 +1363,3 @@
+-     // FIXME: for `time_t`
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__localtime64_r")]
+-     pub fn localtime_r(time_p: *const time_t, result: *mut tm) -> *mut tm;
+-@@ -1344,2 +1372,3 @@
+-     // FIXME: for `time_t`
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__mktime64")]
+-     pub fn mktime(tm: *mut tm) -> time_t;
+-@@ -1348,2 +1377,3 @@
+-     // FIXME: for `time_t`
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__time64")]
+-     pub fn time(time: *mut time_t) -> time_t;
+-@@ -1352,2 +1382,3 @@
+-     // FIXME: for `time_t`
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__gmtime64")]
+-     pub fn gmtime(time_p: *const time_t) -> *mut tm;
+-@@ -1356,2 +1387,3 @@
+-     // FIXME: for `time_t`
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__localtime64")]
+-     pub fn localtime(time_p: *const time_t) -> *mut tm;
+-@@ -1360,2 +1392,3 @@
+-     // FIXME: for `time_t`
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__difftime64")]
+-     pub fn difftime(time1: time_t, time0: time_t) -> c_double;
+-@@ -1364,2 +1397,3 @@
+-     // FIXME: for `time_t`
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__timegm64")]
+-     pub fn timegm(tm: *mut crate::tm) -> time_t;
+-@@ -1418,2 +1452,3 @@
+-     #[cfg_attr(target_os = "netbsd", link_name = "__select50")]
+-+    #[cfg_attr(gnu_time64_abi, link_name = "__select64")]
+-     pub fn select(
+-@@ -1436,3 +1471,5 @@
+-     pub fn sem_post(sem: *mut sem_t) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "statvfs64")]
+-     pub fn statvfs(path: *const c_char, buf: *mut statvfs) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "fstatvfs64")]
+-     pub fn fstatvfs(fd: c_int, buf: *mut statvfs) -> c_int;
+-@@ -1460,3 +1497,5 @@
+- 
+-+    #[cfg_attr(gnu_time64_abi, link_name = "fseeko64")]
+-     pub fn fseeko(stream: *mut crate::FILE, offset: off_t, whence: c_int) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "ftello64")]
+-     pub fn ftello(stream: *mut crate::FILE) -> off_t;
+-@@ -1477,2 +1516,3 @@
+-     pub fn tcsendbreak(fd: c_int, duration: c_int) -> c_int;
+-+    #[cfg_attr(gnu_time64_abi, link_name = "mkstemp64")]
+-     pub fn mkstemp(template: *mut c_char) -> c_int;
+-@@ -1501,2 +1541,3 @@
+- 
+-+    #[cfg_attr(gnu_time64_abi, link_name = "lockf64")]
+-     pub fn lockf(fd: c_int, cmd: c_int, len: off_t) -> c_int;
+-@@ -1531,2 +1572,3 @@
+-         extern "C" {
+-+            #[cfg_attr(gnu_time64_abi, link_name = "__adjtime64")]
+-             pub fn adjtime(delta: *const timeval, olddelta: *mut timeval) -> c_int;
+-@@ -1575,2 +1617,3 @@
+-             pub fn mkdirat(dirfd: c_int, pathname: *const c_char, mode: crate::mode_t) -> c_int;
+-+            #[cfg_attr(gnu_time64_abi, link_name = "openat64")]
+-             pub fn openat(dirfd: c_int, pathname: *const c_char, flags: c_int, ...) -> c_int;
+-@@ -1598,2 +1641,3 @@
+-             /// https://www.unix.com/man-page/opensolaris/3LIB/libc/
+-+            #[cfg_attr(gnu_time64_abi, link_name = "readdir64_r")]
+-             pub fn readdir_r(
+-@@ -1682,2 +1726,3 @@
+-             #[cfg_attr(target_os = "netbsd", link_name = "__pselect50")]
+-+            #[cfg_attr(gnu_time64_abi, link_name = "__pselect64")]
+-             pub fn pselect(
+diff --git a/src/libc/debian/patches/time64-050-update-struct-input_event.patch b/src/libc/debian/patches/time64-050-update-struct-input_event.patch
+deleted file mode 100644
+index 9c1229a076..0000000000
+--- a/src/libc/debian/patches/time64-050-update-struct-input_event.patch
++++ /dev/null
+@@ -1,27 +0,0 @@
+-This patch is based on the commit described below from the upstream
+-time64 pull request, adapted for use in the Debian package by
+-Peter Michael Green.
+-
+-commit 7bb47139eda82d37a43cdd3ff60572e5d224a2e4
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Fri Mar 17 15:21:05 2023 +0100
+-
+-    linux: Update struct input_event for glibc _TIME_BITS=64
+-
+-diff --git a/src/unix/linux_like/linux/mod.rs b/src/unix/linux_like/linux/mod.rs
+-index 2ff9a7e264..e280488620 100644
+---- a/src/unix/linux_like/linux/mod.rs
+-+++ b/src/unix/linux_like/linux/mod.rs
+-@@ -322,7 +322,12 @@ s! {
+-     }
+- 
+-     pub struct input_event {
+-+        #[cfg(not(gnu_time64_abi))]
+-         pub time: crate::timeval,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub __sec: c_ulong,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub __usec: c_ulong,
+-         pub type_: __u16,
+-         pub code: __u16,
+-         pub value: __s32,
+diff --git a/src/libc/debian/patches/time64-060-handle-tv_usec.patch b/src/libc/debian/patches/time64-060-handle-tv_usec.patch
+deleted file mode 100644
+index 34338340d2..0000000000
+--- a/src/libc/debian/patches/time64-060-handle-tv_usec.patch
++++ /dev/null
+@@ -1,26 +0,0 @@
+-commit b24da0142bd3babba1935866b266845ed2ece4c6
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Fri Mar 17 15:30:46 2023 +0100
+-
+-    gnu: Handle timeval.tv_usec for glibc 64-bit time_t
+-    
+-    For 64 bit time on 32 bit linux glibc timeval.tv_usec is actually
+-    __suseconds64_t (64 bits) while suseconds_t is still 32 bits.
+-
+-diff --git a/src/unix/mod.rs b/src/unix/mod.rs
+-index a380bf1ef8..42a293e9b0 100644
+---- a/src/unix/mod.rs
+-+++ b/src/unix/mod.rs
+-@@ -62,7 +62,12 @@ s! {
+- 
+-     pub struct timeval {
+-         pub tv_sec: time_t,
+-+        #[cfg(not(gnu_time64_abi))]
+-         pub tv_usec: suseconds_t,
+-+        // For 64 bit time on 32 bit linux glibc, suseconds_t is still
+-+        // a 32 bit type.  Using suseconds_t here will break the tests, use i64 instead
+-+        #[cfg(gnu_time64_abi)]
+-+        pub tv_usec: i64
+-     }
+- 
+-     // linux x32 compatibility
+diff --git a/src/libc/debian/patches/time64-080-socket-options.patch b/src/libc/debian/patches/time64-080-socket-options.patch
+deleted file mode 100644
+index 16b5897290..0000000000
+--- a/src/libc/debian/patches/time64-080-socket-options.patch
++++ /dev/null
+@@ -1,165 +0,0 @@
+-This patch is based on the commit described below from the upstream time64
+-pull request, adapted for use in the Debian package by Peter Michael Green.
+-
+-commit 17ad6e6394956e535887900ed8ff5949fa4c37fc
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Mon Mar 20 14:21:04 2023 +0100
+-
+-    linux: Set SO_TIMESTAMP* and SO_RCVTIMEO and SO_SNDTIMEO
+-    
+-    The actual values may be different on 32bit archs and glibc with
+-    64-bit time.
+-
+-diff --git a/src/unix/linux_like/linux/arch/generic/mod.rs b/src/unix/linux_like/linux/arch/generic/mod.rs
+-index 2f437e16db..2e319f5823 100644
+---- a/src/unix/linux_like/linux/arch/generic/mod.rs
+-+++ b/src/unix/linux_like/linux/arch/generic/mod.rs
+-@@ -37,10 +37,6 @@ pub const SO_PASSCRED: c_int = 16;
+- pub const SO_PEERCRED: c_int = 17;
+- pub const SO_RCVLOWAT: c_int = 18;
+- pub const SO_SNDLOWAT: c_int = 19;
+--pub const SO_RCVTIMEO: c_int = 20;
+--pub const SO_SNDTIMEO: c_int = 21;
+--// pub const SO_RCVTIMEO_OLD: c_int = 20;
+--// pub const SO_SNDTIMEO_OLD: c_int = 21;
+- pub const SO_SECURITY_AUTHENTICATION: c_int = 22;
+- pub const SO_SECURITY_ENCRYPTION_TRANSPORT: c_int = 23;
+- pub const SO_SECURITY_ENCRYPTION_NETWORK: c_int = 24;
+-@@ -49,18 +45,35 @@ pub const SO_ATTACH_FILTER: c_int = 26;
+- pub const SO_DETACH_FILTER: c_int = 27;
+- pub const SO_GET_FILTER: c_int = SO_ATTACH_FILTER;
+- pub const SO_PEERNAME: c_int = 28;
+--pub const SO_TIMESTAMP: c_int = 29;
+-+
+-+cfg_if! {
+-+    if #[cfg(all(gnu_time64_abi,
+-+                 any(target_arch = "arm", target_arch = "x86")))] {
+-+        pub const SO_TIMESTAMP: c_int = 63;
+-+        pub const SO_TIMESTAMPNS: c_int = 64;
+-+        pub const SO_TIMESTAMPING: c_int = 65;
+-+        pub const SO_RCVTIMEO: c_int = 66;
+-+        pub const SO_SNDTIMEO: c_int = 67;
+-+    } else {
+-+        pub const SO_TIMESTAMP: c_int = 29;
+-+        pub const SO_TIMESTAMPNS: c_int = 35;
+-+        pub const SO_TIMESTAMPING: c_int = 37;
+-+        pub const SO_RCVTIMEO: c_int = 20;
+-+        pub const SO_SNDTIMEO: c_int = 21;
+-+    }
+-+}
+- // pub const SO_TIMESTAMP_OLD: c_int = 29;
+-+// pub const SO_TIMESTAMPNS_OLD: c_int = 35;
+-+// pub const SO_TIMESTAMPING_OLD: c_int = 37;
+-+// pub const SO_RCVTIMEO_OLD: c_int = 20;
+-+// pub const SO_SNDTIMEO_OLD: c_int = 21;
+-+
+- pub const SO_ACCEPTCONN: c_int = 30;
+- pub const SO_PEERSEC: c_int = 31;
+- pub const SO_SNDBUFFORCE: c_int = 32;
+- pub const SO_RCVBUFFORCE: c_int = 33;
+- pub const SO_PASSSEC: c_int = 34;
+--pub const SO_TIMESTAMPNS: c_int = 35;
+--// pub const SO_TIMESTAMPNS_OLD: c_int = 35;
+- pub const SO_MARK: c_int = 36;
+--pub const SO_TIMESTAMPING: c_int = 37;
+--// pub const SO_TIMESTAMPING_OLD: c_int = 37;
+- pub const SO_PROTOCOL: c_int = 38;
+- pub const SO_DOMAIN: c_int = 39;
+- pub const SO_RXQ_OVFL: c_int = 40;
+-diff --git a/src/unix/linux_like/linux/arch/mips/mod.rs b/src/unix/linux_like/linux/arch/mips/mod.rs
+-index 7699677026..82e091f4e9 100644
+---- a/src/unix/linux_like/linux/arch/mips/mod.rs
+-+++ b/src/unix/linux_like/linux/arch/mips/mod.rs
+-@@ -33,8 +33,15 @@ pub const SO_RCVLOWAT: c_int = 0x1004;
+- // NOTE: These definitions are now being renamed with _OLD postfix,
+- // but CI haven't support them yet.
+- // Some related consts could be found in b32.rs and b64.rs
+--pub const SO_SNDTIMEO: c_int = 0x1005;
+--pub const SO_RCVTIMEO: c_int = 0x1006;
+-+cfg_if! {
+-+    if #[cfg(gnu_time64_abi)] {
+-+        pub const SO_SNDTIMEO: c_int = 67;
+-+        pub const SO_RCVTIMEO: c_int = 66;
+-+    } else {
+-+        pub const SO_SNDTIMEO: c_int = 0x1005;
+-+        pub const SO_RCVTIMEO: c_int = 0x1006;
+-+    }
+-+}
+- // pub const SO_SNDTIMEO_OLD: c_int = 0x1005;
+- // pub const SO_RCVTIMEO_OLD: c_int = 0x1006;
+- pub const SO_ACCEPTCONN: c_int = 0x1009;
+-@@ -88,9 +95,17 @@ pub const SO_BINDTOIFINDEX: c_int = 62;
+- // NOTE: These definitions are now being renamed with _OLD postfix,
+- // but CI haven't support them yet.
+- // Some related consts could be found in b32.rs and b64.rs
+--pub const SO_TIMESTAMP: c_int = 29;
+--pub const SO_TIMESTAMPNS: c_int = 35;
+--pub const SO_TIMESTAMPING: c_int = 37;
+-+cfg_if! {
+-+    if #[cfg(gnu_time64_abi)] {
+-+        pub const SO_TIMESTAMP: c_int = 63;
+-+        pub const SO_TIMESTAMPNS: c_int = 64;
+-+        pub const SO_TIMESTAMPING: c_int = 65;
+-+    } else {
+-+        pub const SO_TIMESTAMP: c_int = 29;
+-+        pub const SO_TIMESTAMPNS: c_int = 35;
+-+        pub const SO_TIMESTAMPING: c_int = 37;
+-+    }
+-+}
+- // pub const SO_TIMESTAMP_OLD: c_int = 29;
+- // pub const SO_TIMESTAMPNS_OLD: c_int = 35;
+- // pub const SO_TIMESTAMPING_OLD: c_int = 37;
+-diff --git a/src/unix/linux_like/linux/arch/powerpc/mod.rs b/src/unix/linux_like/linux/arch/powerpc/mod.rs
+-index 27834dbfea..039839995c 100644
+---- a/src/unix/linux_like/linux/arch/powerpc/mod.rs
+-+++ b/src/unix/linux_like/linux/arch/powerpc/mod.rs
+-@@ -21,8 +21,15 @@ pub const SO_REUSEPORT: c_int = 15;
+- // powerpc only differs in these
+- pub const SO_RCVLOWAT: c_int = 16;
+- pub const SO_SNDLOWAT: c_int = 17;
+--pub const SO_RCVTIMEO: c_int = 18;
+--pub const SO_SNDTIMEO: c_int = 19;
+-+cfg_if! {
+-+    if #[cfg(gnu_time64_abi)] {
+-+        pub const SO_SNDTIMEO: c_int = 67;
+-+        pub const SO_RCVTIMEO: c_int = 66;
+-+    } else {
+-+        pub const SO_SNDTIMEO: c_int = 19;
+-+        pub const SO_RCVTIMEO: c_int = 18;
+-+    }
+-+}
+- // pub const SO_RCVTIMEO_OLD: c_int = 18;
+- // pub const SO_SNDTIMEO_OLD: c_int = 19;
+- pub const SO_PASSCRED: c_int = 20;
+-@@ -36,18 +43,26 @@ pub const SO_ATTACH_FILTER: c_int = 26;
+- pub const SO_DETACH_FILTER: c_int = 27;
+- pub const SO_GET_FILTER: c_int = SO_ATTACH_FILTER;
+- pub const SO_PEERNAME: c_int = 28;
+--pub const SO_TIMESTAMP: c_int = 29;
+-+cfg_if! {
+-+    if #[cfg(gnu_time64_abi)] {
+-+        pub const SO_TIMESTAMP: c_int = 63;
+-+        pub const SO_TIMESTAMPNS: c_int = 64;
+-+        pub const SO_TIMESTAMPING: c_int = 65;
+-+    } else {
+-+        pub const SO_TIMESTAMP: c_int = 29;
+-+        pub const SO_TIMESTAMPNS: c_int = 35;
+-+        pub const SO_TIMESTAMPING: c_int = 37;
+-+    }
+-+}
+- // pub const SO_TIMESTAMP_OLD: c_int = 29;
+-+// pub const SO_TIMESTAMPNS_OLD: c_int = 35;
+-+// pub const SO_TIMESTAMPING_OLD: c_int = 37;
+- pub const SO_ACCEPTCONN: c_int = 30;
+- pub const SO_PEERSEC: c_int = 31;
+- pub const SO_SNDBUFFORCE: c_int = 32;
+- pub const SO_RCVBUFFORCE: c_int = 33;
+- pub const SO_PASSSEC: c_int = 34;
+--pub const SO_TIMESTAMPNS: c_int = 35;
+--// pub const SO_TIMESTAMPNS_OLD: c_int = 35;
+- pub const SO_MARK: c_int = 36;
+--pub const SO_TIMESTAMPING: c_int = 37;
+--// pub const SO_TIMESTAMPING_OLD: c_int = 37;
+- pub const SO_PROTOCOL: c_int = 38;
+- pub const SO_DOMAIN: c_int = 39;
+- pub const SO_RXQ_OVFL: c_int = 40;
+diff --git a/src/libc/debian/patches/time64-090-mips-rlim.patch b/src/libc/debian/patches/time64-090-mips-rlim.patch
+deleted file mode 100644
+index 4159f3cf6e..0000000000
+--- a/src/libc/debian/patches/time64-090-mips-rlim.patch
++++ /dev/null
+@@ -1,29 +0,0 @@
+-This patch is based on the commit described below, taken from the upstream time64
+-pull request and adapted for use in the Debian package by Peter Michael Green.
+-
+-commit d8a1d16f489c0b2d7064eb2863378f7e45a696c3
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Mon Mar 27 14:30:10 2023 +0200
+-
+-    linux: Set RLIM_INFINITY for mips GNU libc with _FILE_OFFSET_BITS=64
+-
+-Index: libc/src/unix/linux_like/linux/arch/mips/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/arch/mips/mod.rs
+-+++ libc/src/unix/linux_like/linux/arch/mips/mod.rs
+-@@ -364,10 +364,12 @@ cfg_if! {
+- }
+- 
+- cfg_if! {
+--    if #[cfg(
+-+    if #[cfg(all(gnu_time64_abi, any(target_arch = "mips", target_arch = "mips32r6")))] {
+-+        pub const RLIM_INFINITY: ::rlim_t = !0;
+-+    } else if #[cfg(all(
+-         any(target_arch = "mips", target_arch = "mips32r6"),
+--        any(target_env = "gnu", target_env = "uclibc")
+--    )] {
+-+        target_env = "uclibc"
+-+    ))] {
+-         pub const RLIM_INFINITY: crate::rlim_t = 0x7fffffff;
+-     }
+- }
+diff --git a/src/libc/debian/patches/time64-100-shmid.patch b/src/libc/debian/patches/time64-100-shmid.patch
+deleted file mode 100644
+index c0b187dfb7..0000000000
+--- a/src/libc/debian/patches/time64-100-shmid.patch
++++ /dev/null
+@@ -1,64 +0,0 @@
+-This patch is based on the commit described below, taken from the upstream
+-time64 pull request and adapted for use in the Debian package by
+-Peter Michael Green.
+-
+-commit c2f9db639c38f34bda0d999d557f5cec0fb80915
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Mon Mar 20 14:22:31 2023 +0100
+-
+-    gnu: Update struct shmid_ds for 64-bit time
+-
+-Index: b/src/unix/linux_like/linux/gnu/b32/arm/mod.rs
+-===================================================================
+---- a/src/unix/linux_like/linux/gnu/b32/arm/mod.rs
+-+++ b/src/unix/linux_like/linux/gnu/b32/arm/mod.rs
+-@@ -116,10 +116,13 @@ s! {
+-         pub shm_perm: crate::ipc_perm,
+-         pub shm_segsz: size_t,
+-         pub shm_atime: crate::time_t,
+-+        #[cfg(not(gnu_time64_abi))]
+-         __unused1: c_ulong,
+-         pub shm_dtime: crate::time_t,
+-+        #[cfg(not(gnu_time64_abi))]
+-         __unused2: c_ulong,
+-         pub shm_ctime: crate::time_t,
+-+        #[cfg(not(gnu_time64_abi))]
+-         __unused3: c_ulong,
+-         pub shm_cpid: crate::pid_t,
+-         pub shm_lpid: crate::pid_t,
+-Index: b/src/unix/linux_like/linux/gnu/b32/powerpc.rs
+-===================================================================
+---- a/src/unix/linux_like/linux/gnu/b32/powerpc.rs
+-+++ b/src/unix/linux_like/linux/gnu/b32/powerpc.rs
+-@@ -113,14 +113,10 @@ s! {
+- 
+-     pub struct shmid_ds {
+-         pub shm_perm: crate::ipc_perm,
+--        __glibc_reserved1: c_uint,
+-+        pub shm_segsz: crate::size_t,
+-         pub shm_atime: crate::time_t,
+--        __glibc_reserved2: c_uint,
+-         pub shm_dtime: crate::time_t,
+--        __glibc_reserved3: c_uint,
+-         pub shm_ctime: crate::time_t,
+--        __glibc_reserved4: c_uint,
+--        pub shm_segsz: size_t,
+-         pub shm_cpid: crate::pid_t,
+-         pub shm_lpid: crate::pid_t,
+-         pub shm_nattch: crate::shmatt_t,
+-Index: b/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-===================================================================
+---- a/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-+++ b/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-@@ -190,11 +190,8 @@ s! {
+-         pub shm_perm: crate::ipc_perm,
+-         pub shm_segsz: size_t,
+-         pub shm_atime: crate::time_t,
+--        __unused1: c_ulong,
+-         pub shm_dtime: crate::time_t,
+--        __unused2: c_ulong,
+-         pub shm_ctime: crate::time_t,
+--        __unused3: c_ulong,
+-         pub shm_cpid: crate::pid_t,
+-         pub shm_lpid: crate::pid_t,
+-         pub shm_nattch: crate::shmatt_t,
+diff --git a/src/libc/debian/patches/time64-105-stat.patch b/src/libc/debian/patches/time64-105-stat.patch
+deleted file mode 100644
+index dfa3eb51e4..0000000000
+--- a/src/libc/debian/patches/time64-105-stat.patch
++++ /dev/null
+@@ -1,605 +0,0 @@
+-This patch is based on the commit described below, taken from upstream pull
+-request 3175, it was adapted for use in the Debian package by Peter Michael
+-Green.
+-
+-commit 3e37f1b0ca3ca56f8a18a0d46075a12f89838dc6
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Mon Mar 4 11:13:49 2024 +0100
+-
+-    gnu: Adapt stat, statfs, statvfs for _TIME_BITS=64
+-    
+-    Adapt the 32-bit versions of the various stat and stat*64 structs to
+-    support 64 bit time and file offset.
+-    
+-    Move the default stat struct from b32/mod.rs to a new file
+-    fnu/b32/generic.rs as it now only supports _most_ platforms.
+-    Some archs still need their own version.
+-    
+-    stat64, statfs64 and statvfs64 becomes aliases to stat, statfs and
+-    statfcf respectively for arm, riscv32 and sparc.
+-    
+-    statfs64 becomes an alias for statfs on mips and powerpc.
+-
+-Index: libc/src/unix/linux_like/linux/gnu/b32/arm/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b32/arm/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b32/arm/mod.rs
+-@@ -59,58 +59,8 @@ s! {
+-         __unused2: c_ulong,
+-     }
+- 
+--    pub struct stat64 {
+--        pub st_dev: crate::dev_t,
+--        __pad1: c_uint,
+--        __st_ino: crate::ino_t,
+--        pub st_mode: crate::mode_t,
+--        pub st_nlink: crate::nlink_t,
+--        pub st_uid: crate::uid_t,
+--        pub st_gid: crate::gid_t,
+--        pub st_rdev: crate::dev_t,
+--        __pad2: c_uint,
+--        pub st_size: off64_t,
+--        pub st_blksize: crate::blksize_t,
+--        pub st_blocks: crate::blkcnt64_t,
+--        pub st_atime: crate::time_t,
+--        pub st_atime_nsec: c_long,
+--        pub st_mtime: crate::time_t,
+--        pub st_mtime_nsec: c_long,
+--        pub st_ctime: crate::time_t,
+--        pub st_ctime_nsec: c_long,
+--        pub st_ino: crate::ino64_t,
+--    }
+- 
+--    pub struct statfs64 {
+--        pub f_type: crate::__fsword_t,
+--        pub f_bsize: crate::__fsword_t,
+--        pub f_blocks: u64,
+--        pub f_bfree: u64,
+--        pub f_bavail: u64,
+--        pub f_files: u64,
+--        pub f_ffree: u64,
+--        pub f_fsid: crate::fsid_t,
+--        pub f_namelen: crate::__fsword_t,
+--        pub f_frsize: crate::__fsword_t,
+--        pub f_flags: crate::__fsword_t,
+--        pub f_spare: [crate::__fsword_t; 4],
+--    }
+- 
+--    pub struct statvfs64 {
+--        pub f_bsize: c_ulong,
+--        pub f_frsize: c_ulong,
+--        pub f_blocks: u64,
+--        pub f_bfree: u64,
+--        pub f_bavail: u64,
+--        pub f_files: u64,
+--        pub f_ffree: u64,
+--        pub f_favail: u64,
+--        pub f_fsid: c_ulong,
+--        __f_unused: c_int,
+--        pub f_flag: c_ulong,
+--        pub f_namemax: c_ulong,
+--        __f_spare: [c_int; 6],
+--    }
+- 
+-     pub struct shmid_ds {
+-         pub shm_perm: crate::ipc_perm,
+-Index: libc/src/unix/linux_like/linux/gnu/b32/generic.rs
+-===================================================================
+---- /dev/null
+-+++ libc/src/unix/linux_like/linux/gnu/b32/generic.rs
+-@@ -0,0 +1,30 @@
+-+s! {
+-+    pub struct stat {
+-+        pub st_dev: crate::dev_t,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        _pad1: i32,
+-+        pub st_ino: crate::ino_t,
+-+        pub st_mode: crate::mode_t,
+-+        pub st_nlink: crate::nlink_t,
+-+        pub st_uid: crate::uid_t,
+-+        pub st_gid: crate::gid_t,
+-+        pub st_rdev: crate::dev_t,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        __pad2: i32,
+-+        pub st_size: crate::off_t,
+-+        pub st_blksize: crate::blksize_t,
+-+        pub st_blocks: crate::blkcnt_t,
+-+        pub st_atime: crate::time_t,
+-+        pub st_atime_nsec: crate::c_long,
+-+        #[cfg(gnu_time64_abi)]
+-+        __pad3: i32,
+-+        pub st_mtime: crate::time_t,
+-+        pub st_mtime_nsec: crate::c_long,
+-+        #[cfg(gnu_time64_abi)]
+-+        __pad4: i32,
+-+        pub st_ctime: crate::time_t,
+-+        pub st_ctime_nsec: crate::c_long,
+-+        #[cfg(gnu_time64_abi)]
+-+        __pad5: i32,
+-+    }
+-+}
+-Index: libc/src/unix/linux_like/linux/gnu/b32/mips/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b32/mips/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b32/mips/mod.rs
+-@@ -4,30 +4,90 @@ use crate::{off64_t, off_t};
+- pub type c_char = i8;
+- pub type wchar_t = i32;
+- 
+-+pub type statfs64 = statfs;
+- s! {
+--    pub struct stat64 {
+-+    pub struct stat {
+-+        #[cfg(gnu_time64_abi)]
+-+        pub st_dev: crate::dev_t,
+-+        #[cfg(not(gnu_time64_abi))]
+-         pub st_dev: c_ulong,
+-+        #[cfg(not(gnu_time64_abi))]
+-         st_pad1: [c_long; 3],
+--        pub st_ino: crate::ino64_t,
+-+
+-+        pub st_ino: crate::ino_t,
+-         pub st_mode: crate::mode_t,
+-         pub st_nlink: crate::nlink_t,
+-         pub st_uid: crate::uid_t,
+-         pub st_gid: crate::gid_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub st_rdev: crate::dev_t,
+-+        #[cfg(not(gnu_time64_abi))]
+-         pub st_rdev: c_ulong,
+-+
+-+        #[cfg(not(gnu_time64_abi))]
+-         st_pad2: [c_long; 2],
+--        pub st_size: off64_t,
+-+
+-+
+-+        pub st_size: crate::off_t,
+-+
+-+        #[cfg(not(gnu_time64_abi))]
+-+        st_pad3: c_long,
+-+
+-+        #[cfg(gnu_time64_abi)]
+-+        pub st_blksize: crate::blksize_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        pub st_blocks: crate::blkcnt_t,
+-+
+-         pub st_atime: crate::time_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        __pad1: i32,
+-         pub st_atime_nsec: c_long,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        __pad1: i32,
+-         pub st_mtime: crate::time_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        __pad2: i32,
+-         pub st_mtime_nsec: c_long,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        __pad2: i32,
+-         pub st_ctime: crate::time_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        __pad3: i32,
+-         pub st_ctime_nsec: c_long,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        __pad3: i32,
+-+
+-+
+-+        #[cfg(not(gnu_time64_abi))]
+-         pub st_blksize: crate::blksize_t,
+--        st_pad3: c_long,
+--        pub st_blocks: crate::blkcnt64_t,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        pub st_blocks: crate::blkcnt_t,
+-+        #[cfg(not(gnu_time64_abi))]
+-         st_pad5: [c_long; 14],
+-     }
+- 
+-+    pub struct stat64 {
+-+        pub st_dev: crate::dev_t,
+-+        pub st_ino: crate::ino64_t,
+-+        pub st_mode: crate::mode_t,
+-+        pub st_nlink: crate::nlink_t,
+-+        pub st_uid: crate::uid_t,
+-+        pub st_gid: crate::gid_t,
+-+        pub st_rdev: crate::dev_t,
+-+        pub st_size: off64_t,
+-+        pub st_blksize: crate::blksize_t,
+-+        pub st_blocks: crate::blkcnt64_t,
+-+        pub st_atime: crate::time_t,
+-+        __pad1: i32,
+-+        pub st_atime_nsec: c_long,
+-+        pub st_mtime: crate::time_t,
+-+        __pad2: i32,
+-+        pub st_mtime_nsec: c_long,
+-+        pub st_ctime: crate::time_t,
+-+        __pad3: i32,
+-+        pub st_ctime_nsec: c_long,
+-+    }
+-+
+-     pub struct statfs {
+-         pub f_type: c_long,
+-         pub f_bsize: c_long,
+-@@ -44,21 +104,6 @@ s! {
+-         f_spare: [c_long; 5],
+-     }
+- 
+--    pub struct statfs64 {
+--        pub f_type: c_long,
+--        pub f_bsize: c_long,
+--        pub f_frsize: c_long,
+--        pub f_blocks: u64,
+--        pub f_bfree: u64,
+--        pub f_files: u64,
+--        pub f_ffree: u64,
+--        pub f_bavail: u64,
+--        pub f_fsid: crate::fsid_t,
+--        pub f_namelen: c_long,
+--        pub f_flags: c_long,
+--        pub f_spare: [c_long; 5],
+--    }
+--
+-     pub struct statvfs64 {
+-         pub f_bsize: c_ulong,
+-         pub f_frsize: c_ulong,
+-Index: libc/src/unix/linux_like/linux/gnu/b32/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b32/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b32/mod.rs
+-@@ -53,56 +53,15 @@ cfg_if! {
+-         pub type blksize_t = i32;
+-     }
+- }
+--
+--s! {
+--    pub struct stat {
+--        #[cfg(not(any(target_arch = "mips", target_arch = "mips32r6")))]
+--        pub st_dev: crate::dev_t,
+--        #[cfg(any(target_arch = "mips", target_arch = "mips32r6"))]
+--        pub st_dev: c_ulong,
+--
+--        #[cfg(not(any(target_arch = "mips", target_arch = "mips32r6")))]
+--        __pad1: c_short,
+--        #[cfg(any(target_arch = "mips", target_arch = "mips32r6"))]
+--        st_pad1: [c_long; 3],
+--        pub st_ino: crate::ino_t,
+--        pub st_mode: crate::mode_t,
+--        pub st_nlink: crate::nlink_t,
+--        pub st_uid: crate::uid_t,
+--        pub st_gid: crate::gid_t,
+--        #[cfg(not(any(target_arch = "mips", target_arch = "mips32r6")))]
+--        pub st_rdev: crate::dev_t,
+--        #[cfg(any(target_arch = "mips", target_arch = "mips32r6"))]
+--        pub st_rdev: c_ulong,
+--        #[cfg(not(any(target_arch = "mips", target_arch = "mips32r6")))]
+--        __pad2: c_short,
+--        #[cfg(any(target_arch = "mips", target_arch = "mips32r6"))]
+--        st_pad2: [c_long; 2],
+--        pub st_size: off_t,
+--        #[cfg(any(target_arch = "mips", target_arch = "mips32r6"))]
+--        st_pad3: c_long,
+--        #[cfg(not(any(target_arch = "mips", target_arch = "mips32r6")))]
+--        pub st_blksize: crate::blksize_t,
+--        #[cfg(not(any(target_arch = "mips", target_arch = "mips32r6")))]
+--        pub st_blocks: crate::blkcnt_t,
+--        pub st_atime: crate::time_t,
+--        pub st_atime_nsec: c_long,
+--        pub st_mtime: crate::time_t,
+--        pub st_mtime_nsec: c_long,
+--        pub st_ctime: crate::time_t,
+--        pub st_ctime_nsec: c_long,
+--        #[cfg(not(any(target_arch = "mips", target_arch = "mips32r6")))]
+--        __unused4: c_long,
+--        #[cfg(not(any(target_arch = "mips", target_arch = "mips32r6")))]
+--        __unused5: c_long,
+--        #[cfg(any(target_arch = "mips", target_arch = "mips32r6"))]
+--        pub st_blksize: crate::blksize_t,
+--        #[cfg(any(target_arch = "mips", target_arch = "mips32r6"))]
+--        pub st_blocks: crate::blkcnt_t,
+--        #[cfg(any(target_arch = "mips", target_arch = "mips32r6"))]
+--        st_pad5: [c_long; 14],
+-+cfg_if! {
+-+    if #[cfg(any(target_arch = "arm", target_arch="riscv32", target_arch="sparc"))] {
+-+        pub type stat64 = stat;
+-+        pub type statfs64 = statfs;
+-+        pub type statvfs64 = statvfs;
+-     }
+-+}
+- 
+-+s! {
+-     pub struct statvfs {
+-         pub f_bsize: c_ulong,
+-         pub f_frsize: c_ulong,
+-@@ -454,3 +413,16 @@ cfg_if! {
+-         // Unknown target_arch
+-     }
+- }
+-+
+-+cfg_if! {
+-+    if #[cfg(not(any(
+-+        target_arch = "mips",
+-+        target_arch = "mips32r6",
+-+        target_arch = "powerpc",
+-+        target_arch = "riscv32",
+-+        target_arch = "sparc",
+-+    )))] {
+-+        mod generic;
+-+        pub use self::generic::*;
+-+    }
+-+}
+-Index: libc/src/unix/linux_like/linux/gnu/b32/powerpc.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b32/powerpc.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b32/powerpc.rs
+-@@ -4,6 +4,8 @@ use crate::{off64_t, off_t};
+- pub type c_char = u8;
+- pub type wchar_t = i32;
+- 
+-+pub type statfs64 = statfs;
+-+
+- s! {
+-     pub struct sigaction {
+-         pub sa_sigaction: crate::sighandler_t,
+-@@ -12,6 +14,38 @@ s! {
+-         pub sa_restorer: Option<extern "C" fn()>,
+-     }
+- 
+-+    pub struct stat {
+-+        pub st_dev: crate::dev_t,
+-+        pub st_ino: crate::ino_t,
+-+        pub st_mode: crate::mode_t,
+-+        pub st_nlink: crate::nlink_t,
+-+        pub st_uid: crate::uid_t,
+-+        pub st_gid: crate::gid_t,
+-+        pub st_rdev: crate::dev_t,
+-+        pub st_size: off_t,
+-+        pub st_blksize: crate::blksize_t,
+-+        pub st_blocks: crate::blkcnt_t,
+-+        pub st_atime: crate::time_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        __pad1: i32,
+-+        pub st_atime_nsec: c_long,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        __pad1: i32,
+-+        pub st_mtime: crate::time_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        __pad2: i32,
+-+        pub st_mtime_nsec: c_long,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        __pad2: i32,
+-+        pub st_ctime: crate::time_t,
+-+        #[cfg(gnu_time64_abi)]
+-+        __pad3: i32,
+-+        pub st_ctime_nsec: c_long,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        __pad3: i32,
+-+    }
+-+
+-+
+-     pub struct statfs {
+-         pub f_type: crate::__fsword_t,
+-         pub f_bsize: crate::__fsword_t,
+-@@ -66,33 +100,18 @@ s! {
+-         pub st_uid: crate::uid_t,
+-         pub st_gid: crate::gid_t,
+-         pub st_rdev: crate::dev_t,
+--        __pad2: c_ushort,
+-         pub st_size: off64_t,
+-         pub st_blksize: crate::blksize_t,
+-         pub st_blocks: crate::blkcnt64_t,
+-         pub st_atime: crate::time_t,
+--        pub st_atime_nsec: c_long,
+-+         __pad1: i32,
+-+       pub st_atime_nsec: c_long,
+-         pub st_mtime: crate::time_t,
+-+        __pad2: i32,
+-         pub st_mtime_nsec: c_long,
+-         pub st_ctime: crate::time_t,
+-+        __pad3: i32,
+-         pub st_ctime_nsec: c_long,
+--        __glibc_reserved4: c_ulong,
+--        __glibc_reserved5: c_ulong,
+--    }
+--
+--    pub struct statfs64 {
+--        pub f_type: crate::__fsword_t,
+--        pub f_bsize: crate::__fsword_t,
+--        pub f_blocks: u64,
+--        pub f_bfree: u64,
+--        pub f_bavail: u64,
+--        pub f_files: u64,
+--        pub f_ffree: u64,
+--        pub f_fsid: crate::fsid_t,
+--        pub f_namelen: crate::__fsword_t,
+--        pub f_frsize: crate::__fsword_t,
+--        pub f_flags: crate::__fsword_t,
+--        pub f_spare: [crate::__fsword_t; 4],
+-     }
+- 
+-     pub struct statvfs64 {
+-Index: libc/src/unix/linux_like/linux/gnu/b32/riscv32/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b32/riscv32/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b32/riscv32/mod.rs
+-@@ -21,28 +21,6 @@ s! {
+-         __glibc_reserved5: c_ulong,
+-     }
+- 
+--    pub struct stat64 {
+--        pub st_dev: crate::dev_t,
+--        pub st_ino: crate::ino64_t,
+--        pub st_mode: crate::mode_t,
+--        pub st_nlink: crate::nlink_t,
+--        pub st_uid: crate::uid_t,
+--        pub st_gid: crate::gid_t,
+--        pub st_rdev: crate::dev_t,
+--        pub __pad1: crate::dev_t,
+--        pub st_size: off64_t,
+--        pub st_blksize: crate::blksize_t,
+--        pub __pad2: c_int,
+--        pub st_blocks: crate::blkcnt64_t,
+--        pub st_atime: crate::time_t,
+--        pub st_atime_nsec: c_long,
+--        pub st_mtime: crate::time_t,
+--        pub st_mtime_nsec: c_long,
+--        pub st_ctime: crate::time_t,
+--        pub st_ctime_nsec: c_long,
+--        __unused: [c_int; 2],
+--    }
+--
+-     pub struct statfs {
+-         pub f_type: c_long,
+-         pub f_bsize: c_long,
+-@@ -58,36 +36,6 @@ s! {
+-         pub f_spare: [c_long; 4],
+-     }
+- 
+--    pub struct statfs64 {
+--        pub f_type: c_long,
+--        pub f_bsize: c_long,
+--        pub f_blocks: crate::fsblkcnt64_t,
+--        pub f_bfree: crate::fsblkcnt64_t,
+--        pub f_bavail: crate::fsblkcnt64_t,
+--        pub f_files: crate::fsfilcnt64_t,
+--        pub f_ffree: crate::fsfilcnt64_t,
+--        pub f_fsid: crate::fsid_t,
+--        pub f_namelen: c_long,
+--        pub f_frsize: c_long,
+--        pub f_flags: c_long,
+--        pub f_spare: [c_long; 4],
+--    }
+--
+--    pub struct statvfs64 {
+--        pub f_bsize: c_ulong,
+--        pub f_frsize: c_ulong,
+--        pub f_blocks: crate::fsblkcnt64_t,
+--        pub f_bfree: crate::fsblkcnt64_t,
+--        pub f_bavail: crate::fsblkcnt64_t,
+--        pub f_files: crate::fsfilcnt64_t,
+--        pub f_ffree: crate::fsfilcnt64_t,
+--        pub f_favail: crate::fsfilcnt64_t,
+--        pub f_fsid: c_ulong,
+--        pub f_flag: c_ulong,
+--        pub f_namemax: c_ulong,
+--        pub __f_spare: [c_int; 6],
+--    }
+--
+-     pub struct siginfo_t {
+-         pub si_signo: c_int,
+-         pub si_errno: c_int,
+-Index: libc/src/unix/linux_like/linux/gnu/b32/sparc/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b32/sparc/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b32/sparc/mod.rs
+-@@ -61,56 +61,7 @@ s! {
+-         pub ss_size: size_t,
+-     }
+- 
+--    pub struct stat64 {
+--        pub st_dev: crate::dev_t,
+--        pub st_ino: crate::ino64_t,
+--        pub st_mode: crate::mode_t,
+--        pub st_nlink: crate::nlink_t,
+--        pub st_uid: crate::uid_t,
+--        pub st_gid: crate::gid_t,
+--        pub st_rdev: crate::dev_t,
+--        __pad2: c_ushort,
+--        pub st_size: off64_t,
+--        pub st_blksize: crate::blksize_t,
+--        pub st_blocks: crate::blkcnt64_t,
+--        pub st_atime: crate::time_t,
+--        pub st_atime_nsec: c_long,
+--        pub st_mtime: crate::time_t,
+--        pub st_mtime_nsec: c_long,
+--        pub st_ctime: crate::time_t,
+--        pub st_ctime_nsec: c_long,
+--        __reserved: [c_long; 2],
+--    }
+--
+--    pub struct statfs64 {
+--        pub f_type: crate::__fsword_t,
+--        pub f_bsize: crate::__fsword_t,
+--        pub f_blocks: u64,
+--        pub f_bfree: u64,
+--        pub f_bavail: u64,
+--        pub f_files: u64,
+--        pub f_ffree: u64,
+--        pub f_fsid: crate::fsid_t,
+--        pub f_namelen: crate::__fsword_t,
+--        pub f_frsize: crate::__fsword_t,
+--        pub f_flags: crate::__fsword_t,
+--        pub f_spare: [crate::__fsword_t; 4],
+--    }
+- 
+--    pub struct statvfs64 {
+--        pub f_bsize: c_ulong,
+--        pub f_frsize: c_ulong,
+--        pub f_blocks: u64,
+--        pub f_bfree: u64,
+--        pub f_bavail: u64,
+--        pub f_files: u64,
+--        pub f_ffree: u64,
+--        pub f_favail: u64,
+--        pub f_fsid: c_ulong,
+--        pub f_flag: c_ulong,
+--        pub f_namemax: c_ulong,
+--        __f_spare: [c_int; 6],
+--    }
+- 
+-     pub struct ipc_perm {
+-         pub __key: crate::key_t,
+-Index: libc/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-@@ -5,6 +5,8 @@ pub type c_char = i8;
+- pub type wchar_t = i32;
+- pub type greg_t = i32;
+- 
+-+pub type statfs64 = statfs;
+-+
+- s! {
+-     pub struct sigaction {
+-         pub sa_sigaction: crate::sighandler_t,
+-@@ -135,39 +137,24 @@ s! {
+- 
+-     pub struct stat64 {
+-         pub st_dev: crate::dev_t,
+--        __pad1: c_uint,
+--        __st_ino: crate::ino_t,
+-+        pub st_ino: crate::ino_t,
+-         pub st_mode: crate::mode_t,
+-         pub st_nlink: crate::nlink_t,
+-         pub st_uid: crate::uid_t,
+-         pub st_gid: crate::gid_t,
+-         pub st_rdev: crate::dev_t,
+--        __pad2: c_uint,
+-         pub st_size: off64_t,
+-         pub st_blksize: crate::blksize_t,
+-         pub st_blocks: crate::blkcnt64_t,
+-         pub st_atime: crate::time_t,
+-         pub st_atime_nsec: c_long,
+-+        __pad1: i32,
+-         pub st_mtime: crate::time_t,
+-         pub st_mtime_nsec: c_long,
+-+        __pad2: i32,
+-         pub st_ctime: crate::time_t,
+-         pub st_ctime_nsec: c_long,
+--        pub st_ino: crate::ino64_t,
+--    }
+--
+--    pub struct statfs64 {
+--        pub f_type: crate::__fsword_t,
+--        pub f_bsize: crate::__fsword_t,
+--        pub f_blocks: u64,
+--        pub f_bfree: u64,
+--        pub f_bavail: u64,
+--        pub f_files: u64,
+--        pub f_ffree: u64,
+--        pub f_fsid: crate::fsid_t,
+--        pub f_namelen: crate::__fsword_t,
+--        pub f_frsize: crate::__fsword_t,
+--        pub f_flags: crate::__fsword_t,
+--        pub f_spare: [crate::__fsword_t; 4],
+-+        __pad3: i32,
+-     }
+- 
+-     pub struct statvfs64 {
+diff --git a/src/libc/debian/patches/time64-108-fix-stat-i386.patch b/src/libc/debian/patches/time64-108-fix-stat-i386.patch
+deleted file mode 100644
+index f7bb6c09c9..0000000000
+--- a/src/libc/debian/patches/time64-108-fix-stat-i386.patch
++++ /dev/null
+@@ -1,92 +0,0 @@
+-The patch series taken from upstream unconditionally changes the stat definitions
+-in src/unix/linux_like/linux/gnu/b32/x86/mod.rs, since we don't enable time64
+-on i386 this causes us problems. This patch puts back the old definitions and
+-adds conditionals.
+-
+-Index: libc-0.2.168/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-===================================================================
+---- libc-0.2.168.orig/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-+++ libc-0.2.168/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-@@ -5,6 +5,7 @@ pub type c_char = i8;
+- pub type wchar_t = i32;
+- pub type greg_t = i32;
+- 
+-+#[cfg(gnu_time64_abi)]
+- pub type statfs64 = statfs;
+- 
+- s! {
+-@@ -134,7 +135,50 @@ s! {
+-         __unused1: c_ulong,
+-         __unused2: c_ulong,
+-     }
+-+}
+- 
+-+#[cfg(not(gnu_time64_abi))]
+-+s! {
+-+    pub struct stat64 {
+-+        pub st_dev: crate::dev_t,
+-+        __pad1: c_uint,
+-+        __st_ino: crate::ino_t,
+-+        pub st_mode: crate::mode_t,
+-+        pub st_nlink: crate::nlink_t,
+-+        pub st_uid: crate::uid_t,
+-+        pub st_gid: crate::gid_t,
+-+        pub st_rdev: crate::dev_t,
+-+        __pad2: c_uint,
+-+        pub st_size: crate::off64_t,
+-+        pub st_blksize: crate::blksize_t,
+-+        pub st_blocks: crate::blkcnt64_t,
+-+        pub st_atime: crate::time_t,
+-+        pub st_atime_nsec: c_long,
+-+        pub st_mtime: crate::time_t,
+-+        pub st_mtime_nsec: c_long,
+-+        pub st_ctime: crate::time_t,
+-+        pub st_ctime_nsec: c_long,
+-+        pub st_ino: crate::ino64_t,
+-+    }
+-+
+-+    pub struct statfs64 {
+-+        pub f_type: crate::__fsword_t,
+-+        pub f_bsize: crate::__fsword_t,
+-+        pub f_blocks: u64,
+-+        pub f_bfree: u64,
+-+        pub f_bavail: u64,
+-+        pub f_files: u64,
+-+        pub f_ffree: u64,
+-+        pub f_fsid: crate::fsid_t,
+-+        pub f_namelen: crate::__fsword_t,
+-+        pub f_frsize: crate::__fsword_t,
+-+        pub f_flags: crate::__fsword_t,
+-+        pub f_spare: [crate::__fsword_t; 4],
+-+    }
+-+}
+-+
+-+#[cfg(gnu_time64_abi)]
+-+s! {
+-     pub struct stat64 {
+-         pub st_dev: crate::dev_t,
+-         pub st_ino: crate::ino_t,
+-@@ -156,7 +200,9 @@ s! {
+-         pub st_ctime_nsec: c_long,
+-         __pad3: i32,
+-     }
+-+}
+- 
+-+s! {
+-     pub struct statvfs64 {
+-         pub f_bsize: c_ulong,
+-         pub f_frsize: c_ulong,
+-Index: libc-0.2.168/src/unix/linux_like/linux/gnu/b32/generic.rs
+-===================================================================
+---- libc-0.2.168.orig/src/unix/linux_like/linux/gnu/b32/generic.rs
+-+++ libc-0.2.168/src/unix/linux_like/linux/gnu/b32/generic.rs
+-@@ -26,5 +26,9 @@ s! {
+-         pub st_ctime_nsec: crate::c_long,
+-         #[cfg(gnu_time64_abi)]
+-         __pad5: i32,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        __unused4: crate::c_long,
+-+        #[cfg(not(gnu_time64_abi))]
+-+        __unused5: crate::c_long,
+-     }
+- }
+diff --git a/src/libc/debian/patches/time64-110-msquid.patch b/src/libc/debian/patches/time64-110-msquid.patch
+deleted file mode 100644
+index c40610a7cc..0000000000
+--- a/src/libc/debian/patches/time64-110-msquid.patch
++++ /dev/null
+@@ -1,86 +0,0 @@
+-This patch is based on the commit described below, taken from the upstream
+-time64 pull request and modified for use in the Debian package by Peter
+-Michael Green.
+-
+-commit eebc18690dc2a2173737251f09c874ef39424395
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Mon Mar 27 14:15:18 2023 +0200
+-
+-    gnu: Update struct msqid_ds for 64-bit time
+-
+-Index: libc/src/unix/linux_like/linux/gnu/b32/arm/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b32/arm/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b32/arm/mod.rs
+-@@ -84,10 +84,13 @@ s! {
+-     pub struct msqid_ds {
+-         pub msg_perm: crate::ipc_perm,
+-         pub msg_stime: crate::time_t,
+-+        #[cfg(not(gnu_time64_abi))]
+-         __glibc_reserved1: c_ulong,
+-         pub msg_rtime: crate::time_t,
+-+        #[cfg(not(gnu_time64_abi))]
+-         __glibc_reserved2: c_ulong,
+-         pub msg_ctime: crate::time_t,
+-+        #[cfg(not(gnu_time64_abi))]
+-         __glibc_reserved3: c_ulong,
+-         __msg_cbytes: c_ulong,
+-         pub msg_qnum: crate::msgqnum_t,
+-Index: libc/src/unix/linux_like/linux/gnu/b32/mips/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b32/mips/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b32/mips/mod.rs
+-@@ -169,21 +169,9 @@ s! {
+- 
+-     pub struct msqid_ds {
+-         pub msg_perm: crate::ipc_perm,
+--        #[cfg(target_endian = "big")]
+--        __glibc_reserved1: c_ulong,
+-         pub msg_stime: crate::time_t,
+--        #[cfg(target_endian = "little")]
+--        __glibc_reserved1: c_ulong,
+--        #[cfg(target_endian = "big")]
+--        __glibc_reserved2: c_ulong,
+-         pub msg_rtime: crate::time_t,
+--        #[cfg(target_endian = "little")]
+--        __glibc_reserved2: c_ulong,
+--        #[cfg(target_endian = "big")]
+--        __glibc_reserved3: c_ulong,
+-         pub msg_ctime: crate::time_t,
+--        #[cfg(target_endian = "little")]
+--        __glibc_reserved3: c_ulong,
+-         __msg_cbytes: c_ulong,
+-         pub msg_qnum: crate::msgqnum_t,
+-         pub msg_qbytes: crate::msglen_t,
+-Index: libc/src/unix/linux_like/linux/gnu/b32/powerpc.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b32/powerpc.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b32/powerpc.rs
+-@@ -145,11 +145,8 @@ s! {
+- 
+-     pub struct msqid_ds {
+-         pub msg_perm: crate::ipc_perm,
+--        __glibc_reserved1: c_uint,
+-         pub msg_stime: crate::time_t,
+--        __glibc_reserved2: c_uint,
+-         pub msg_rtime: crate::time_t,
+--        __glibc_reserved3: c_uint,
+-         pub msg_ctime: crate::time_t,
+-         __msg_cbytes: c_ulong,
+-         pub msg_qnum: crate::msgqnum_t,
+-Index: libc/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-@@ -189,11 +189,8 @@ s! {
+-     pub struct msqid_ds {
+-         pub msg_perm: crate::ipc_perm,
+-         pub msg_stime: crate::time_t,
+--        __glibc_reserved1: c_ulong,
+-         pub msg_rtime: crate::time_t,
+--        __glibc_reserved2: c_ulong,
+-         pub msg_ctime: crate::time_t,
+--        __glibc_reserved3: c_ulong,
+-         __msg_cbytes: c_ulong,
+-         pub msg_qnum: crate::msgqnum_t,
+-         pub msg_qbytes: crate::msglen_t,
+diff --git a/src/libc/debian/patches/time64-120-semid.patch b/src/libc/debian/patches/time64-120-semid.patch
+deleted file mode 100644
+index de38bb0dff..0000000000
+--- a/src/libc/debian/patches/time64-120-semid.patch
++++ /dev/null
+@@ -1,53 +0,0 @@
+-This patch is based on the commit described below, taken from the upstream
+-time64 pull request and modified for use in the Debian package by Peter
+-Michael Green.
+-
+-commit 4385156cfbdfd908881a606e9db5d68a0555847c
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Mon Mar 20 14:29:55 2023 +0100
+-
+-    gnu: Update struct semid_ds for 64-bit time
+-
+-Index: libc/src/unix/linux_like/linux/gnu/b32/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b32/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b32/mod.rs
+-@@ -109,25 +109,36 @@ s! {
+- 
+-     pub struct semid_ds {
+-         pub sem_perm: ipc_perm,
+--        #[cfg(target_arch = "powerpc")]
+-+        #[cfg(all(not(gnu_time64_abi), target_arch = "powerpc"))]
+-         __reserved: crate::__syscall_ulong_t,
+-         pub sem_otime: crate::time_t,
+-         #[cfg(not(any(
+-+            gnu_time64_abi,
+-             target_arch = "mips",
+-             target_arch = "mips32r6",
+-             target_arch = "powerpc"
+-         )))]
+-         __reserved: crate::__syscall_ulong_t,
+--        #[cfg(target_arch = "powerpc")]
+-+        #[cfg(all(not(gnu_time64_abi), target_arch = "powerpc"))]
+-         __reserved2: crate::__syscall_ulong_t,
+-         pub sem_ctime: crate::time_t,
+-         #[cfg(not(any(
+-+            gnu_time64_abi,
+-             target_arch = "mips",
+-             target_arch = "mips32r6",
+-             target_arch = "powerpc"
+-         )))]
+-         __reserved2: crate::__syscall_ulong_t,
+-         pub sem_nsems: crate::__syscall_ulong_t,
+-+        #[cfg(all(gnu_time64_abi,
+-+                  not(any(
+-+                      target_arch = "mips",
+-+                      target_arch = "mips32r6",
+-+                      target_arch = "powerpc",
+-+                      target_arch = "arm",
+-+                      target_arch = "x86"
+-+                  ))))]
+-+        __reserved2: crate::__syscall_ulong_t,
+-         __glibc_reserved3: crate::__syscall_ulong_t,
+-         __glibc_reserved4: crate::__syscall_ulong_t,
+-     }
+diff --git a/src/libc/debian/patches/time64-130-getlk.patch b/src/libc/debian/patches/time64-130-getlk.patch
+deleted file mode 100644
+index 18d83b2b8d..0000000000
+--- a/src/libc/debian/patches/time64-130-getlk.patch
++++ /dev/null
+@@ -1,86 +0,0 @@
+-This patch is based on the commit described below, taken from the upstream
+-time64 pull request and modified for use in the Debian package by Peter
+-Michael Green.
+-
+-commit dee82c3532ce9503e19377a880cc1978c0eb50b0
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Mon Mar 20 14:31:28 2023 +0100
+-
+-    gnu: Update F_GETLK and F_GETLK64 for 64-bit time
+-
+-diff --git a/src/unix/linux_like/linux/gnu/b32/arm/mod.rs b/src/unix/linux_like/linux/gnu/b32/arm/mod.rs
+-index 80d8d3b11d..aa7e60d5ad 100644
+---- a/src/unix/linux_like/linux/gnu/b32/arm/mod.rs
+-+++ b/src/unix/linux_like/linux/gnu/b32/arm/mod.rs
+-@@ -293,7 +293,13 @@ pub const MCL_ONFAULT: c_int = 0x0004;
+- pub const POLLWRNORM: c_short = 0x100;
+- pub const POLLWRBAND: c_short = 0x200;
+- 
+--pub const F_GETLK: c_int = 5;
+-+cfg_if! {
+-+    if #[cfg(gnu_time64_abi)] {
+-+        pub const F_GETLK: c_int = 12;
+-+    } else {
+-+        pub const F_GETLK: c_int = 5;
+-+    }
+-+}
+- pub const F_GETOWN: c_int = 9;
+- pub const F_SETOWN: c_int = 8;
+- 
+-diff --git a/src/unix/linux_like/linux/gnu/b32/mips/mod.rs b/src/unix/linux_like/linux/gnu/b32/mips/mod.rs
+-index edd26c3f01..471c93f98e 100644
+---- a/src/unix/linux_like/linux/gnu/b32/mips/mod.rs
+-+++ b/src/unix/linux_like/linux/gnu/b32/mips/mod.rs
+-@@ -740,7 +740,13 @@ pub const MAP_HUGETLB: c_int = 0x080000;
+- 
+- pub const EFD_NONBLOCK: c_int = 0x80;
+- 
+--pub const F_GETLK: c_int = 14;
+-+cfg_if! {
+-+    if #[cfg(gnu_time64_abi)] {
+-+        pub const F_GETLK: c_int = 33;
+-+    } else {
+-+        pub const F_GETLK: c_int = 14;
+-+    }
+-+}
+- pub const F_GETOWN: c_int = 23;
+- pub const F_SETOWN: c_int = 24;
+- 
+-diff --git a/src/unix/linux_like/linux/gnu/b32/powerpc.rs b/src/unix/linux_like/linux/gnu/b32/powerpc.rs
+-index 79a26cd613..8fe5f10c95 100644
+---- a/src/unix/linux_like/linux/gnu/b32/powerpc.rs
+-+++ b/src/unix/linux_like/linux/gnu/b32/powerpc.rs
+-@@ -310,7 +310,13 @@ pub const MCL_ONFAULT: c_int = 0x8000;
+- pub const POLLWRNORM: c_short = 0x100;
+- pub const POLLWRBAND: c_short = 0x200;
+- 
+--pub const F_GETLK: c_int = 5;
+-+cfg_if! {
+-+    if #[cfg(gnu_time64_abi)] {
+-+        pub const F_GETLK: c_int = 12;
+-+    } else {
+-+        pub const F_GETLK: c_int = 5;
+-+    }
+-+}
+- pub const F_GETOWN: c_int = 9;
+- pub const F_SETOWN: c_int = 8;
+- 
+-diff --git a/src/unix/linux_like/linux/gnu/b32/x86/mod.rs b/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-index e5a1a2afb7..da99b5dd7c 100644
+---- a/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-+++ b/src/unix/linux_like/linux/gnu/b32/x86/mod.rs
+-@@ -472,7 +472,13 @@ pub const SA_NOCLDWAIT: c_int = 0x00000002;
+- pub const SOCK_STREAM: c_int = 1;
+- pub const SOCK_DGRAM: c_int = 2;
+- 
+--pub const F_GETLK: c_int = 5;
+-+cfg_if! {
+-+    if #[cfg(gnu_time64_abi)] {
+-+        pub const F_GETLK: c_int = 12;
+-+    } else {
+-+        pub const F_GETLK: c_int = 5;
+-+    }
+-+}
+- pub const F_GETOWN: c_int = 9;
+- pub const F_SETOWN: c_int = 8;
+- 
+diff --git a/src/libc/debian/patches/time64-140-setlk.patch b/src/libc/debian/patches/time64-140-setlk.patch
+deleted file mode 100644
+index 8abe8be9bf..0000000000
+--- a/src/libc/debian/patches/time64-140-setlk.patch
++++ /dev/null
+@@ -1,58 +0,0 @@
+-This patch is based on the commit described below, taken from upstream pull
+-request 3175, it was adapted for use in the Debian package by Peter Michael
+-Green.
+-
+-commit 4446ec06aa33813c732e2e473742cd5f410e1906
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Mon Mar 20 14:32:07 2023 +0100
+-
+-    gnu: Update F_SETLK and F_SETLKW for 64-bit time
+-    
+-    Also add the F_[SG]ET*64 constants.
+-
+-Index: libc/src/unix/linux_like/linux/gnu/b32/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/b32/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/b32/mod.rs
+-@@ -255,9 +255,6 @@ cfg_if! {
+- 
+-         pub const PTRACE_DETACH: c_uint = 11;
+- 
+--        pub const F_SETLK: c_int = 8;
+--        pub const F_SETLKW: c_int = 9;
+--
+-         pub const F_RDLCK: c_int = 1;
+-         pub const F_WRLCK: c_int = 2;
+-         pub const F_UNLCK: c_int = 3;
+-@@ -301,9 +298,6 @@ cfg_if! {
+- 
+-         pub const PTRACE_DETACH: c_uint = 17;
+- 
+--        pub const F_SETLK: c_int = 6;
+--        pub const F_SETLKW: c_int = 7;
+--
+-         pub const F_RDLCK: c_int = 0;
+-         pub const F_WRLCK: c_int = 1;
+-         pub const F_UNLCK: c_int = 2;
+-@@ -339,6 +333,21 @@ cfg_if! {
+-         pub const EFD_CLOEXEC: c_int = 0x80000;
+-     }
+- }
+-+cfg_if! {
+-+    if #[cfg(target_arch = "sparc")] {
+-+        pub const F_SETLK: c_int = 8;
+-+        pub const F_SETLKW: c_int = 9;
+-+    } else if #[cfg(all(gnu_time64_abi, target_arch = "mips"))] {
+-+        pub const F_SETLK: c_int = 34;
+-+        pub const F_SETLKW: c_int = 35;
+-+    } else if #[cfg(gnu_time64_abi)] {
+-+        pub const F_SETLK: c_int = 13;
+-+        pub const F_SETLKW: c_int = 14;
+-+    } else {
+-+        pub const F_SETLK: c_int = 6;
+-+        pub const F_SETLKW: c_int = 7;
+-+    }
+-+}
+- 
+- #[cfg(target_endian = "little")]
+- pub const PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP: crate::pthread_mutex_t = pthread_mutex_t {
+diff --git a/src/libc/debian/patches/time64-150-aiocb.patch b/src/libc/debian/patches/time64-150-aiocb.patch
+deleted file mode 100644
+index dc4a3c676d..0000000000
+--- a/src/libc/debian/patches/time64-150-aiocb.patch
++++ /dev/null
+@@ -1,23 +0,0 @@
+-This patch is based on the commit described below, taken from upstream pull
+-request 3175, it was adapted for use in the Debian package by Peter Michael
+-Green.
+-
+-commit 9fe31f90a01d5c5c49eef81676f5968b917f5e62
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Mon Mar 20 14:33:33 2023 +0100
+-
+-    gnu: Update struct aiocb for _TIME_BITS=64
+-
+-Index: libc/src/unix/linux_like/linux/gnu/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/gnu/mod.rs
+-+++ libc/src/unix/linux_like/linux/gnu/mod.rs
+-@@ -32,7 +32,7 @@ s! {
+-         __error_code: c_int,
+-         __return_value: ssize_t,
+-         pub aio_offset: off_t,
+--        #[cfg(all(not(target_arch = "x86_64"), target_pointer_width = "32"))]
+-+        #[cfg(all(not(gnu_time64_abi), not(target_arch = "x86_64"), target_pointer_width = "32"))]
+-         __unused1: [c_char; 4],
+-         __glibc_reserved: [c_char; 32],
+-     }
+diff --git a/src/libc/debian/patches/time64-160-timespec.patch b/src/libc/debian/patches/time64-160-timespec.patch
+deleted file mode 100644
+index 2e92e8ca77..0000000000
+--- a/src/libc/debian/patches/time64-160-timespec.patch
++++ /dev/null
+@@ -1,34 +0,0 @@
+-This patch is based on the commit described below, taken from upstream pull
+-request 3175.
+-
+-It was adjusted by Peter Michael Green to use target_endian instead of hard
+-coding big and little endian architectures.
+-
+-commit 7f3a1e7727377045d73daca272711c548fe0f394
+-Author: Ola x Nilsson <olani@axis.com>
+-Date:   Mon Mar 27 14:17:19 2023 +0200
+-
+-    Update struct timespec for _TIME_BITS=64
+-    
+-    powerpc and mips wants 32 bits of padding before tv_nsec.
+-    arm and x86 wants 32bits of padding after tv_nsec.
+-
+-diff --git a/src/unix/mod.rs b/src/unix/mod.rs
+-index 42a293e9b0..f120933db6 100644
+---- a/src/unix/mod.rs
+-+++ b/src/unix/mod.rs
+-@@ -74,10 +74,14 @@ s! {
+-     // See https://sourceware.org/bugzilla/show_bug.cgi?id=16437
+-     pub struct timespec {
+-         pub tv_sec: time_t,
+-+        #[cfg(all(gnu_time64_abi, target_endian = "big"))]
+-+        __pad: i32,
+-         #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
+-         pub tv_nsec: i64,
+-         #[cfg(not(all(target_arch = "x86_64", target_pointer_width = "32")))]
+-         pub tv_nsec: c_long,
+-+        #[cfg(all(gnu_time64_abi, target_endian = "little"))]
+-+        __pad: i32,
+-     }
+- 
+-     pub struct rlimit {
+diff --git a/src/libc/debian/patches/time64-190-fix-clock-nanosleep-i386.patch b/src/libc/debian/patches/time64-190-fix-clock-nanosleep-i386.patch
+deleted file mode 100644
+index c6cec60faf..0000000000
+--- a/src/libc/debian/patches/time64-190-fix-clock-nanosleep-i386.patch
++++ /dev/null
+@@ -1,14 +0,0 @@
+-Index: libc/src/unix/linux_like/linux/mod.rs
+-===================================================================
+---- libc.orig/src/unix/linux_like/linux/mod.rs
+-+++ libc/src/unix/linux_like/linux/mod.rs
+-@@ -5628,7 +5628,8 @@ extern "C" {
+-         all(
+-             target_env = "gnu",
+-             target_pointer_width = "32",
+--            not(target_arch = "x86_64")
+-+            not(target_arch = "x86_64"),
+-+            gnu_time64_abi
+-         ),
+-         link_name = "__clock_nanosleep_time64"
+-     )]
