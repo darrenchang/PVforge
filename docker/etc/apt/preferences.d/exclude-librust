@@ -1,0 +1,4 @@
+Package: librust-*
+Pin: release *
+Pin-Priority: -1
+

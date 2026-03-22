@@ -20,10 +20,10 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-docker buildx bake
-docker run --rm -d --name ${BUILDER_NAME} pvebuilder /bin/sh -c "sleep infinity";
-echo "Copying $(du -sh ./) to the container ${BUILDER_NAME}..."
-docker exec ${BUILDER_NAME} bash -c "mkdir /pxvirt/"
+docker buildx bake && \
+docker run --rm -d --name ${BUILDER_NAME} pvebuilder /bin/sh -c "sleep infinity" && \
+echo "Copying $(du -sh ./) to the container ${BUILDER_NAME}..." && \
+docker exec ${BUILDER_NAME} bash -c "mkdir /pxvirt/" && \
 tar -cf - ./ | pv -f -s $(du -sb ./ | cut -f1) | docker exec -i ${BUILDER_NAME} bash -c "tar -xf - -C /pxvirt/"
 # docker exec -ti ${BUILDER_NAME} bash -c '/pxvirt/packages/build_all.sh';
 # docker cp ${BUILDER_NAME}:/logs/ ./

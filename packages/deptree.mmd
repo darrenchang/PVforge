@@ -4,6 +4,11 @@ title: pxvirt Package Compile Dependency tree
 graph LR
     %% Tier 0.0 - Foundations (rust libraries)
     subgraph T0.0["Tier 0.0 – Foundations (rust libraries)"]
+        shlex
+        libc
+        jobserver
+        unicode-ident
+        proc-macro2
         cc
         openssl
         openssl-probe
@@ -17,27 +22,50 @@ graph LR
         tracing-attributes
         tracing-core
         ucd-trie
-        tracing-attributes --> tracing
         valuable-derive
         valuable
+        rayon
+        either
+        crossbeam-utils
+        crossbeam-epoch
+        crossbeam-deque
+        rayon-core
+        wasm-sync
+        tokio-macros
+        signal-hook-registry
+        httparse
+        semver
+        tracing-attributes --> tracing
+        shlex --> cc
+        libc --> cc
+        jobserver --> cc
+        cc --> compiler-builtins
+        unicode-ident --> proc-macro2
+        proc-macro2 --> quote
+        quote --> syn
+        syn --> serde-derive
+        wasm-sync --> rayon-core
+        crossbeam-utils --> crossbeam-epoch
+        crossbeam-epoch --> crossbeam-deque
+        crossbeam-deque --> rayon-core
+        either --> rayon
+        rayon-core --> rayon
+        rayon --> id-arena
         valuable-derive --> valuable
         valuable --> tracing-core
         tracing-core --> tracing
-        tokio-macros
-        signal-hook-registry
         tokio-macros --> tokio
         signal-hook-registry --> tokio
         tracing --> tokio
         socket2 --> tokio
         parking-lot --> tokio
-        httparse
-        httparse --> hyprr
-        httpdate
+        httparse --> hyper
         httpdate --> hyper
-        want
         want --> hyper
-        h2
         h2 --> hyper
+        httpdate
+        want
+        h2
         ipnet
         ipnet --> hyper-util
         tower-service
@@ -81,6 +109,39 @@ graph LR
         openssl-sys --> compact-jwt
         der-parser
         serde-cbor
+        serde-json
+        serde-test
+        no-panic
+        itoa
+        compiler-builtins
+        erased-serde
+        sval-derive
+        ryu
+        sval
+        sval-ref
+        sval-fmt
+        value-bag
+        sval-serde
+        log
+        memchr
+        ryu --> sval-fmt
+        sval-derive --> sval
+        sval --> sval-ref
+        erased_serde --> serde-fmt
+        sval-fmt --> value-bag-sval2
+        sval-serde --> value-bag-sval2
+        memchr --> serde-json
+        itoa --> serde-json
+        indexmap --> serde-json
+        serde-json --> serde-test
+        serde-json --> value-bag-serde
+        serde-json --> wasm-bindgen
+        value-bag-serde --> value-bag
+        sval-serde --> value-bag
+        value-bag-sval2 --> value-bag
+        value-bag --> log
+        compiler-builtins --> memchr
+        no-panic --> itoa
         serde-cbor-2
         webauthn-attestation-ca
         serde-wasm-bindgen
@@ -96,6 +157,26 @@ graph LR
         wasm-bindgen
         web-sys
         js-sys
+        once-cell
+        critical-section
+        parking-lot-core
+        portable-atomic
+        derive-arbitrary
+        arbitrary
+        small-vec
+        allocator-api2
+        allocator-api2 --> bumpalo
+        bumpalo
+        bumpalo --> wasm-bindgen-macro-support
+        derive-arbitrary --> arbitrary
+        arbitrary --> smallvec
+        small-vec --> parking-lot-core
+        critical-section --> once-cell
+        parking-lot-core --> once-cell
+        portable-atomic --> once-cell
+        once-cell --> js-sys
+        wasm-bindgen --> js-sys
+        js-sys --> wasm-sync
         js-sys --> web-sys
         serde-wasm-bindgen --> webauthn-rs-proto
         wasm-bindgen --> webauthn-rs-proto
@@ -194,9 +275,16 @@ graph LR
         rand-xorshift
         rand-core
         rand-chacha
+        bytemuck-derive
+        bytemuck
         bitflags
         errno
+        cfg-if
+        cfg-if --> getrandom
+        libc --> getrandom
+        getrandom --> rand-core
         rustc-std-workspace-core
+        cfg-if --> rustc-std-workspace-core
         libc
         linux-raw-sys
         rustc-std-workspace-alloc
@@ -207,9 +295,10 @@ graph LR
         syn
         heck
         foldhash
-        foldhash
         id-arena
+        ahash
         hashbrown
+        equivalent
         indexmap
         wasmparser
         wat
@@ -222,7 +311,11 @@ graph LR
         wit-bindgen
         getrandom
         tempfile
+        unicode-width
+        bytemuck-derive --> bytemuck
+        bytemuck --> bitflags
         bitflags --> errno
+        libc --> errno
         errno --> rustc-std-workspace-core
         rustc-std-workspace-core --> libc
         libc --> linux-raw-sys
@@ -230,24 +323,36 @@ graph LR
         rustc-std-workspace-alloc --> getrandom
         r-efi --> getrandom
         wasip2 --> getrandom
+        wast --> getrandom
         anyhow --> wit-bindgen-rust-macro
+        syn --> prettyplease
         prettyplease --> wit-bindgen-rust-macro
+        prettyplease --> wit-bindgen
         wit-bindgen-core --> wit-bindgen-rust-macro
         heck --> wit-bindgen-core
-        id-arena --> hashbrown
-        foldhash --> hashbrown
-        foldhash --> hashbrown
-        hashbrown --> wit-parser
-        wasmparser --> wit-parser
+        anyhow --> wit-bindgen-core
+        semver --> wasmparser
+        bitflags --> wasmparser
+        wasmparser --> wasm-encoder
+        unicode-width --> wast
         leb128fmt --> wast
         wasm-encoder --> wast
         wast --> wat
         wat --> wit-parser
+        wasmparser --> hashbrown
+        wasmparser --> wit-parser
+        hashbrown --> wit-parser
         indexmap --> wit-parser
         wit-parser --> wit-bindgen-core
-        syn --> prettyplease
+        ahash --> hashbrown
+        id-arena --> hashbrown
+        foldhash --> hashbrown
+        hashbrown --> indexmap
+        equivalent --> indexmap
+        getrandom --> ahash
         wit-bindgen-rust-macro --> wit-bindgen
         wit-bindgen --> getrandom
+        wit-bindgen --> wasip2
         getrandom --> tempfile
         rand-core --> rand-xorshift
         rand-chacha --> rand
@@ -394,31 +499,6 @@ graph LR
         pve-vgpu-helper
         pxvirt-spdk
         proxmox-widget-toolkit
-        cc --> debcargo-conf
-        pam --> debcargo-conf
-        openssl --> debcargo-conf
-        openssl-probe --> debcargo-conf
-        url --> debcargo-conf
-        http-body-util --> debcargo-conf
-        httparse --> debcargo-conf
-        hyper --> debcargo-conf
-        hyper-util --> debcargo-conf
-        native-tls --> debcargo-conf
-        futures --> debcargo-conf
-        js-sys --> debcargo-conf
-        zstd --> debcargo-conf
-        const-format --> debcargo-conf
-        env-logger --> debcargo-conf
-        tar --> debcargo-conf
-        walkdir --> debcargo-conf
-        sync-wrapper --> debcargo-conf
-        tokio-openssl --> debcargo-conf
-        textwrap --> debcargo-conf
-        serde --> debcargo-conf
-        serde-bytes --> debcargo-conf
-        serde-plain --> debcargo-conf
-        endian-trait-derive --> debcargo-conf
-        endian-trait --> debcargo-conf
         ceph-19
         perlmod
         librust-proxmox-base64 --> proxmox

@@ -46,13 +46,17 @@ RUN apt update && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*;
 
+# Set up apt preferences
+COPY etc/apt/preferences.d/exclude-librust /etc/apt/preferences.d/
+
+# Install build requirements
 RUN apt update && \
     apt -y install \
     libgit2-dev \
     # librust-zstd \
     libzstd-dev \
     # librust-proxmox \
-    librust-ureq-dev \
+    # librust-ureq-dev \
     # ceph-18 build dependencies \
     libopentracing-dev \
     libthrift-dev \
@@ -66,17 +70,17 @@ RUN apt update && \
     libnet-ip-perl \
     libtest-mockmodule-perl \
     # proxmox-perl-rs build dependencies \
-    librust-anyhow-dev \
-    librust-base32-dev \
-    librust-base64-dev \
-    librust-hex-dev \
-    librust-http-dev \
-    librust-http-0.2-dev \
+    # librust-anyhow-dev \
+    # librust-base32-dev \
+    # librust-base64-dev \
+    # librust-hex-dev \
+    # librust-http-dev \
+    # librust-http-0.2-dev \
     # pve-xtermjs \
-    librust-form-urlencoded-dev \
-    librust-mio-dev \
-    librust-nix-dev \
-    librust-pico-args-dev \
+    # librust-form-urlencoded-dev \
+    # librust-mio-dev \
+    # librust-nix-dev \
+    # librust-pico-args-dev \
     # pve-doc \
     asciidoc-dblatex \
     asciidoc-base \
