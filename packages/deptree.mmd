@@ -44,7 +44,6 @@ graph LR
         proc-macro2 --> quote
         quote --> syn
         syn --> serde-derive
-        wasm-sync --> rayon-core
         crossbeam-utils --> crossbeam-epoch
         crossbeam-epoch --> crossbeam-deque
         crossbeam-deque --> rayon-core
@@ -114,21 +113,35 @@ graph LR
         no-panic
         itoa
         compiler-builtins
+        typeid
         erased-serde
-        sval-derive
+        sval-derive-macros
         ryu
+        sval-json
+        sval-test
         sval
         sval-ref
         sval-fmt
+        serde-buf
         value-bag
+        value-bag-serde
+        value-bag-sval
+        sval-nested
         sval-serde
         log
+        uicode-xid
         memchr
         ryu --> sval-fmt
-        sval-derive --> sval
+        sval-derive-macros --> sval
         sval --> sval-ref
-        erased_serde --> serde-fmt
+        sval-ref --> sval-buffer
+        typeid --> erased_serde
+        erased-serde --> serde-fmt
+        erased-serde --> value-bag-serde
+        sval-json --> value-bag-sval
+        sval-test --> value-bag-sval
         sval-fmt --> value-bag-sval2
+        sval-nested --> sval-serde
         sval-serde --> value-bag-sval2
         memchr --> serde-json
         itoa --> serde-json
@@ -140,6 +153,8 @@ graph LR
         sval-serde --> value-bag
         value-bag-sval2 --> value-bag
         value-bag --> log
+        serde-buf --> value-bag-serde
+        value-bag --> value-bag-serde
         compiler-builtins --> memchr
         no-panic --> itoa
         serde-cbor-2
@@ -283,10 +298,11 @@ graph LR
         cfg-if --> getrandom
         libc --> getrandom
         getrandom --> rand-core
-        rustc-std-workspace-core
         cfg-if --> rustc-std-workspace-core
         libc
         linux-raw-sys
+        rustc-std-workspace-core
+        rustc-std-workspace-std
         rustc-std-workspace-alloc
         r-efi
         wasip2
@@ -303,9 +319,30 @@ graph LR
         wasmparser
         wat
         leb128fmt
+        fallible-iterator
+        fnv
+        stable-deref-trait
+        gimli
         wast
         wasm-encoder
         wit-parser
+        clap-lex
+        clap
+        pulldown-cmark
+        clap-derive
+        anstyle
+        utf8parse
+        zeroize-derive
+        zeroize
+        arrayvec
+        anstyle-parse
+        anstyle-query
+        colorchoice
+        is-terminal-polyfill
+        anstream
+        strsim
+        unicase
+        clap-builder
         wit-bindgen-core
         wit-bindgen-rust-macro
         wit-bindgen
@@ -318,6 +355,11 @@ graph LR
         libc --> errno
         errno --> rustc-std-workspace-core
         rustc-std-workspace-core --> libc
+        fnv --> fimli
+        rustc-std-workspace-alloc --> gimli
+        stable-deref-trait --> gimli
+        fallible-iterator --> gimli
+        gimli --> wast
         libc --> linux-raw-sys
         linux-raw-sys --> rustc-std-workspace-alloc
         rustc-std-workspace-alloc --> getrandom
@@ -328,12 +370,31 @@ graph LR
         syn --> prettyplease
         prettyplease --> wit-bindgen-rust-macro
         prettyplease --> wit-bindgen
+        clap-lex --> clap-derive
+        utf8parse --> anstyle-parse
+        is-terminal-polyfill --> anstream
+        colorchoice --> anstream
+        anstyle-query --> anstream
+        anstyle --> anstream
+        zeroize-derive --> zeroize
+        zeroize --> arrayvec
+        arrayvec --> anstyle-parse
+        unicase --> clap-builder
+        strsim --> clap-builder
+        anstyle-parse --> anstream
+        anstream --> clap-builder
+        pulldown-cmark --> clap-derive
+        clap-derive --> clap-builder
+        clap-derive --> clap
+        clap-builder --> clap
+        clap --> wit-bindgen-core
         wit-bindgen-core --> wit-bindgen-rust-macro
         heck --> wit-bindgen-core
         anyhow --> wit-bindgen-core
         semver --> wasmparser
-        bitflags --> wasmparser
+        bitflags --> wasparser
         wasmparser --> wasm-encoder
+        rustc-std-workspace-std --> unicode-width
         unicode-width --> wast
         leb128fmt --> wast
         wasm-encoder --> wast
@@ -343,9 +404,10 @@ graph LR
         wasmparser --> wit-parser
         hashbrown --> wit-parser
         indexmap --> wit-parser
+        log --> wit-parser
+        unicode-xid --> wit-parser
         wit-parser --> wit-bindgen-core
-        ahash --> hashbrown
-        id-arena --> hashbrown
+        equivalent --> hashbrown
         foldhash --> hashbrown
         hashbrown --> indexmap
         equivalent --> indexmap
