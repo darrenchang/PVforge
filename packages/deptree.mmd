@@ -35,47 +35,10 @@ graph LR
         signal-hook-registry
         httparse
         semver
-        tracing-attributes --> tracing
-        shlex --> cc
-        libc --> cc
-        jobserver --> cc
-        cc --> compiler-builtins
-        unicode-ident --> proc-macro2
-        proc-macro2 --> quote
-        quote --> syn
-        syn --> serde-derive
-        crossbeam-utils --> crossbeam-epoch
-        crossbeam-epoch --> crossbeam-deque
-        crossbeam-deque --> rayon-core
-        either --> rayon
-        rayon-core --> rayon
-        rayon --> id-arena
-        valuable-derive --> valuable
-        valuable --> tracing-core
-        tracing-core --> tracing
-        tokio-macros --> tokio
-        signal-hook-registry --> tokio
-        tracing --> tokio
-        socket2 --> tokio
-        parking-lot --> tokio
-        httparse --> hyper
-        httpdate --> hyper
-        want --> hyper
-        h2 --> hyper
         httpdate
         want
         h2
         ipnet
-        ipnet --> hyper-util
-        tower-service
-        tower-service --> hyper-util
-        atomic-waker --> h2
-        tokio-util
-        tokio-util --> h2
-        try-lock --> want
-        tokio --> hyper
-        httparse --> hyper
-        hyper --> hyper-util
         native-tls
         slab
         futures
@@ -89,23 +52,8 @@ graph LR
         pin-project-lite
         futures-io
         num-cpus
-        pin-project-lite --> futures-util
-        futures-io --> futures-util
-        slab --> futures-util
-        futures-macro --> futures-util
-        futures-task --> futures-executor
-        num-cpus --> futures-executor
-        futures-util --> futures-executor
-        futures-core --> futures-channel
-        futures-sink --> futures-channel
-        futures-channel --> futures
-        futures-executor --> futures
-        http-body
-        http-body --> http-body-util
-        base64urlsafedata
-        compact-jwt
-        openssl-macros --> compact-jwt
-        openssl-sys --> compact-jwt
+        tower-service
+        tokio-util
         der-parser
         serde-cbor
         serde-json
@@ -131,44 +79,16 @@ graph LR
         log
         uicode-xid
         memchr
-        ryu --> sval-fmt
-        sval-derive-macros --> sval
-        sval --> sval-ref
-        sval-ref --> sval-buffer
-        typeid --> erased_serde
-        erased-serde --> serde-fmt
-        erased-serde --> value-bag-serde
-        sval-json --> value-bag-sval
-        sval-test --> value-bag-sval
-        sval-fmt --> value-bag-sval2
-        sval-nested --> sval-serde
-        sval-serde --> value-bag-sval2
-        memchr --> serde-json
-        itoa --> serde-json
-        indexmap --> serde-json
-        serde-json --> serde-test
-        serde-json --> value-bag-serde
-        serde-json --> wasm-bindgen
-        value-bag-serde --> value-bag
-        sval-serde --> value-bag
-        value-bag-sval2 --> value-bag
-        value-bag --> log
-        serde-buf --> value-bag-serde
-        value-bag --> value-bag-serde
-        compiler-builtins --> memchr
-        no-panic --> itoa
+        http-body
+        base64urlsafedata
+        compact-jwt
         serde-cbor-2
         webauthn-attestation-ca
         serde-wasm-bindgen
         rustversion
         wasm-bindgen-macro-support
         wasm-bindgen-macro
-        wasm-bindgen-macro-support --> wasm-bindgen-macro
         wasm-bindgen-shared
-        wasm-bindgen-shared --> wasm-bindgen-macro-support
-        rustversion --> wasm-bindgen
-        wasm-bindgen-macro --> wasm-bindgen
-        wasm-bindgen-shared --> wasm-bindgen
         wasm-bindgen
         web-sys
         js-sys
@@ -180,61 +100,28 @@ graph LR
         arbitrary
         small-vec
         allocator-api2
-        allocator-api2 --> bumpalo
         bumpalo
-        bumpalo --> wasm-bindgen-macro-support
-        derive-arbitrary --> arbitrary
-        arbitrary --> smallvec
-        small-vec --> parking-lot-core
-        critical-section --> once-cell
-        parking-lot-core --> once-cell
-        portable-atomic --> once-cell
-        once-cell --> js-sys
-        wasm-bindgen --> js-sys
-        js-sys --> wasm-sync
-        js-sys --> web-sys
-        serde-wasm-bindgen --> webauthn-rs-proto
-        wasm-bindgen --> webauthn-rs-proto
-        web-sys --> webauthn-rs-proto
         x509-parser
         webauthn-rs-core
-        x509-parser --> webauthn-rs-core
-        webauthn-attestation-ca --> webauthn-rs-core
-        webauthn-rs-proto --> webauthn-rs-core
-        serde-cbor --> webauthn-rs-core
-        serde-cbor-2 --> webauthn-rs-core
-        webauthn-attenstation-ca --> webauthn-rs-core
         webauthn-rs
-        webauthn-rs-core --> webauthn-rs
-        futures --> http-body-util
         js-sys
         zstd
         zstd-safe
         zstd-sys
-        zstd-sys --> zstd-safe
-        zstd-safe --> zstd
         const-format
         xattr
         const-format-proc-macros
-        const-format-proc-macros --> const-format
-        xattr --> const-format
-        env-logger
         tar
         walkdir
         same-file
         winapi
         winapi-util
-        winapi --> same-file
-        winapi-util --> winapi
-        same-file --> walkdir
         sync-wrapper
         tokio-openssl
         tokio-stream
         smawk
         textwrap
         unicode-linebreak
-        smawk --> textwrap
-        unicode-linebreak --> textwrap
         serde
         serde-bytes
         serde-plain
@@ -256,23 +143,6 @@ graph LR
         iana-time-zone
         pure-rust-locales
         valuable-serde
-        valuable-serde --> tracing-serde
-        pure-rust-locales --> chrono
-        iana-time-zone --> chrono
-        lru --> tracing-log
-        chrono --> tracing-subscriber
-        matchers --> tracing-subscriber
-        tracing-serde --> tracing-subscriber
-        tracing-log --> tracing-subscriber
-        thread-local --> tracing-subscriber
-        alloca --> criterion
-        criterion-plot --> criterion
-        criterion --> spin
-        spin --> lazy-static
-        lazy-static --> sharded-slab
-        sharded-slab --> tracing-subscriber
-        nu-ansi-term --> tracing-subscriber
-        tracing-subscriber --> tracing-journald
         pest
         handlebars
         thiserror
@@ -295,10 +165,6 @@ graph LR
         bitflags
         errno
         cfg-if
-        cfg-if --> getrandom
-        libc --> getrandom
-        getrandom --> rand-core
-        cfg-if --> rustc-std-workspace-core
         libc
         linux-raw-sys
         rustc-std-workspace-core
@@ -343,12 +209,177 @@ graph LR
         strsim
         unicase
         clap-builder
+        topological-sort
+        dyn-clone
+        serde-derive-internals
+        ref-cast-impl
+        ref-cast
+        autocfg
+        libm
+        num-traits
+        num-integer
+        env-filter
+        regex
+        jiff-tzdb
+        jiff-tzdb-platform
+        jiff-static
+        portable-atomic-util
+        portable-atomic
+        jiff
+        env-logger
+        quickcheck
+        num-bigint
+        bigdecimal
+        bytes
+        jiff
+        rust-decimal
+        schemars-derive
+        schemars
+        auditable-serde
+        wasm-metadata
         wit-bindgen-core
+        wit-bindgen-rust
         wit-bindgen-rust-macro
         wit-bindgen
         getrandom
         tempfile
         unicode-width
+        serde-with
+        pam
+        endian-trait-derive
+        tracing-attributes --> tracing
+        shlex --> cc
+        libc --> cc
+        jobserver --> cc
+        cc --> compiler-builtins
+        unicode-ident --> proc-macro2
+        proc-macro2 --> quote
+        quote --> syn
+        syn --> serde-derive
+        crossbeam-utils --> crossbeam-epoch
+        crossbeam-epoch --> crossbeam-deque
+        crossbeam-deque --> rayon-core
+        either --> rayon
+        rayon-core --> rayon
+        rayon --> id-arena
+        valuable-derive --> valuable
+        valuable --> tracing-core
+        tracing-core --> tracing
+        tokio-macros --> tokio
+        signal-hook-registry --> tokio
+        tracing --> tokio
+        socket2 --> tokio
+        parking-lot --> tokio
+        httparse --> hyper
+        httpdate --> hyper
+        want --> hyper
+        h2 --> hyper
+        ipnet --> hyper-util
+        tower-service --> hyper-util
+        atomic-waker --> h2
+        tokio-util --> h2
+        try-lock --> want
+        tokio --> hyper
+        httparse --> hyper
+        hyper --> hyper-util
+        pin-project-lite --> futures-util
+        futures-io --> futures-util
+        slab --> futures-util
+        futures-macro --> futures-util
+        futures-task --> futures-executor
+        num-cpus --> futures-executor
+        futures-util --> futures-executor
+        futures-core --> futures-channel
+        futures-sink --> futures-channel
+        futures-channel --> futures
+        futures-executor --> futures
+        http-body --> http-body-util
+        openssl-macros --> compact-jwt
+        openssl-sys --> compact-jwt
+        ryu --> sval-fmt
+        sval-derive-macros --> sval
+        sval --> sval-ref
+        sval-ref --> sval-buffer
+        typeid --> erased_serde
+        erased-serde --> serde-fmt
+        erased-serde --> value-bag-serde
+        sval-json --> value-bag-sval
+        sval-test --> value-bag-sval
+        sval-fmt --> value-bag-sval2
+        sval-nested --> sval-serde
+        sval-serde --> value-bag-sval2
+        memchr --> serde-json
+        itoa --> serde-json
+        indexmap --> serde-json
+        serde-json --> serde-test
+        serde-json --> value-bag-serde
+        serde-json --> wasm-bindgen
+        value-bag-serde --> value-bag
+        sval-serde --> value-bag
+        value-bag-sval2 --> value-bag
+        value-bag --> log
+        serde-buf --> value-bag-serde
+        value-bag --> value-bag-serde
+        compiler-builtins --> memchr
+        no-panic --> itoa
+        wasm-bindgen-macro-support --> wasm-bindgen-macro
+        wasm-bindgen-shared --> wasm-bindgen-macro-support
+        rustversion --> wasm-bindgen
+        wasm-bindgen-macro --> wasm-bindgen
+        wasm-bindgen-shared --> wasm-bindgen
+        allocator-api2 --> bumpalo
+        bumpalo --> wasm-bindgen-macro-support
+        derive-arbitrary --> arbitrary
+        arbitrary --> smallvec
+        small-vec --> parking-lot-core
+        critical-section --> once-cell
+        parking-lot-core --> once-cell
+        portable-atomic --> once-cell
+        once-cell --> js-sys
+        wasm-bindgen --> js-sys
+        js-sys --> wasm-sync
+        js-sys --> web-sys
+        serde-wasm-bindgen --> webauthn-rs-proto
+        wasm-bindgen --> webauthn-rs-proto
+        web-sys --> webauthn-rs-proto
+        x509-parser --> webauthn-rs-core
+        webauthn-attestation-ca --> webauthn-rs-core
+        webauthn-rs-proto --> webauthn-rs-core
+        serde-cbor --> webauthn-rs-core
+        serde-cbor-2 --> webauthn-rs-core
+        webauthn-attenstation-ca --> webauthn-rs-core
+        webauthn-rs-core --> webauthn-rs
+        futures --> http-body-util
+        zstd-sys --> zstd-safe
+        zstd-safe --> zstd
+        const-format-proc-macros --> const-format
+        xattr --> const-format
+        winapi --> same-file
+        winapi-util --> winapi
+        same-file --> walkdir
+        smawk --> textwrap
+        unicode-linebreak --> textwrap
+        valuable-serde --> tracing-serde
+        pure-rust-locales --> chrono
+        iana-time-zone --> chrono
+        lru --> tracing-log
+        chrono --> tracing-subscriber
+        matchers --> tracing-subscriber
+        tracing-serde --> tracing-subscriber
+        tracing-log --> tracing-subscriber
+        thread-local --> tracing-subscriber
+        alloca --> criterion
+        criterion-plot --> criterion
+        criterion --> spin
+        spin --> lazy-static
+        lazy-static --> sharded-slab
+        sharded-slab --> tracing-subscriber
+        nu-ansi-term --> tracing-subscriber
+        tracing-subscriber --> tracing-journald
+        cfg-if --> getrandom
+        libc --> getrandom
+        getrandom --> rand-core
+        cfg-if --> rustc-std-workspace-core
         bytemuck-derive --> bytemuck
         bytemuck --> bitflags
         bitflags --> errno
@@ -380,6 +411,7 @@ graph LR
         zeroize --> arrayvec
         arrayvec --> anstyle-parse
         unicase --> clap-builder
+        unicase --> pulldown-cmark
         strsim --> clap-builder
         anstyle-parse --> anstream
         anstream --> clap-builder
@@ -388,6 +420,35 @@ graph LR
         clap-derive --> clap
         clap-builder --> clap
         clap --> wit-bindgen-core
+        ref-cast-impl --> ref-cast
+        ref-cast --> schemars
+        autocfg --> schemars
+        libm --> schemars
+        num-integer --> schemars
+        env-filter --> env-logger
+        jiff-tzdb --> jiff
+        jiff-tzdb-platform --> jiff
+        portable-atomic-util --> jiff
+        portable-atomic --> jiff
+        jiff-static --> jiff
+        jiff --> env-logger
+        env-logger --> quickcheck
+        quickcheck --> num_bigint
+        rand --> num_bigint
+        num-bigint --> schemars
+        bigdecimal --> schemars
+        bytes --> schemars
+        chrono --> schemars
+        jiff --> schemars
+        rust-decimal --> schemars
+        serde-derive-internals --> schemars-derive
+        schemars-derive --> schemars
+        dyn-clone --> schemars
+        schemars --> auditable-serde
+        topological-sort --> auditable-serde
+        auditable-serde --> wasm-metadata
+        wasm-metadata --> wit-bindgen-rust
+        wit-bindgen-rust --> wit-bindgen-rust
         wit-bindgen-core --> wit-bindgen-rust-macro
         heck --> wit-bindgen-core
         anyhow --> wit-bindgen-core
@@ -434,10 +495,6 @@ graph LR
         thiserror --> pest
         thiserror-1 --> pest
         pest --> handlebars
-        serde-with
-        regex
-        pam
-        endian-trait-derive
         endian-trait-derive --> endian-trait
     end
 
