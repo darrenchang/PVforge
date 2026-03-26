@@ -275,8 +275,23 @@ RUST_LIBS=(
     "ucd-trie:ucd-trie"
     "miette-derive:miette-derive"
     "home:home"
+    "rustc-version:rustc_version"
+    "xdg:xdg"
     "afl:afl"
     "cpp-demangle:cpp_demangle"
+    "memmap:memmap"
+    "crc32fast:crc32fast"
+    "adler2:adler2"
+    "simd-adler32:simd-adler32"
+    "miniz-oxide:miniz_oxide"
+    "cloudflare-zlib-sys:cloudflare-zlib-sys"
+    "litrs:litrs"
+    "document-features:document-features"
+    "cmake:cmake"
+    "libz-ng-sys:libz-ng-sys"
+    "libz-sys:libz-sys"
+    "flate2:flate2"
+    "object:object"
     "addr2line:addr2line"
     "backtrace:backtrace"
     "backtrace-ext:backtrace-ext"
@@ -454,8 +469,7 @@ for entry in "${RUST_LIBS[@]}"; do
   rm -rf ./build/*
   ./repackage.sh ${repackage_name}
   (
-    cd build/${rust_lib}/
-    pwd
+    cd ./build/${rust_lib}/ && \
     yes |mk-build-deps --install --remove; \
     dpkg-buildpackage -b -us -uc
   )
@@ -470,6 +484,6 @@ for entry in "${RUST_LIBS[@]}"; do
   CURRENT=$((CURRENT + 1))
   echo "Build finished for rust library ${repackage_name}... [${CURRENT}/${TOTAL}]"
   # Remove the patch
-  rm -rf ./src/${repackage_name}/debian/patches/
+  rm -rf ./src/${rust_lib}/debian/patches/
 done
 
