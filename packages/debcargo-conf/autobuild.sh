@@ -2,6 +2,17 @@
 
 set -e
 
+# Function to clean up on exit (Ctrl+C)
+cleanup() {
+    printf "\033[r"
+    printf "\033[${ROWS};1H"
+    tput cnorm
+    # Add a newline so the prompt appears BELOW the progress bar
+    echo ""
+    exit
+}
+trap cleanup SIGINT EXIT
+
 SCRIPT_DIR=$(cd $(dirname ${BASH_SOURCE[0]}); pwd)
 PKGNAME=$(basename $SCRIPT_DIR)
 
@@ -350,6 +361,23 @@ CURRENT=0
 for entry in "${RUST_LIBS[@]}"; do
   rust_lib="${entry%%:*}"
   repackage_name="${entry##*:}"
+
+  # Print progress bar
+  BAR_WIDTH=40
+  ROWS=$(tput lines)
+  printf "\033[1;$(($ROWS - 1))r"
+  printf "\n%.0s" $(seq 1 $ROWS)
+  tput civis
+  printf "\033[s"
+  printf "\033[${ROWS};1H"
+  PERCENT=$(( CURRENT * 100 / TOTAL))
+  FILLED=$(( CURRENT * BAR_WIDTH / TOTAL))
+  EMPTY=$(( BAR_WIDTH - FILLED ))
+  BAR=$(printf "%${FILLED}s" | tr ' ' '#')
+  SPACE=$(printf "%${EMPTY}s" | tr ' ' '-')
+  printf "\033[K\e[30;46m[%s%s] %d%% (%d/%d) building ${repackage_name}...\e[0m" "$BAR" "$SPACE" "$PERCENT" "$CURRENT" "$TOTAL"
+  printf "\033[u"
+
   echo "####################"
   echo "Build start... [${CURRENT}/${TOTAL}]"
   echo "Building rust package ${repackage_name}..."
@@ -366,7 +394,7 @@ for entry in "${RUST_LIBS[@]}"; do
   )
   mkdir -p /tmp/${PKGNAME}-temp
   mkdir -p /tmp/${PKGNAME}
-  for deb_pkg in $(find $(pwd)/build/ -name *.deb); do
+  for deb_pkg in $(find $(pwd)/build/ -name "*.deb"); do
     cp ${deb_pkg} "/tmp/${PKGNAME}-temp/"
     cp ${deb_pkg} "/tmp/${PKGNAME}/"
   done
