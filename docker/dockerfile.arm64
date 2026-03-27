@@ -53,6 +53,8 @@ COPY etc/apt/preferences.d/exclude-librust /etc/apt/preferences.d/
 RUN apt update && \
     apt -y install \
     libgit2-dev \
+    # librust-cmake \
+    cmake \
     # librust-pulldown-cmark \
     help2man \
     # librust-zstd \
