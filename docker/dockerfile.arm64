@@ -91,6 +91,12 @@ RUN apt update && \
     libpam-dev \
     # lilbrust-openssl-sys \
     libssl-dev \
+    # librust-clang-sys \
+    clang \
+    libclang-19-dev \
+    libclang-dev \
+    llvm \
+    llvm-runtime \
     # librust-proxmox \
     # librust-ureq-dev \
     # ceph-18 build dependencies \
