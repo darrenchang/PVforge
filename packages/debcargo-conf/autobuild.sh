@@ -429,6 +429,8 @@ RUST_LIBS=(
     "ahash:ahash"
     "wasm-bindgen:wasm-bindgen"
     "js-sys:js-sys"
+    "md-5:md-5"
+    "uuid:uuid"
     "getrandom:getrandom"
     "serde-test:serde_test"
     "http-body-util:http-body-util"
