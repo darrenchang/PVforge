@@ -413,6 +413,7 @@ RUST_LIBS=(
     "url:url"
     "atomic:atomic"
     "sha1-smol:sha1_smol"
+    "uuid-rng-internal:uuid-rng-internal"
     "uuid:uuid"
     "schemars:schemars"
     "auditable-serde:auditable-serde"

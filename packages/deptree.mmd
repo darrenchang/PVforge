@@ -4,7 +4,7 @@ title: pxvirt Package Compile Dependency tree
 graph LR
     %% Tier 0.0 - Foundations (rust libraries)
     subgraph T0.0["Tier 0.0 – Foundations (rust libraries)"]
-        subgraph T0.4["Tier 0.4 – Foundations (rust libraries)"]
+        subgraph T0.0A["Tier 0.0A – Foundations (rust libraries)"]
             shlex
             libc
             jobserver
@@ -588,6 +588,7 @@ graph LR
     %% Tier 1 - Foundations (no compile dependencies)
     subgraph T1["Tier 1 – Foundations"]
         debcargo-conf
+        proxmox
         chrony
         corosync-pve
         corosync-qdevice
@@ -623,23 +624,6 @@ graph LR
         proxmox-widget-toolkit
         ceph-19
         perlmod
-        librust-proxmox-base64 --> proxmox
-        librust-proxmox-io --> proxmox
-        librust-proxmox-lang --> proxmox
-        librust-proxmox-time --> proxmox
-        librust-promxox-time-api --> proxmox
-        librust-proxmox-sys --> proxmox
-        librust-proxmox-router --> proxmox
-        librust-proxmox-product-config --> proxmox
-        librust-proxmox-schema --> proxmox
-        librust-proxmox-http --> proxmox
-        librust-proxmox-http-error --> proxmox
-        librust-proxmox-rate-limiter --> proxmox
-        librust-proxmox-async --> proxmox
-        librust-proxmox-compression --> proxmox
-        librust-proxmox-acme --> proxmox
-        librust-proxmox-api-macro --> proxmox
-        librust-proxmox-apt-api-types --> proxmox
         unknown_pkg
     end
 
