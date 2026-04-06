@@ -49,7 +49,7 @@ RUST_LIBS=(
     "errno:errno:patches"
     "r-efi:r-efi:patches"
     "anyhow:anyhow:patches"
-    "heck:heck:patches"
+    "heck:heck:none"
     "either:either:patches"
     "crossbeam-utils:crossbeam-utils:patches"
     "crossbeam-epoch:crossbeam-epoch:patches"
@@ -163,12 +163,12 @@ RUST_LIBS=(
     "jiff-tzdb:jiff-tzdb:patches"
     "jiff-tzdb-platform:jiff-tzdb-platform:patches"
     "portable-atomic-util:portable-atomic-util:patches"
-    "portable-atomic:portable-atomic:patches" # TODO duplicate
+    "portable-atomic:portable-atomic:none" # TODO duplicate
     "jiff-static:jiff-static:patches"
     "jiff:jiff:patches"
     "env-logger:env_logger:patches"
     "rand-core:rand_core:patches" # TODO duplicate
-    "rand-xorshift:rand_xorshift:patches" # TODO duplicate
+    "rand-xorshift:rand_xorshift:none" # TODO duplicate
     "zerocopy-derive:zerocopy-derive:patches"
     "zerocopy:zerocopy:patches"
     "ppv-lite86:ppv-lite86:patches"
@@ -228,10 +228,10 @@ RUST_LIBS=(
     "potential-utf:potential_utf:patches"
     "map:map:patches"
     "yoke:yoke:patches" # TODO duplicate
-    "zerovec:zerovec:patches"
+    "zerovec:zerovec:none"
     "yoke-derive:yoke-derive:patches"
-    "yoke:yoke:patches"
-    "zerovec:zerovec:patches"
+    "yoke:yoke:none"
+    "zerovec:zerovec:none"
     "litemap:litemap:patches"
     "zerotrie:zerotrie:patches"
     "icu-collections:icu_collections:patches"
@@ -275,7 +275,7 @@ RUST_LIBS=(
     "glob:glob:patches"
     "target-triple:target-triple:patches"
     "typewit:typewit:patches"
-    "unicode-xid:unicode-xid:patches"
+    "unicode-xid:unicode-xid:none"
     "const-panic-proc-macros:const_panic_proc_macros:patches"
     "const-panic:const_panic:patches"
     "encase:encase:patches"
@@ -326,7 +326,7 @@ RUST_LIBS=(
     "hyphenation-commons:hyphenation_commons:patches"
     "tinyvec-macros:tinyvec_macros:patches"
     "faster-hex:faster-hex:patches"
-    "version-check:version_check:none" # TODO duplicate
+    "version-check:version_check:none"
     "generic-array-0.14:generic-array 0:patches"
     "generic-array:generic-array:patches"
     "tinyvec:tinyvec:patches"
@@ -358,7 +358,7 @@ RUST_LIBS=(
     "page-size:page_size:patches"
     "tinytemplate:tinytemplate:patches"
     "scopeguard:scopeguard:patches"
-    "stable-deref-trait:stable_deref_trait:patches"
+    "stable-deref-trait:stable_deref_trait:none"
     "owning-ref:owning_ref:patches"
     "lock-api:lock_api:patches"
     "once:once:patches"
@@ -382,11 +382,11 @@ RUST_LIBS=(
     "http-body:http-body:patches"
     "wasip3:wasip3:patches"
     "getrandom:getrandom:patches"
-    "rand-core:rand_core:patches"
+    "rand-core:rand_core:none"
     "rand-chacha:rand_chacha:patches"
     "rand:rand:patches" # TODO duplicate
     "rand-xorshift:rand_xorshift:patches"
-    "rand:rand:patches"
+    "rand:rand:none"
     "quick-error:quick-error:patches"
     "unarray:unarray:patches"
     "base64:base64:patches"
@@ -423,7 +423,7 @@ RUST_LIBS=(
     "bigdecimal:bigdecimal:patches"
     "windows-link:windows-link:patches"
     "chrono:chrono:patches"
-    "crunchy:crunchy:patches" # TODO duplicate
+    "crunchy:crunchy:none" # TODO duplicate
     "tiny-keccak:tiny-keccak:patches"
     "ahash:ahash:patches"
     "wasm-bindgen:wasm-bindgen:patches"
@@ -431,7 +431,7 @@ RUST_LIBS=(
     "md-5:md-5:patches"
     "uuid:uuid:patches_2"
     "getrandom:getrandom:none"
-    "serde-test:serde_test:patches"
+    "serde-test:serde_test:none"
     "http-body-util:http-body-util:patches"
     "parking-lot:parking_lot:patches"
     "tracing-attributes:tracing-attributes:patches"
@@ -440,7 +440,7 @@ RUST_LIBS=(
     "tracing-core:tracing-core:patches"
     "tracing:tracing:patches"
     "socket2:socket2:patches"
-    "tokio-macros:tokio-macros:patches"
+    "tokio-macros:tokio-macros:none"
     "signal-hook-registry:signal-hook-registry:patches"
     "httparse:httparse:patches"
     "httpdate:httpdate:patches"
@@ -461,7 +461,7 @@ RUST_LIBS=(
     "matchers:matchers:patches"
     "valuable-serde:valuable-serde:patches"
     "tracing-serde:tracing-serde:patches"
-    "tracing-core:tracing-core:patches" # TODO duplicate
+    "tracing-core:tracing-core:none" # TODO duplicate
     "tracing-subscriber:tracing-subscriber:patches"
     "tracing-journald:tracing-journald:patches"
     "rhai-codegen:rhai_codegen:patches"
@@ -520,16 +520,15 @@ RUST_LIBS=(
     "openssl:openssl:patches"
     "tokio-openssl:tokio-openssl:patches"
     "wasm-sync:wasm_sync:patches"
-    "linux-raw-sys:linux-raw-sys:patches"
+    "linux-raw-sys:linux-raw-sys:none"
     "rustix:rustix:patches"
     "xattr:xattr:patches"
     "tar:tar:patches"
     "tokio-stream:tokio-stream:patches"
     "web-time:web-time:patches"
-    "version-check:version_check:none"
     "core-error:core-error:patches"
     "rhai:rhai:patches"
-    "heck:heck:patches" # TODO duplicate
+    "heck:heck:none" # TODO duplicate
     "derive-builder-core:derive_builder_core:patches"
     "derive-builder-macro:derive_builder_macro:patches"
     "num-modular:num-modular:patches"
@@ -599,7 +598,8 @@ for entry in "${RUST_LIBS[@]}"; do
   # Prepare patch for ./repackage.sh script
   cp -r "./src/${rust_lib}/" "/tmp/tmp_${rust_lib}"
   if [[ $patch_name == "none" ]]; then
-    rm -rf "./src/${rust_lib}/debian/patches*/"
+    rm -rf "./src/${rust_lib}/debian/patches/"
+    rm -rf "./src/${rust_lib}/debian/patches_*/"
     ./repackage.sh ${repackage_name}
   elif [[ $patch_name == "patches" ]]; then
     rm -rf "./src/${rust_lib}/debian/patches_*/"
@@ -628,5 +628,20 @@ for entry in "${RUST_LIBS[@]}"; do
   rm -rf /tmp/${PKGNAME}-temp
   CURRENT=$((CURRENT + 1))
   echo "Build finished for rust library ${repackage_name}... [${CURRENT}/${TOTAL}]"
+  # Print progress bar
+  BAR_WIDTH=40
+  ROWS=$(tput lines)
+  printf "\033[1;$(($ROWS - 1))r"
+  printf "\n%.0s" $(seq 1 $ROWS)
+  tput civis
+  printf "\033[s"
+  printf "\033[${ROWS};1H"
+  PERCENT=$(( CURRENT * 100 / TOTAL))
+  FILLED=$(( CURRENT * BAR_WIDTH / TOTAL))
+  EMPTY=$(( BAR_WIDTH - FILLED ))
+  BAR=$(printf "%${FILLED}s" | tr ' ' '#')
+  SPACE=$(printf "%${EMPTY}s" | tr ' ' '-')
+  printf "\033[K\e[30;46m[%s%s] %d%% (%d/%d) building ${repackage_name}...\e[0m" "$BAR" "$SPACE" "$PERCENT" "$CURRENT" "$TOTAL"
+  printf "\033[u"
 done
 
