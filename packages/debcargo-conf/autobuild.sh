@@ -419,7 +419,6 @@ RUST_LIBS=(
     "wasmparser:wasmparser:none"
     "wit-component:wit-component:patches"
     "wit-bindgen-core:wit-bindgen-core:patches"
-    "wit-bindgen-rust-macro:wit-bindgen-rust-macro:none"
     "wit-bindgen-rust:wit-bindgen-rust:patches"
     "bigdecimal:bigdecimal:patches"
     "windows-link:windows-link:patches"
