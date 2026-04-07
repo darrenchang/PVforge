@@ -77,7 +77,7 @@ RUN apt update && \
 # Set up apt preferences
 COPY etc/apt/preferences.d/exclude-librust /etc/apt/preferences.d/
 
-# Install build requirements
+# Install build requirements for Proxmox
 RUN apt update && \
     apt -y install \
     libgit2-dev \
@@ -97,8 +97,10 @@ RUN apt update && \
     libclang-dev \
     llvm \
     llvm-runtime \
-    # librust-proxmox \
-    # librust-ureq-dev \
+    # librust-proxmox-sys \
+    libacl1-dev \
+    # librust-proxmox-systemd \
+    libsystemd-dev \
     # ceph-18 build dependencies \
     libopentracing-dev \
     libthrift-dev \
@@ -111,18 +113,6 @@ RUN apt update && \
     liblinux-inotify2-perl \
     libnet-ip-perl \
     libtest-mockmodule-perl \
-    # proxmox-perl-rs build dependencies \
-    # librust-anyhow-dev \
-    # librust-base32-dev \
-    # librust-base64-dev \
-    # librust-hex-dev \
-    # librust-http-dev \
-    # librust-http-0.2-dev \
-    # pve-xtermjs \
-    # librust-form-urlencoded-dev \
-    # librust-mio-dev \
-    # librust-nix-dev \
-    # librust-pico-args-dev \
     # pve-doc \
     asciidoc-dblatex \
     asciidoc-base \
