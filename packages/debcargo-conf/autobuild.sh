@@ -586,6 +586,7 @@ RUST_LIBS=(
     "rustyline-derive:rustyline-derive:none"
     "rustyline:rustyline:patches"
     "handlebars:handlebars:patches_2"
+    "base32:base32:none"
   )
 
 export CARGO=/usr/local/bin/cargo
@@ -601,7 +602,7 @@ for entry in "${RUST_LIBS[@]}"; do
     patch_name \
     <<< "$entry"
 
-  print_progress ${TOTAL} ${CURRENT} ${ITEM_NAME}
+  print_progress ${TOTAL} ${CURRENT} ${repackage_name}
 
   echo "####################"
   echo "Build start... [${CURRENT}/${TOTAL}]"
@@ -644,6 +645,6 @@ for entry in "${RUST_LIBS[@]}"; do
   CURRENT=$((CURRENT + 1))
   echo "Build finished for rust library ${repackage_name}... [${CURRENT}/${TOTAL}]"
 
-  print_progress ${TOTAL} ${CURRENT} ${ITEM_NAME}
+  print_progress ${TOTAL} ${CURRENT} ${repackage_name}
 done
 
