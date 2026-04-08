@@ -92,8 +92,6 @@ for rust_lib in "${RUST_LIBS[@]}"; do
   echo "####################"
   echo "Build start... [${CURRENT}/${TOTAL}]"
   echo "Building rust package ${rust_lib}..."
-  echo "CARGO: $($CARGO --version)"
-  echo "RUSTC: $($RUSTC --version)"
   echo "DEBCARGO: $(debcargo --version)"
   rm -rf ./build/*
   ./build.sh ${rust_lib}

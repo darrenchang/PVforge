@@ -1,0 +1,13 @@
+diff --git a/proxmox-fixed-string/Cargo.toml b/proxmox-fixed-string/Cargo.toml
+index 455160cf..ff56d9f6 100644
+--- a/proxmox-fixed-string/Cargo.toml
++++ b/proxmox-fixed-string/Cargo.toml
+@@ -7,7 +7,7 @@ license.workspace = true
+ repository.workspace = true
+ homepage.workspace = true
+ exclude.workspace = true
+-rust-version = "1.87"
++rust-version = "1.85"
+ 
+ [dependencies]
+ serde.workspace = true

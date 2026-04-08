@@ -1,1 +1,2 @@
-patches/001-proxmox-time-fix-is_multiple_of.patch
+patches/001-use-custom-cargo-rustc.diff
+patches/002-proxmox-fixed-string-relax-rustc-version.diff
