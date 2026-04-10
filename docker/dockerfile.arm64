@@ -99,6 +99,8 @@ RUN apt update && \
     llvm-runtime \
     # librust-bzip2-sys \
     libbz2-dev \
+    # librust-nettle-sys \
+    nettle-dev \
     # librust-proxmox-sys \
     libacl1-dev \
     # librust-proxmox-systemd \

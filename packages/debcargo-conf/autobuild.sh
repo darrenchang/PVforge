@@ -602,15 +602,32 @@ RUST_LIBS=(
     "petgraph:petgraph:none:vendor"
     "pico-args:pico-args:none:vendor"
     "sha3:sha3:none:vendor"
-    "term:term:none:vendor"
+    "term:term:patches:notvendor"
     "new-debug-unreachable:new_debug_unreachable:none:notvendor"
     "phf-shared:phf_shared:none:vendor"
     "precomputed-hash:precomputed-hash:none:notvendor"
     "siphasher:siphasher:none:vendor"
     "string-cache:string_cache:none:notvendor"
     "fixedbitset:fixedbitset:none:notvendor"
+    "keccak:keccak:none:notvendor"
     "lalrpop:lalrpop:patches:notvendor"
-    "sequoia-openpgp:sequoia-openpgp:patches:notvendor"
+    "memsec:memsec:none:vendor"
+    "nettle:nettle:none:vendor"
+    "digest-0.10:digest 0.10:none:vendor"
+    "block-buffer-0.10:block-buffer 0.10:none:vendor"
+    "crypto-common-0.1:crypto-common 0.1:none:vendor"
+    "generic-array-0.14:generic-array 0.14:none:vendor"
+    "sha1collisiondetection:sha1collisiondetection:none:vendor"
+    "xxhash-rust:xxhash-rust:patches:vendor"
+    "getrandom-0.2:getrandom 0.2:none:vendor"
+    "blake2:blake2:none:vendor"
+    "password-hash:password-hash:none:vendor"
+    "cpufeatures-0.2:cpufeatures 0.2:none:vendor"
+    "libbz2-rs-sys-0.1:libbz2-rs-sys 0.1:none:notvendor"
+    "bzip2-0.5:bzip2 0.5:none:notvendor"
+    "nettle-sys:nettle-sys:none:vendor"
+    "wasi-0.11:wasi 0.11:none:vendor"
+    "sequoia-openpgp:sequoia-openpgp:patches:vendor"
   )
 
 export CARGO=/usr/local/bin/cargo
@@ -627,7 +644,7 @@ for entry in "${RUST_LIBS[@]}"; do
     vendor \
     <<< "$entry"
 
-  print_progress ${TOTAL} ${CURRENT} ${repackage_name}
+  print_progress ${TOTAL} ${CURRENT} "${repackage_name}"
 
   echo "####################"
   echo "Build start... [${CURRENT}/${TOTAL}]"
@@ -660,7 +677,10 @@ for entry in "${RUST_LIBS[@]}"; do
       yes |mk-build-deps --install --remove; \
       dpkg-buildpackage -b -us -uc
     elif [[ $vendor == "vendor" ]]; then
-      cargo vendor && \
+      $CARGO vendor && \
+      # Remove windows crates \
+      rm -rf ./vendor/windows*; \
+      rm -rf ./vendor/vcpkg/test-data/normalized/installed/*; \
       # Remove controls depends section because it's not needed for vendor
       DEBIAN_CONTROL_FILE="./debian/control"
       awk '/^Depends:/{skip=1; next} skip && /^[[:space:]]/{next} {skip=0; print}' "$DEBIAN_CONTROL_FILE" > "$DEBIAN_CONTROL_FILE.tmp"
@@ -679,6 +699,6 @@ for entry in "${RUST_LIBS[@]}"; do
   CURRENT=$((CURRENT + 1))
   echo "Build finished for rust library ${repackage_name}... [${CURRENT}/${TOTAL}]"
 
-  print_progress ${TOTAL} ${CURRENT} ${repackage_name}
+  print_progress ${TOTAL} ${CURRENT} "${repackage_name}"
 done
 
