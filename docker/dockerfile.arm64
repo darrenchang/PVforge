@@ -101,6 +101,8 @@ RUN apt update && \
     libbz2-dev \
     # librust-nettle-sys \
     nettle-dev \
+    # librust-apt-native \
+    libapt-pkg-dev \
     # librust-proxmox-sys \
     libacl1-dev \
     # librust-proxmox-systemd \
