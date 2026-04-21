@@ -718,9 +718,21 @@ RUST_LIBS=(
     "pkcs1:pkcs1:none:notvendor"
     "rsa:rsa:none:vendor"
     "fslock:fslock:none:notvendor"
-    "boring-sys:boring-sys:none:notvendor"
+    "boring-sys:boring-sys:patches:vendor"
+    "bitflags-2:bitflags 2.9:none:notvendor"
+    "foreign-types-shared-0.3:foreign-types-shared 0.3:none:notvendor"
+    "foreign-types-0.5:foreign-types 0.5:none:notvendor"
     "tokio-boring:tokio-boring:none:notvendor"
-    "lettre:lettre:none:notvendor"
+    "lettre:lettre:patches:notvendor"
+    "hashify:hashify:none:notvendor"
+    "mail-parser:mail-parser:none:vendor"
+    "getset:getset:none:notvendor"
+    "strum:strum:none:vendor"
+    "strum-macros:strum_macros:none:vendor"
+    "quickcheck:quickcheck:none:vendor"
+    "oci-spec:oci-spec:none:notvendor"
+    "openidconnect:openidconnect:none:vendor"
+    "base64-0.21:base64 0.21:none:vendor"
   )
 
 export CARGO=/usr/local/bin/cargo
