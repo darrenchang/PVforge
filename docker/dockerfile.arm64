@@ -97,6 +97,9 @@ RUN apt update && \
     libclang-dev \
     llvm \
     llvm-runtime \
+    # librust-brotli \
+    brotli-rs \
+    brotli \
     # librust-bzip2-sys \
     libbz2-dev \
     # librust-nettle-sys \
