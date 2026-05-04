@@ -98,8 +98,9 @@ RUN apt update && \
     llvm \
     llvm-runtime \
     # librust-brotli \
-    brotli-rs \
     brotli \
+    # librust-tower-http \
+    python3-inflate64 \
     # librust-bzip2-sys \
     libbz2-dev \
     # librust-nettle-sys \
