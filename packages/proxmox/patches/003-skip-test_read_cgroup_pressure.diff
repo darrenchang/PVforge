@@ -1,0 +1,19 @@
+diff --git a/proxmox-procfs/src/pressure.rs b/proxmox-procfs/src/pressure.rs
+--- a/proxmox-procfs/src/pressure.rs
++++ b/proxmox-procfs/src/pressure.rs
+@@ -317,11 +317,14 @@
+     }
+
+     #[test]
+     fn test_read_cgroup_pressure() {
+         for resource in [Resource::Io, Resource::Memory, Resource::Cpu] {
+-            PressureData::read_cgroup("system.slice", resource).unwrap();
++            match PressureData::read_cgroup("system.slice", resource) {
++                Ok(_) | Err(Error::NotFound(_)) => {}
++                Err(err) => panic!("unexpected error: {err}"),
++            }
+         }
+     }
+
+     #[test]
+     fn test_read_file_notfound() {

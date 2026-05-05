@@ -82,8 +82,8 @@ RUST_LIBS=(
     "proxmox-notify"
     "proxmox-oci"
     "proxmox-openid"
-    "proxmox-procfs"
     "pbs-api-types"
+    "proxmox-procfs"
 )
 
 TOTAL=${#RUST_LIBS[@]}
