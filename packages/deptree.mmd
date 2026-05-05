@@ -2,594 +2,12 @@
 title: pxvirt Package Compile Dependency tree
 ---
 graph LR
-    %% Tier 0.0 - Foundations (rust libraries)
-    subgraph T0.0["Tier 0.0 – Foundations (rust libraries)"]
-        subgraph T0.0A["Tier 0.0A – Foundations (rust libraries)"]
-            shlex
-            libc
-            jobserver
-            unicode-ident
-            proc-macro2
-            cc
-            openssl
-            openssl-probe
-            url
-            http-body-util
-            httparse
-            tokio
-            hyper
-            socket2
-            tracing
-            tracing-attributes
-            tracing-core
-            ucd-trie
-            valuable-derive
-            valuable
-            rayon
-            either
-            crossbeam-utils
-            crossbeam-epoch
-            crossbeam-deque
-            rayon-core
-            wasm-sync
-            tokio-macros
-            signal-hook-registry
-            httparse
-            semver
-            httpdate
-            want
-            h2
-            ipnet
-            native-tls
-            slab
-            futures
-            futures-core
-            futures-sink
-            futures-channel
-            futures-executor
-            futures-task
-            futures-util
-            futures-macro
-            pin-project-lite
-            futures-io
-            num-cpus
-            tower-service
-            tokio-util
-            der-parser
-            serde-cbor
-            serde-json
-            serde-test
-            no-panic
-            itoa
-            compiler-builtins
-            typeid
-            erased-serde
-            sval-derive-macros
-            ryu
-            sval-json
-            sval-test
-            sval
-            sval-ref
-            sval-fmt
-            serde-buf
-            value-bag
-            value-bag-serde
-            value-bag-sval
-            sval-nested
-            sval-serde
-            log
-            uicode-xid
-            memchr
-            http-body
-            base64urlsafedata
-            compact-jwt
-            serde-cbor-2
-            webauthn-attestation-ca
-            serde-wasm-bindgen
-            rustversion
-            wasm-bindgen-macro-support
-            wasm-bindgen-macro
-            wasm-bindgen-shared
-            wasm-bindgen
-            web-sys
-            js-sys
-            once-cell
-            critical-section
-            parking-lot-core
-            portable-atomic
-            derive-arbitrary
-            arbitrary
-            small-vec
-            allocator-api2
-            bumpalo
-            x509-parser
-            webauthn-rs-core
-            webauthn-rs
-            js-sys
-            zstd
-            zstd-safe
-            zstd-sys
-            const-format
-            xattr
-            const-format-proc-macros
-            tar
-            walkdir
-            same-file
-            winapi
-            winapi-util
-            sync-wrapper
-            tokio-openssl
-            tokio-stream
-            smawk
-            textwrap
-            unicode-linebreak
-            serde
-            serde-bytes
-            serde-plain
-            tracing-subscriber
-            tracing-journald
-            lazy-static
-            alloca
-            criterion-plot
-            criterion
-            spin
-            sharded-slab
-            nu-ansi-term
-            thread-local
-            tracing-log
-            lru
-            chrono
-            matchers
-            tracing-serde
-            iana-time-zone
-            pure-rust-locales
-            valuable-serde
-            pest
-            handlebars
-            thiserror
-            thiserror1
-            pest-meta
-            rhai
-            embed
-            rhai
-            rhai-codegen
-            embed
-            smartstring
-            proptest
-            bit-vec
-            bit-set
-            rand-xorshift
-            rand-core
-            rand-chacha
-            bytemuck-derive
-            bytemuck
-            bitflags
-            errno
-            cfg-if
-            libc
-            linux-raw-sys
-            rustc-std-workspace-core
-            rustc-std-workspace-std
-            rustc-std-workspace-alloc
-            r-efi
-            wasip2
-            anyhow
-            prettyplease
-            syn
-            heck
-            foldhash
-            id-arena
-            ahash
-            hashbrown
-            equivalent
-            indexmap
-            wasmparser
-            wat
-            leb128fmt
-            fallible-iterator
-            fnv
-            stable-deref-trait
-            gimli
-            wast
-            wasm-encoder
-            wit-parser
-            clap-lex
-            clap
-            pulldown-cmark
-            clap-derive
-            anstyle
-            utf8parse
-            zeroize-derive
-            zeroize
-            arrayvec
-            anstyle-parse
-            anstyle-query
-            colorchoice
-            is-terminal-polyfill
-            anstream
-            strsim
-            unicase
-            clap-builder
-            topological-sort
-            dyn-clone
-            serde-derive-internals
-            ref-cast-impl
-            ref-cast
-            autocfg
-            libm
-            num-traits
-            num-integer
-            env-filter
-            regex
-            jiff-tzdb
-            jiff-tzdb-platform
-            jiff-static
-            portable-atomic-util
-            portable-atomic
-            jiff
-            env-logger
-            quickcheck
-            num-bigint
-            bigdecimal
-            bytes
-            jiff
-            rust-decimal
-            schemars-derive
-            schemars
-            auditable-serde
-            wasm-metadata
-            wit-bindgen-core
-            wit-bindgen-rust
-            wit-bindgen-rust-macro
-            wit-bindgen
-            getrandom
-            tempfile
-            unicode-width
-            serde-with
-            pam
-            endian-trait-derive
-            tracing-attributes --> tracing
-            shlex --> cc
-            libc --> cc
-            jobserver --> cc
-            cc --> compiler-builtins
-            unicode-ident --> proc-macro2
-            proc-macro2 --> quote
-            quote --> syn
-            syn --> serde-derive
-            crossbeam-utils --> crossbeam-epoch
-            crossbeam-epoch --> crossbeam-deque
-            crossbeam-deque --> rayon-core
-            either --> rayon
-            rayon-core --> rayon
-            rayon --> id-arena
-            valuable-derive --> valuable
-            valuable --> tracing-core
-            tracing-core --> tracing
-            tokio-macros --> tokio
-            signal-hook-registry --> tokio
-            tracing --> tokio
-            socket2 --> tokio
-            parking-lot --> tokio
-            httparse --> hyper
-            httpdate --> hyper
-            want --> hyper
-            h2 --> hyper
-            ipnet --> hyper-util
-            tower-service --> hyper-util
-            atomic-waker --> h2
-            tokio-util --> h2
-            try-lock --> want
-            tokio --> hyper
-            httparse --> hyper
-            hyper --> hyper-util
-            pin-project-lite --> futures-util
-            futures-io --> futures-util
-            slab --> futures-util
-            futures-macro --> futures-util
-            futures-task --> futures-executor
-            num-cpus --> futures-executor
-            futures-util --> futures-executor
-            futures-core --> futures-channel
-            futures-sink --> futures-channel
-            futures-channel --> futures
-            futures-executor --> futures
-            http-body --> http-body-util
-            openssl-macros --> compact-jwt
-            openssl-sys --> compact-jwt
-            ryu --> sval-fmt
-            sval-derive-macros --> sval
-            sval --> sval-ref
-            sval-ref --> sval-buffer
-            typeid --> erased_serde
-            erased-serde --> serde-fmt
-            erased-serde --> value-bag-serde
-            sval-json --> value-bag-sval
-            sval-test --> value-bag-sval
-            sval-fmt --> value-bag-sval2
-            sval-nested --> sval-serde
-            sval-serde --> value-bag-sval2
-            memchr --> serde-json
-            itoa --> serde-json
-            indexmap --> serde-json
-            serde-json --> serde-test
-            serde-json --> value-bag-serde
-            serde-json --> wasm-bindgen
-            value-bag-serde --> value-bag
-            sval-serde --> value-bag
-            value-bag-sval2 --> value-bag
-            value-bag --> log
-            serde-buf --> value-bag-serde
-            value-bag --> value-bag-serde
-            compiler-builtins --> memchr
-            no-panic --> itoa
-            wasm-bindgen-macro-support --> wasm-bindgen-macro
-            wasm-bindgen-shared --> wasm-bindgen-macro-support
-            rustversion --> wasm-bindgen
-            wasm-bindgen-macro --> wasm-bindgen
-            wasm-bindgen-shared --> wasm-bindgen
-            allocator-api2 --> bumpalo
-            bumpalo --> wasm-bindgen-macro-support
-            derive-arbitrary --> arbitrary
-            arbitrary --> smallvec
-            small-vec --> parking-lot-core
-            critical-section --> once-cell
-            parking-lot-core --> once-cell
-            portable-atomic --> once-cell
-            once-cell --> js-sys
-            wasm-bindgen --> js-sys
-            js-sys --> wasm-sync
-            js-sys --> web-sys
-            serde-wasm-bindgen --> webauthn-rs-proto
-            wasm-bindgen --> webauthn-rs-proto
-            web-sys --> webauthn-rs-proto
-            x509-parser --> webauthn-rs-core
-            webauthn-attestation-ca --> webauthn-rs-core
-            webauthn-rs-proto --> webauthn-rs-core
-            serde-cbor --> webauthn-rs-core
-            serde-cbor-2 --> webauthn-rs-core
-            webauthn-attenstation-ca --> webauthn-rs-core
-            webauthn-rs-core --> webauthn-rs
-            futures --> http-body-util
-            zstd-sys --> zstd-safe
-            zstd-safe --> zstd
-            const-format-proc-macros --> const-format
-            xattr --> const-format
-            winapi --> same-file
-            winapi-util --> winapi
-            same-file --> walkdir
-            smawk --> textwrap
-            unicode-linebreak --> textwrap
-            valuable-serde --> tracing-serde
-            pure-rust-locales --> chrono
-            iana-time-zone --> chrono
-            lru --> tracing-log
-            chrono --> tracing-subscriber
-            matchers --> tracing-subscriber
-            tracing-serde --> tracing-subscriber
-            tracing-log --> tracing-subscriber
-            thread-local --> tracing-subscriber
-            alloca --> criterion
-            criterion-plot --> criterion
-            criterion --> spin
-            spin --> lazy-static
-            lazy-static --> sharded-slab
-            sharded-slab --> tracing-subscriber
-            nu-ansi-term --> tracing-subscriber
-            tracing-subscriber --> tracing-journald
-            cfg-if --> getrandom
-            libc --> getrandom
-            getrandom --> rand-core
-            cfg-if --> rustc-std-workspace-core
-            bytemuck-derive --> bytemuck
-            bytemuck --> bitflags
-            bitflags --> errno
-            libc --> errno
-            errno --> rustc-std-workspace-core
-            rustc-std-workspace-core --> libc
-            fnv --> fimli
-            rustc-std-workspace-alloc --> gimli
-            stable-deref-trait --> gimli
-            fallible-iterator --> gimli
-            gimli --> wast
-            libc --> linux-raw-sys
-            linux-raw-sys --> rustc-std-workspace-alloc
-            rustc-std-workspace-alloc --> getrandom
-            r-efi --> getrandom
-            wasip2 --> getrandom
-            wast --> getrandom
-            anyhow --> wit-bindgen-rust-macro
-            syn --> prettyplease
-            prettyplease --> wit-bindgen-rust-macro
-            prettyplease --> wit-bindgen
-            clap-lex --> clap-derive
-            utf8parse --> anstyle-parse
-            is-terminal-polyfill --> anstream
-            colorchoice --> anstream
-            anstyle-query --> anstream
-            anstyle --> anstream
-            zeroize-derive --> zeroize
-            zeroize --> arrayvec
-            arrayvec --> anstyle-parse
-            unicase --> clap-builder
-            unicase --> pulldown-cmark
-            strsim --> clap-builder
-            anstyle-parse --> anstream
-            anstream --> clap-builder
-            pulldown-cmark --> clap-derive
-            clap-derive --> clap-builder
-            clap-derive --> clap
-            clap-builder --> clap
-            clap --> wit-bindgen-core
-            ref-cast-impl --> ref-cast
-            ref-cast --> schemars
-            autocfg --> schemars
-            libm --> schemars
-            num-integer --> schemars
-            env-filter --> env-logger
-            jiff-tzdb --> jiff
-            jiff-tzdb-platform --> jiff
-            portable-atomic-util --> jiff
-            portable-atomic --> jiff
-            jiff-static --> jiff
-            jiff --> env-logger
-            env-logger --> quickcheck
-            quickcheck --> num_bigint
-            rand --> num_bigint
-            num-bigint --> schemars
-            bigdecimal --> schemars
-            bytes --> schemars
-            chrono --> schemars
-            jiff --> schemars
-            rust-decimal --> schemars
-            serde-derive-internals --> schemars-derive
-            schemars-derive --> schemars
-            dyn-clone --> schemars
-            schemars --> auditable-serde
-            topological-sort --> auditable-serde
-            auditable-serde --> wasm-metadata
-            wasm-metadata --> wit-bindgen-rust
-            wit-bindgen-rust --> wit-bindgen-rust
-            wit-bindgen-core --> wit-bindgen-rust-macro
-            heck --> wit-bindgen-core
-            anyhow --> wit-bindgen-core
-            semver --> wasmparser
-            bitflags --> wasparser
-            wasmparser --> wasm-encoder
-            rustc-std-workspace-std --> unicode-width
-            unicode-width --> wast
-            leb128fmt --> wast
-            wasm-encoder --> wast
-            wast --> wat
-            wat --> wit-parser
-            wasmparser --> hashbrown
-            wasmparser --> wit-parser
-            hashbrown --> wit-parser
-            indexmap --> wit-parser
-            log --> wit-parser
-            unicode-xid --> wit-parser
-            wit-parser --> wit-bindgen-core
-            equivalent --> hashbrown
-            foldhash --> hashbrown
-            hashbrown --> indexmap
-            equivalent --> indexmap
-            getrandom --> ahash
-            wit-bindgen-rust-macro --> wit-bindgen
-            wit-bindgen --> getrandom
-            wit-bindgen --> wasip2
-            getrandom --> tempfile
-            rand-core --> rand-xorshift
-            rand-chacha --> rand
-            bit-vec --> bit-set
-            rand-xorshift --> protest
-            bit-set --> protest
-            proptest --> smartstring
-            smartstring --> rhai
-            embed --> handlebars
-            rhai --> handlebars
-            rhai-codegen --> rhai
-            pest-meta --> pest
-            pest-generator
-            pest-derive --> pest
-            pest-generator --> pest
-            ucd-trie --> pest
-            thiserror --> pest
-            thiserror-1 --> pest
-            pest --> handlebars
-            endian-trait-derive --> endian-trait
-        end
-    end
-
-    %% Tier 0.1 - Foundations (Proxmox rust libraries)
-    subgraph T0.1["Tier 0.1 – Foundations (Proxmox rust libraries)"]
-        librust-proxmox-base64
-        librust-proxmox-io
-        librust-proxmox-lang
-        librust-proxmox-time
-        librust-proxmox-sys
-        librust-proxmox-api-macro
-        librust-proxmox-section-config
-        librust-proxmox-rate-limiter
-        librust-proxmox-shared-memory
-        librust-shared-cache
-        librust-proxmox-pbs-api-types
-        librust-proxmox-apt-api-types
-        librust-proxmox-config-digest
-        librust-proxmox-serde
-        librust-proxmox-string
-        librust-proxmox-log
-        librust-proxmox-daemon
-        librust-proxmox-network-types
-        librust-proxmox-worker-task
-        librust-proxmox-uuid
-        librust-proxmox-systemd
-        librust-proxmox-rest-server
-        librust-proxmox-acme-api
-        librust-proxmox-tfa
-        librust-proxmox-http-error
-        librust-proxmox-compression
-        librust-proxmox-acme
-        librust-proxmox-schema --> librust-proxmox-router
-        librust-proxmox-http --> librust-proxmox-router
-        librust-proxmox-http-error --> librust-proxmox-router
-        librust-proxmox-sys --> librust-proxmox-product-config
-        librust-proxmox-section-config --> librust-proxmox-api-macro
-        librust-proxmox-router --> librust-proxmox-api-macro
-        librust-proxmox-api-macro --> librust-proxmox-schema
-        librust-proxmox-shared-memory --> librust-proxmox-rate-limiter
-        librust-proxmox-product-config --> librust-proxmox-schema
-        librust-proxmox-api-macro --> librust-proxmox-schema
-        librust-proxmox-router --> librust-proxmox-schema
-        librust-proxmox-schema --> librust-promxox-time-api
-        librust-proxmox-config-digest --> librust-proxmox-apt-api-types
-        librust-proxmox-serde --> librust-proxmox-apt-api-types
-        librust-proxmox-fixed-string --> librust-proxmox-apt-api-types
-        librust-proxmox-apt-api-types --> librust-proxmox-pbs-api-types
-        librust-proxmox-systemd --> librust-proxmox-daemon
-        librust-proxmox-worker-task --> librust-proxmox-rest-server
-        librust-proxmox-network-types --> librust-proxmox-rest-server
-        librust-proxmox-daemon --> librust-proxmox-rest-server
-        librust-proxmox-rest-server --> librust-proxmox-acme-api
-        librust-proxmox-log --> librust-proxmox-acme-api
-        librust-proxmox-uuid --> librust-proxmox-acme-api
-        librust-proxmox-lang --> librust-proxmox-async
-        librust-proxmox-rate-limiter --> librust-proxmox-http
-        librust-proxmox-http --> librust-proxmox-http-error
-        librust-proxmox-time --> librust-proxmox-compression
-        librust-proxmox-async --> librust-proxmox-http
-        librust-proxmox-io --> librust-proxmox-http
-        librust-proxmox-base64 --> librust-proxmox-acme
-        librust-proxmox-schema --> librust-proxmox-acme
-        librust-proxmox-http --> librust-proxmox-acme
-        zstd --> librust-proxmox-sys
-        env-logger --> librust-proxmox-router
-        serde-plain --> librust-proxmox-router
-        tokio-stream --> librust-proxmox-router
-        const-format --> librust-proxmox-schema
-        textwrap --> librust-proxmox-schema
-        serde --> librust-proxmox-network-types
-        serde-with --> librust-proxmox-network-types
-        regex --> librust-proxmox-network-types
-        tracing-journald --> librust-proxmox-log
-        handlebars --> librust-proxmox-rest-server
-        webauthn-rs --> librust-proxmox-tfa
-        js-sys --> librust-proxmox-time
-        futures --> librust-proxmox-http
-        hyper-util --> librust-proxmox-http
-        native-tls --> librust-proxmox-http
-        sync-wrapper --> librust-proxmox-http
-        tokio-openssl --> librust-proxmox-http
-        walkdir --> librust-proxmox-compression
-        tar --> librust-proxmox-compression
-        http-body-util --> librust-proxmox-acme
-        hyper --> librust-proxmox-acme
-    end
-
     %% Tier 1 - Foundations (no compile dependencies)
     subgraph T1["Tier 1 – Foundations"]
         debcargo-conf
         proxmox
         chrony
+        pve-apiclient
         corosync-pve
         corosync-qdevice
         extjs
@@ -624,91 +42,70 @@ graph LR
         proxmox-widget-toolkit
         ceph-19
         perlmod
+        proxmox-perltidy
         unknown_pkg
     end
 
     %% Tier2
     subgraph T2["Tier 2 – Cluster Infrastructure"]
         debcargo-conf --> pxar
-        unknown_pkg --> proxmox-acme
-        unknown_pkg --> pve-cluster
-        unknown_pkg --> pve-apiclient
-        unknown_pkg --> pve-guest-common
-        unknown_pkg --> pve-network
-        unknown_pkg --> pve-storage
-        unknown_pkg --> pve-edk2-firmware
-        unknown_pkg --> pve-firewall
-        unknown_pkg --> pve-ha-manager
-        unknown_pkg --> proxmox-firewall
-        unknown_pkg --> proxmox-archive-keyring
+        debcargo-conf --> pve-xtermjs
+        perlmod --> proxmox-perl-rs
+        proxmox --> proxmox-mail-forward
+        proxmox --> proxmox-network-interface-pinning
+        proxmox --> proxmox-offline-mirror
+        proxmox --> proxmox-rrd-migration-tool
+        proxmox --> proxmox-websocket-tunnel
         unknown_pkg --> proxmox-kernel-helper
-        unknown_pkg --> pve-manager
-        unknown_pkg --> pve-server
-        unknown_pkg --> pve-xtermjs
-        unknown_pkg --> roxmox-biome
-        unknown_pkg --> roxmox-i18n
-        unknown_pkg --> roxmox-mail-forward
-        unknown_pkg --> roxmox-mini-journalreader
-        unknown_pkg --> roxmox-network-interface-pinning
-        unknown_pkg --> roxmox-offline-mirror
-        unknown_pkg --> roxmox-perltidy
-        unknown_pkg --> roxmox-rrd-migration-tool
-        unknown_pkg --> roxmox-websocket-tunnel
-        unknown_pkg --> ve-firmware
-        unknown_pkg --> proxmox-ve-rs
+        unknown_pkg --> proxmox-archive-keyring
+        unknown_pkg --> proxmox-biome
+        unknown_pkg --> proxmox-i18n
+        unknown_pkg --> proxmox-mini-journalreader
     end
 
     %% Tier 3 
     subgraph T3["Tier 3 – Cluster Infrastructure"]
-        proxmox-acme --> roxmox-backup
-        proxmox-acme --> roxmox-backup-meta
-        proxmox-acme --> roxmox-backup-qemu
-        proxmox-acme --> roxmox-backup-restore-image
-        proxmox-acme --> proxmox-perl-rs
-        debcargo-conf --> proxmox-perl-rs
-        perlmod --> proxmox-perl-rs
+        proxmox-perl-rs --> pve-common
     end
 
     %% Tier 4
     subgraph T4["Tier 4 – Cluster Infrastructure"]
-        proxmox-perl-rs --> pve-common
-    end
-
-    %% Tier 5
-    subgraph T5["Tier 5 – Cluster Infrastructure"]
-        proxmox-widget-toolkit --> pve-docs
+        pve-common --> proxmox-acme
         pve-common --> pve-docs
         pve-common --> pve-access-control
         pve-common --> pve-http-server
         pve-common --> pve-installer
     end
 
-    %% Tier 6
-    subgraph T6["Tier 6 – Cluster Infrastructure"]
-        pve-docs --> qemu-server
-        pve-common --> qemu-server
-        pve-guest-common --> qemu-server
-        pve-apiclient --> qemu-server
-        pve-cluster --> qemu-server
-        pve-network --> qemu-server
-        pve-storage --> qemu-server
-        pve-edk2-firmware --> qemu-server
-        pve-firewall --> qemu-server
-        pve-ha-manager --> qemu-server
-        proxmox-firewall --> qemu-server
+    %% Tier 5
+    subgraph T5["Tier 5 – Cluster Infrastructure"]
+        pve-access-control --> pve-cluster
         pve-access-control --> pve-qemu
-        ceph-19 --> librados2-perl
         pve-access-control --> librados2-perl
         pve-access-control --> pve-container
+        proxmox-acme --> roxmox-backup
+        proxmox-acme --> roxmox-backup-meta
+        proxmox-acme --> roxmox-backup-qemu
+        proxmox-acme --> roxmox-backup-restore-image
+    end
+
+    %% Tier 6
+    subgraph T6["Tier 6 – Cluster Infrastructure"]
+        pve-cluster --> pve-guest-common
+        pve-cluster --> pve-network
+        pve-cluster --> pve-firewall
+        pve-cluster --> pve-ha-manager
+        pve-cluster --> proxmox-firewall
+        pve-cluster --> pve-manager
+        pve-cluster --> pve-firmware
+        pve-qemu --> pve-edk2-firmware
+        pve-qemu --> proxmox-ve
+        pve-qemu --> spiceterm
     end
 
     %% Tier 7
     subgraph T7["Tier 7 – Cluster Infrastructure"]
-        proxmox-archive-keyring --> proxmox-ve
-        proxmox-kernel-helper --> proxmox-ve
-        pve-manager --> proxmox-ve
-        pve-qemu --> proxmox-ve
-        pve-qemu --> spiceterm
-        pve-server --> proxmox-ve
+        pve-guest-common --> qemu-server
+        pve-guest-common --> pve-storage
     end
 
