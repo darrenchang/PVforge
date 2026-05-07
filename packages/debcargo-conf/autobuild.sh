@@ -11,13 +11,6 @@ echo "This is $PKGNAME build scripts"
 
 cd $SCRIPT_DIR/$PKGNAME
 
-arch=`arch`
-if [[ "$arch" == "loongarch64" || "$arch" == "aarch64" ]];then
-  for i in `cat $SCRIPT_DIR/series`; do
-    patch --forward -p1 < ../$i || true
-  done
-fi
-
 RUST_LIBS=(
     "shlex:shlex:patches:notvendor"
     "unicode-ident:unicode-ident:patches:notvendor"
@@ -754,7 +747,7 @@ RUST_LIBS=(
     "alloc-no-stdlib:alloc-no-stdlib:patches:notvendor"
     "alloc-stdlib:alloc-stdlib:patches:notvendor"
     "brotli-decompressor:brotli-decompressor:none:vendor"
-    "brotlI:brotli:patches:vendor"
+    "brotli:brotli:patches:vendor"
     "tower-http:tower-http:none:notvendor"
     "web-sys:web-sys:none:notvendor"
     "siphasher-1:siphasher 1:none:notvendor"
@@ -810,6 +803,9 @@ export RUSTC=/usr/local/bin/rustc
 
 TOTAL=${#RUST_LIBS[@]}
 CURRENT=0
+
+# Update repos so rust can install dependencie libraries
+apt update;
 
 for entry in "${RUST_LIBS[@]}"; do
   IFS=':' read -r \
