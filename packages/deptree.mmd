@@ -43,7 +43,6 @@ graph LR
         ceph-19
         perlmod
         proxmox-perltidy
-        unknown_pkg
     end
 
     %% Tier2
@@ -56,11 +55,11 @@ graph LR
         proxmox --> proxmox-offline-mirror
         proxmox --> proxmox-rrd-migration-tool
         proxmox --> proxmox-websocket-tunnel
-        unknown_pkg --> proxmox-kernel-helper
-        unknown_pkg --> proxmox-archive-keyring
-        unknown_pkg --> proxmox-biome
-        unknown_pkg --> proxmox-i18n
-        unknown_pkg --> proxmox-mini-journalreader
+        proxmox --> proxmox-kernel-helper
+        proxmox --> proxmox-archive-keyring
+        proxmox --> proxmox-biome
+        proxmox --> proxmox-mini-journalreader
+        proxmox --> proxmox-i18n
     end
 
     %% Tier 3 
