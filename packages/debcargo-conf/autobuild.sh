@@ -796,6 +796,13 @@ RUST_LIBS=(
     "p384:p384:none:notvendor"
     "ordered-float:ordered-float:patches:notvendor"
     "serde-value:serde-value:patches:notvendor"
+    "temp-dir:temp-dir:none:vendor"
+    "gettext-sys:gettext-sys:none:vendor"
+    "locale-config:locale_config:patches:notvendor"
+    "gettext-rs:gettext-rs:none:vendor"
+    "gettext:gettext:none:vendor"
+    "tr:tr:patches:notvendor"
+    "xtr:xtr:none:notvendor"
   )
 
 export CARGO=/usr/local/bin/cargo
