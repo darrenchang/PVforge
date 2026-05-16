@@ -1,0 +1,27 @@
+ARG BASE_IMAGE="pve-builder"
+FROM ${BASE_IMAGE}
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt update;
+
+WORKDIR /workspace/
+
+COPY ./packages/build_all.sh ./packages/
+COPY ./docker/start.sh ./packages/
+COPY ./packages/common.sh ./packages/
+
+ENV PACKAGE=debcargo-conf
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN cd ./packages/${PACKAGE}/${PACKAGE}/ && \
+    rm .git && \
+    git init 
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=proxmox
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=chrony
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+

@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 
 log_build_name(){
   echo "########################################"
@@ -35,8 +36,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 export DEBOPT="dd"
-export PACKAGES_PATH="/pxvirt/packages"
-git config --global --add safe.directory ${PACKAGES_PATH}/..
+export PACKAGES_PATH="/workspace/packages"
 
 echo "DEBOPT: ${DEBOPT}"
 echo "PACKAGES_PATH: $PACKAGES_PATH"
@@ -47,9 +47,8 @@ if [[ ${PACKAGE_NAME} == "all" ]]; then
   for pkg_name in $(extract_subgraph_packages "/pxvirt/packages/deptree.mmd"); do
     export PKGDIR="${PACKAGES_PATH}/${pkg_name}/${pkg_name}/"
     if [[ -d $PKGDIR ]]; then
-      git config --global --add safe.directory $PKGDIR
       log_build_name $PKGDIR
-      sh -c '/start.sh'
+      sh -c './start.sh'
       # Install the compiled package
       mkdir -p "/tmp/proxmox/${pkg_name}/"
       for i in $(find /pxvirt/packages/${pkg_name}/ -name '*.deb'); do
@@ -62,11 +61,10 @@ else
   # Build one specified package
   export PKGDIR="${PACKAGES_PATH}/${PACKAGE_NAME}/${PACKAGE_NAME}/"
   if [[ -d $PKGDIR ]]; then
-    git config --global --add safe.directory $PKGDIR
     log_build_name $PKGDIR
-    sh -c '/start.sh'
+    sh -c './start.sh'
     mkdir -p "/tmp/proxmox/${PACKAGE_NAME}/"
-    for i in $(find /pxvirt/packages/${PACKAGE_NAME}/ -name '*.deb'); do
+    for i in $(find /workspace/packages/${PACKAGE_NAME}/ -name '*.deb'); do
       cp $i "/tmp/proxmox/${PACKAGE_NAME}/";
     done
     apt install -y --allow-downgrades $(ls /tmp/proxmox/${PACKAGE_NAME}/*.deb | grep -v -- '-dbgsym_\|zfs-dracut_\|-test_');

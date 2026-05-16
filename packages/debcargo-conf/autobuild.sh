@@ -873,6 +873,10 @@ for entry in "${RUST_LIBS[@]}"; do
     cp ${deb_pkg} "/tmp/${PKGNAME}/"
   done
   apt install --reinstall -y --allow-downgrades --reinstall /tmp/${PKGNAME}-temp/*.deb || exit 1 &&
+  mkdir -p "/tmp/proxmox/${PACKAGE_NAME}/"
+  for i in $(find /workspace/packages/${PACKAGE_NAME}/ -name '*.deb'); do
+    cp $i "/tmp/proxmox/${PACKAGE_NAME}/";
+  done
   rm -rf /tmp/${PKGNAME}-temp
   CURRENT=$((CURRENT + 1))
   echo "Build finished for rust library ${repackage_name}... [${CURRENT}/${TOTAL}]"

@@ -1,14 +1,15 @@
 group "default" {
   targets = [
-    "pvebuilder",
+    "builder-base",
+    "pve-builder",
   ]
 }
 
-target "pvebuilder" {
+target "builder-base" {
   context    = "docker"
-  dockerfile = "dockerfile.arm64"
+  dockerfile = "dockerfile.builder-base.arm64"
   tags       = [
-    "pvebuilder",
+    "builder-base",
   ]
   platforms  = ["linux/arm64"]
   args = {
@@ -16,5 +17,17 @@ target "pvebuilder" {
     DEBIAN_VERSION = "trixie"
     RUST_VERSION = "1.94.0"
     LLVM_VERSION = "22.1.2"
+  }
+}
+
+target "pve-builder" {
+  context    = "."
+  dockerfile = "docker/dockerfile.pve-builder.arm64"
+  tags       = [
+    "pve-builder",
+  ]
+  platforms  = ["linux/arm64"]
+  args = {
+    BASE_IMAGE = "builder-base:latest"
   }
 }

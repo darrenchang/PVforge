@@ -28,6 +28,8 @@ print_progress(){
   CURRENT=$2
   ITEM_NAME=$3
 
+  [ ! -t 1 ] && return
+
   BAR_WIDTH=40
   ROWS=$(tput lines)
   printf "\033[1;$(($ROWS - 1))r"
@@ -51,6 +53,7 @@ errlog(){
 
 # Function to clean up on exit (Ctrl+C)
 cleanup() {
+    [ ! -t 1 ] && return
     printf "\033[r"
     printf "\033[${ROWS};1H"
     tput cnorm
