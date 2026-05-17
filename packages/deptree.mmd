@@ -4,6 +4,7 @@ title: pxvirt Package Compile Dependency tree
 graph LR
     %% Tier 1 - Foundations (no compile dependencies)
     subgraph T1["Tier 1 – Foundations"]
+        perlmod
         debcargo-conf
         proxmox
         chrony
@@ -25,7 +26,6 @@ graph LR
         libxdgmime-perl
         lxc
         lxcfs
-        net-sriov-tools
         novnc-pve
         pathpatterns
         pixman
@@ -41,15 +41,15 @@ graph LR
         pxvirt-spdk
         proxmox-widget-toolkit
         ceph-19
-        perlmod
         proxmox-perltidy
     end
 
     %% Tier2
     subgraph T2["Tier 2 – Cluster Infrastructure"]
+        perlmod --> proxmox-perl-rs
         debcargo-conf --> pxar
         debcargo-conf --> pve-xtermjs
-        perlmod --> proxmox-perl-rs
+        debcargo-conf --> net-sriov-tools
         proxmox --> proxmox-mail-forward
         proxmox --> proxmox-network-interface-pinning
         proxmox --> proxmox-offline-mirror
@@ -70,10 +70,10 @@ graph LR
     %% Tier 4
     subgraph T4["Tier 4 – Cluster Infrastructure"]
         pve-common --> proxmox-acme
-        pve-common --> pve-docs
         pve-common --> pve-access-control
         pve-common --> pve-http-server
         pve-common --> pve-installer
+        pve-common --> pve-docs
     end
 
     %% Tier 5
