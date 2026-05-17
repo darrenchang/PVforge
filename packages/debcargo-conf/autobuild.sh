@@ -814,24 +814,12 @@ git init
 # Update repos so rust can install dependencie libraries
 apt update;
 
-TOTAL=${#RUST_LIBS[@]}
-CURRENT=0
-for entry in "${RUST_LIBS[@]}"; do
-  IFS=':' read -r \
-    rust_lib \
-    repackage_name \
-    patch_name \
-    vendor \
-    <<< "$entry"
+build_rust_libs(){
+  rust_lib=$1
+  repackage_name=$2
+  patch_name=$3
+  vendor=$4
 
-  print_progress ${TOTAL} ${CURRENT} "${repackage_name}"
-
-  echo "####################"
-  echo "Build start... [${CURRENT}/${TOTAL}]"
-  echo "Building rust package ${repackage_name}..."
-  echo "CARGO: $($CARGO --version)"
-  echo "RUSTC: $($RUSTC --version)"
-  echo "DEBCARGO: $(debcargo --version)"
   rm -rf ./build/*
   # Prepare patch for ./repackage.sh script
   cp -r "./src/${rust_lib}/" "/tmp/tmp_${rust_lib}"
@@ -855,7 +843,7 @@ for entry in "${RUST_LIBS[@]}"; do
     cd ./build/${rust_lib}/;
     if [[ $vendor == "notvendor" ]]; then
       yes |mk-build-deps --install --remove; \
-      dpkg-buildpackage -b -us -uc
+      dpkg-buildpackage -b -us -uc 2>&1 > /dev/null
     elif [[ $vendor == "vendor" ]]; then
       $CARGO vendor && \
       # Remove windows crates \
@@ -865,21 +853,36 @@ for entry in "${RUST_LIBS[@]}"; do
       DEBIAN_CONTROL_FILE="./debian/control"
       awk '/^Depends:/{skip=1; next} skip && /^[[:space:]]/{next} {skip=0; print}' "$DEBIAN_CONTROL_FILE" > "$DEBIAN_CONTROL_FILE.tmp"
       mv "$DEBIAN_CONTROL_FILE.tmp" "$DEBIAN_CONTROL_FILE"
-      DEB_BUILD_OPTIONS="nocheck parallel=$(nproc)" dpkg-buildpackage -b -us -uc -Pnocheck
+      DEB_BUILD_OPTIONS="nocheck parallel=$(nproc)" dpkg-buildpackage -b -us -uc -Pnocheck 2>&1 > /dev/null
     fi
   )
   mkdir -p /tmp/${PKGNAME}-temp
-  mkdir -p "/tmp/proxmox/${PACKAGE_NAME}/"
+  mkdir -p ./deb/
   for deb_pkg in $(find $(pwd)/build/ -name "*.deb"); do
     cp ${deb_pkg} "/tmp/${PKGNAME}-temp/"
-    cp ${deb_pkg} "/tmp/proxmox/${PKGNAME}/"
+    cp ${deb_pkg} "./deb/"
   done
   apt install --reinstall -y --allow-downgrades --reinstall /tmp/${PKGNAME}-temp/*.deb || exit 1 &&
   rm -rf /tmp/${PKGNAME}-temp
 
-  CURRENT=$((CURRENT + 1))
-  echo "Build finished for rust library ${repackage_name}... [${CURRENT}/${TOTAL}]"
+  echo "Build finished for rust library ${repackage_name}..."
+}
 
+TOTAL=${#RUST_LIBS[@]}
+CURRENT=0
+for entry in "${RUST_LIBS[@]}"; do
+  IFS=':' read -r \
+    rust_lib \
+    repackage_name \
+    patch_name \
+    vendor \
+    <<< "$entry"
+  CURRENT=$((CURRENT + 1))
   print_progress ${TOTAL} ${CURRENT} "${repackage_name}"
+  if [ ! -t 1 ]; then
+    build_rust_libs "${rust_lib}" "${repackage_name}" "${patch_name}" "${vendor}" > /dev/null 2>&1
+  else
+    build_rust_libs "${rust_lib}" "${repackage_name}" "${patch_name}" "${vendor}"
+  fi
 done
 

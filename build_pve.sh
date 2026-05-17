@@ -2,5 +2,6 @@
 
 set -e
 
-BUILDKIT_PROGRESS=plain docker buildx bake
+BUILDKIT_PROGRESS=plain \
+docker buildx bake
 

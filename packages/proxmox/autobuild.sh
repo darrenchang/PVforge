@@ -101,10 +101,10 @@ for rust_lib in "${RUST_LIBS[@]}"; do
   export NOTEST=1
   ./build.sh ${rust_lib}
   mkdir -p /tmp/${PKGNAME}-temp
-  mkdir -p /tmp/${PKGNAME}
+  mkdir -p ./deb/
   for deb_pkg in $(find $(pwd)/build/ -name '*.deb'); do
     cp ${deb_pkg} "/tmp/${PKGNAME}-temp/"
-    cp ${deb_pkg} "/tmp/proxmox/${PKGNAME}/"
+    cp ${deb_pkg} "./deb/"
   done
   apt install -y --allow-downgrades /tmp/${PKGNAME}-temp/*.deb --reinstall
   rm -rf /tmp/${PKGNAME}-temp
