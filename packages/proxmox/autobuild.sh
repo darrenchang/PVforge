@@ -104,13 +104,9 @@ for rust_lib in "${RUST_LIBS[@]}"; do
   mkdir -p /tmp/${PKGNAME}
   for deb_pkg in $(find $(pwd)/build/ -name '*.deb'); do
     cp ${deb_pkg} "/tmp/${PKGNAME}-temp/"
-    cp ${deb_pkg} "/tmp/${PKGNAME}/"
+    cp ${deb_pkg} "/tmp/proxmox/${PKGNAME}/"
   done
   apt install -y --allow-downgrades /tmp/${PKGNAME}-temp/*.deb --reinstall
-  mkdir -p "/tmp/proxmox/${PACKAGE_NAME}/"
-  for i in $(find /workspace/packages/${PACKAGE_NAME}/ -name '*.deb'); do
-    cp $i "/tmp/proxmox/${PACKAGE_NAME}/";
-  done
   rm -rf /tmp/${PKGNAME}-temp
 
   CURRENT=$((CURRENT + 1))

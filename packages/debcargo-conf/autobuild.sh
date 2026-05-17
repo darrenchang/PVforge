@@ -808,12 +808,14 @@ RUST_LIBS=(
 export CARGO=/usr/local/bin/cargo
 export RUSTC=/usr/local/bin/rustc
 
-TOTAL=${#RUST_LIBS[@]}
-CURRENT=0
+rm .git &&
+git init
 
 # Update repos so rust can install dependencie libraries
 apt update;
 
+TOTAL=${#RUST_LIBS[@]}
+CURRENT=0
 for entry in "${RUST_LIBS[@]}"; do
   IFS=':' read -r \
     rust_lib \
@@ -867,17 +869,14 @@ for entry in "${RUST_LIBS[@]}"; do
     fi
   )
   mkdir -p /tmp/${PKGNAME}-temp
-  mkdir -p /tmp/${PKGNAME}
+  mkdir -p "/tmp/proxmox/${PACKAGE_NAME}/"
   for deb_pkg in $(find $(pwd)/build/ -name "*.deb"); do
     cp ${deb_pkg} "/tmp/${PKGNAME}-temp/"
-    cp ${deb_pkg} "/tmp/${PKGNAME}/"
+    cp ${deb_pkg} "/tmp/proxmox/${PKGNAME}/"
   done
   apt install --reinstall -y --allow-downgrades --reinstall /tmp/${PKGNAME}-temp/*.deb || exit 1 &&
-  mkdir -p "/tmp/proxmox/${PACKAGE_NAME}/"
-  for i in $(find /workspace/packages/${PACKAGE_NAME}/ -name '*.deb'); do
-    cp $i "/tmp/proxmox/${PACKAGE_NAME}/";
-  done
   rm -rf /tmp/${PKGNAME}-temp
+
   CURRENT=$((CURRENT + 1))
   echo "Build finished for rust library ${repackage_name}... [${CURRENT}/${TOTAL}]"
 

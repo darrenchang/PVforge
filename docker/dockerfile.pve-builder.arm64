@@ -12,9 +12,6 @@ COPY ./packages/common.sh ./packages/
 
 ENV PACKAGE=debcargo-conf
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN cd ./packages/${PACKAGE}/${PACKAGE}/ && \
-    rm .git && \
-    git init 
 RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox
