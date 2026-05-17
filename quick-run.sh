@@ -25,5 +25,5 @@ done
 docker exec -ti ${BUILDER_CONTAINER} bash -c "rm -rf /tmp/${PACKAGE_NAME}*";
 docker exec -ti ${BUILDER_CONTAINER} bash -c "rm -rf /workspace/packages/${PACKAGE_NAME}/";
 docker cp ./packages/${PACKAGE_NAME}/ ${BUILDER_CONTAINER}:/workspace/packages/${PACKAGE_NAME}/;
-docker exec -ti ${BUILDER_CONTAINER} bash -c "/workspace/packages/build_all.sh --package ${PACKAGE_NAME}" 2>&1 | tee log.txt
+docker exec -ti ${BUILDER_CONTAINER} bash -c "/workspace/packages/build_all.sh --package ${PACKAGE_NAME}"
 
