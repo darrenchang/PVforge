@@ -803,6 +803,9 @@ RUST_LIBS=(
     "gettext:gettext:none:vendor"
     "tr:tr:patches:notvendor"
     "xtr:xtr:none:notvendor"
+    "ascii:ascii:none:vendor"
+    "encode-unicode:encode_unicode:none:notvendor"
+    "prettytable-rs:prettytable-rs:none:vendor"
   )
 
 export CARGO=/usr/local/bin/cargo
@@ -810,6 +813,7 @@ export RUSTC=/usr/local/bin/rustc
 
 rm .git &&
 git init
+git config --global --add safe.directory $(pwd)
 
 # Update repos so rust can install dependencie libraries
 apt update;
@@ -843,7 +847,7 @@ build_rust_libs(){
     cd ./build/${rust_lib}/;
     if [[ $vendor == "notvendor" ]]; then
       yes |mk-build-deps --install --remove; \
-      dpkg-buildpackage -b -us -uc 2>&1 > /dev/null
+      dpkg-buildpackage -b -us -uc
     elif [[ $vendor == "vendor" ]]; then
       $CARGO vendor && \
       # Remove windows crates \
@@ -853,7 +857,7 @@ build_rust_libs(){
       DEBIAN_CONTROL_FILE="./debian/control"
       awk '/^Depends:/{skip=1; next} skip && /^[[:space:]]/{next} {skip=0; print}' "$DEBIAN_CONTROL_FILE" > "$DEBIAN_CONTROL_FILE.tmp"
       mv "$DEBIAN_CONTROL_FILE.tmp" "$DEBIAN_CONTROL_FILE"
-      DEB_BUILD_OPTIONS="nocheck parallel=$(nproc)" dpkg-buildpackage -b -us -uc -Pnocheck 2>&1 > /dev/null
+      DEB_BUILD_OPTIONS="nocheck parallel=$(nproc)" dpkg-buildpackage -b -us -uc -Pnocheck
     fi
   )
   mkdir -p /tmp/${PKGNAME}-temp
@@ -862,7 +866,7 @@ build_rust_libs(){
     cp ${deb_pkg} "/tmp/${PKGNAME}-temp/"
     cp ${deb_pkg} "./deb/"
   done
-  apt install --reinstall -y --allow-downgrades --reinstall /tmp/${PKGNAME}-temp/*.deb || exit 1 &&
+  apt install --reinstall -y --allow-downgrades /tmp/${PKGNAME}-temp/*.deb || exit 1 &&
   rm -rf /tmp/${PKGNAME}-temp
 
   echo "Build finished for rust library ${repackage_name}..."
