@@ -3,5 +3,5 @@
 set -e
 
 BUILDKIT_PROGRESS=plain \
-docker buildx bake
+docker buildx bake --load
 
