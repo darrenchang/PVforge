@@ -86,19 +86,8 @@ RUST_LIBS=(
     "proxmox-procfs"
 )
 
-TOTAL=${#RUST_LIBS[@]}
-CURRENT=0
-
-rm -rf /tmp/${PKGNAME}
-for rust_lib in "${RUST_LIBS[@]}"; do
-  print_progress ${TOTAL} ${CURRENT} ${rust_lib}
-
-  echo "####################"
-  echo "Build start... [${CURRENT}/${TOTAL}]"
-  echo "Building rust package ${rust_lib}..."
-  echo "DEBCARGO: $(debcargo --version)"
+build_rust_libs(){
   rm -rf ./build/*
-  export NOTEST=1
   ./build.sh ${rust_lib}
   mkdir -p /tmp/${PKGNAME}-temp
   mkdir -p ./deb/
@@ -109,9 +98,22 @@ for rust_lib in "${RUST_LIBS[@]}"; do
   apt install -y --allow-downgrades /tmp/${PKGNAME}-temp/*.deb --reinstall
   rm -rf /tmp/${PKGNAME}-temp
 
-  CURRENT=$((CURRENT + 1))
   echo "Build finished for rust library ${rust_lib}... [${CURRENT}/${TOTAL}]"
+}
 
+export NOTEST=1
+TOTAL=${#RUST_LIBS[@]}
+CURRENT=0
+rm -rf /tmp/${PKGNAME}
+for rust_lib in "${RUST_LIBS[@]}"; do
+  # print_progress ${TOTAL} ${CURRENT} ${rust_lib}
+
+  CURRENT=$((CURRENT + 1))
   print_progress ${TOTAL} ${CURRENT} ${rust_lib}
+  if [ ! -t 1 ]; then
+    build_rust_libs > /dev/null 2>&1
+  else
+    build_rust_libs
+  fi
 done
 
