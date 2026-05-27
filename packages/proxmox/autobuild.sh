@@ -84,19 +84,21 @@ RUST_LIBS=(
     "proxmox-openid"
     "pbs-api-types"
     "proxmox-procfs"
+    "proxmox-disks"
+    "proxmox-installer-types"
 )
 
 build_rust_libs(){
-  rm -rf ./build/*
-  ./build.sh ${rust_lib}
-  mkdir -p /tmp/${PKGNAME}-temp
-  mkdir -p ./deb/
+  rm -rf ./build/* || return $?
+  ./build.sh ${rust_lib} || return $?
+  mkdir -p /tmp/${PKGNAME}-temp || return $?
+  mkdir -p ./deb/ || return $?
   for deb_pkg in $(find $(pwd)/build/ -name '*.deb'); do
-    cp ${deb_pkg} "/tmp/${PKGNAME}-temp/"
-    cp ${deb_pkg} "./deb/"
+    cp ${deb_pkg} "/tmp/${PKGNAME}-temp/" || return $?
+    cp ${deb_pkg} "./deb/" || return $?
   done
-  apt install -y --allow-downgrades /tmp/${PKGNAME}-temp/*.deb --reinstall
-  rm -rf /tmp/${PKGNAME}-temp
+  apt install -y --allow-downgrades /tmp/${PKGNAME}-temp/*.deb --reinstall || return $?
+  rm -rf /tmp/${PKGNAME}-temp || return $?
 
   echo "Build finished for rust library ${rust_lib}... [${CURRENT}/${TOTAL}]"
 }
@@ -106,14 +108,22 @@ TOTAL=${#RUST_LIBS[@]}
 CURRENT=0
 rm -rf /tmp/${PKGNAME}
 for rust_lib in "${RUST_LIBS[@]}"; do
-  # print_progress ${TOTAL} ${CURRENT} ${rust_lib}
-
   CURRENT=$((CURRENT + 1))
   print_progress ${TOTAL} ${CURRENT} ${rust_lib}
   if [ ! -t 1 ]; then
-    build_rust_libs > /dev/null 2>&1
+    log_file=$(mktemp)
+    if ! build_rust_libs > "$log_file" 2>&1; then
+      echo "ERROR: build_rust_libs failed for ${rust_lib}" >&2
+      cat "$log_file" >&2
+      rm -f "$log_file"
+      exit 1
+    fi
+    rm -f "$log_file"
   else
-    build_rust_libs
+    if ! build_rust_libs; then
+      echo "ERROR: build_rust_libs failed for ${rust_lib}" >&2
+      exit 1
+    fi
   fi
 done
 
