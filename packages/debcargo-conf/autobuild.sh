@@ -806,6 +806,10 @@ RUST_LIBS=(
     "ascii:ascii:none:vendor"
     "encode-unicode:encode_unicode:none:notvendor"
     "prettytable-rs:prettytable-rs:none:vendor"
+    "x25519-dalek:x25519-dalek:none:notvendor"
+    "libudev-sys:libudev-sys:none:notvendor"
+    "io-lifetimes:io-lifetimes:patches:notvendor"
+    "udev:udev:patches:notvendor"
   )
 
 export CARGO=/usr/local/bin/cargo
@@ -816,6 +820,7 @@ git init
 git config --global --add safe.directory $(pwd)
 
 # Update repos so rust can install dependencie libraries
+apt update;
 apt update;
 
 build_rust_libs(){
@@ -866,7 +871,7 @@ build_rust_libs(){
     cp ${deb_pkg} "/tmp/${PKGNAME}-temp/"
     cp ${deb_pkg} "./deb/"
   done
-  apt install --reinstall -y --allow-downgrades /tmp/${PKGNAME}-temp/*.deb || exit 1 &&
+  apt install --reinstall -y --allow-downgrades /tmp/${PKGNAME}-temp/*.deb || return $? &&
   rm -rf /tmp/${PKGNAME}-temp
 
   echo "Build finished for rust library ${repackage_name}..."
@@ -884,9 +889,19 @@ for entry in "${RUST_LIBS[@]}"; do
   CURRENT=$((CURRENT + 1))
   print_progress ${TOTAL} ${CURRENT} "${repackage_name}"
   if [ ! -t 1 ]; then
-    build_rust_libs "${rust_lib}" "${repackage_name}" "${patch_name}" "${vendor}" > /dev/null 2>&1
+    log_file=$(mktemp)
+    if ! build_rust_libs "${rust_lib}" "${repackage_name}" "${patch_name}" "${vendor}" > "$log_file" 2>&1; then
+      echo "ERROR: build_rust_libs failed for ${rust_lib}" >&2
+      cat "$log_file" >&2
+      rm -f "$log_file"
+      exit 1
+    fi
+    rm -f "$log_file"
   else
-    build_rust_libs "${rust_lib}" "${repackage_name}" "${patch_name}" "${vendor}"
+    if ! build_rust_libs "${rust_lib}" "${repackage_name}" "${patch_name}" "${vendor}"; then
+      echo "ERROR: build_rust_libs failed for ${rust_lib}" >&2
+      exit 1
+    fi
   fi
 done
 
