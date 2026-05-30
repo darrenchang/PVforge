@@ -22,3 +22,83 @@ ENV PACKAGE=chrony
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
+ENV PACKAGE=pve-apiclient
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=corosync-pve
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=corosync-qdevice
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=extjs
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=fonts-font-logos
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=frr
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=ifupdown2
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=kronosnet
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=ksm-control-daemon
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=libarchive-perl
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=libjs-qrcodejs
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=libpve-u2f-server-perl
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=libqb
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=libseccomp
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+# ENV PACKAGE=libtpms
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+#
+# ENV PACKAGE=libxdgmime-perl
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+#
+# ENV PACKAGE=lxc
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+#
+# ENV PACKAGE=lxcfs
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+#
+# ENV PACKAGE=novnc-pve
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+#
+# ENV PACKAGE=pathpatterns
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+#
