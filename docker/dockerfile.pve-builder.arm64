@@ -78,27 +78,75 @@ ENV PACKAGE=libseccomp
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
-# ENV PACKAGE=libtpms
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
-#
-# ENV PACKAGE=libxdgmime-perl
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
-#
-# ENV PACKAGE=lxc
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
-#
-# ENV PACKAGE=lxcfs
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
-#
-# ENV PACKAGE=novnc-pve
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
-#
-# ENV PACKAGE=pathpatterns
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
-#
+ENV PACKAGE=libtpms
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=libxdgmime-perl
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=lxc
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# Fix git issues
+RUN ( \
+      cd ./packages/$PACKAGE/$PACKAGE/ && \
+      rm -rf .git lxc/ .gitmodules && \
+      git init && \
+      git config --global --add safe.directory /workspace/packages/lxc/lxc && \
+      git submodule add https://git.proxmox.com/git/mirror_lxc ./lxc; \
+    )
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=lxcfs
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=novnc-pve
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pathpatterns
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pixman
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=vncterm
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=smartmontools
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=swtpm
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=sencha-touch
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=zfsonlinux
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-eslint
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-zsync
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-lxc-syscalld
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-vgpu-helper
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
