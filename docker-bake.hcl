@@ -22,12 +22,15 @@ target "builder-base" {
 
 target "pve-builder" {
   context    = "."
+  contexts = {
+    builder-base = "target:builder-base"
+  }
   dockerfile = "docker/dockerfile.pve-builder.arm64"
+  args = {
+    BASE_IMAGE = "builder-base:latest"
+  }
   tags       = [
     "pve-builder",
   ]
   platforms  = ["linux/arm64"]
-  args = {
-    BASE_IMAGE = "builder-base:latest"
-  }
 }
