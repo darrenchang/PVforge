@@ -150,3 +150,23 @@ ENV PACKAGE=pve-vgpu-helper
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
+# ENV PACKAGE=pxvirt-spdk
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+# ENV PACKAGE=proxmox-widget-toolkit
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PACKAGE=ceph-20
+RUN apt update && \
+    apt install -y \
+    libsqlite3-mod-ceph-dev \
+    libsqlite3-dev;
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+# ENV PACKAGE=proxmox-perltidy
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+

@@ -44,14 +44,14 @@ echo
 
 if [[ ${PACKAGE_NAME} == "all" ]]; then
   # Build all packages, except for the ones that are listed in $SKIP_PACKAGES
-  for pkg_name in $(extract_subgraph_packages "/pxvirt/packages/deptree.mmd"); do
+  for pkg_name in $(extract_subgraph_packages "/workspace/packages/deptree.mmd"); do
     export PKGDIR="${PACKAGES_PATH}/${pkg_name}/${pkg_name}/"
     if [[ -d $PKGDIR ]]; then
       log_build_name $PKGDIR
       sh -c './start.sh'
       # Install the compiled package
       mkdir -p "/tmp/proxmox/${pkg_name}/"
-      for i in $(find /pxvirt/packages/${pkg_name}/ -name '*.deb'); do
+      for i in $(find /workspace/packages/${pkg_name}/ -name '*.deb'); do
         cp $i "/tmp/proxmox/${pkg_name}/";
       done
       apt install -y --allow-downgrades $(ls /tmp/proxmox/${pkg_name}/*.deb | grep -v -- '-dbgsym_\|zfs-dracut_\|-test_');

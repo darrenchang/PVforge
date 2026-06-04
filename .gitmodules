@@ -39,7 +39,7 @@
   url = https://git.proxmox.com/git/proxmox-i18n
 [submodule "packages/proxmox-widget-toolkit/proxmox-widget-toolkit"]
   path = packages/proxmox-widget-toolkit/proxmox-widget-toolkit
-  url = https://github.com/jiangcuo/proxmox-widget-toolkit.git
+	url = https://git.proxmox.com/git/proxmox-widget-toolkit.git
 [submodule "packages/pve-http-server/pve-http-server"]
   path = packages/pve-http-server/pve-http-server
   url = https://git.proxmox.com/git/pve-http-server
@@ -178,9 +178,6 @@
 [submodule "packages/libqb/libqb"]
   path = packages/libqb/libqb
   url = https://salsa.debian.org/ha-team/libqb
-[submodule "packages/ceph-17/ceph-17"]
-  path = packages/ceph-17/ceph-17
-  url = https://git.proxmox.com/git/ceph.git
 [submodule "packages/ceph-18/ceph-18"]
   path = packages/ceph-18/ceph-18
   url = https://git.proxmox.com/git/ceph.git
@@ -253,3 +250,6 @@
 [submodule "packages/proxmox/proxmox"]
 	path = packages/proxmox/proxmox
 	url = https://git.proxmox.com/git/proxmox
+[submodule "packages/ceph-20/ceph-20"]
+	path = packages/ceph-20/ceph-20
+	url = https://git.proxmox.com/git/ceph.git

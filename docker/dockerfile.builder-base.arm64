@@ -45,12 +45,12 @@ RUN curl -LO https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-${LL
 ENV LLVM_SYS_221_PREFIX="/usr/local/llvm-22"
 
 ARG ARCH
-RUN ARCH=$(dpkg --print-architecture) \
-&& if [ "$ARCH" = "amd64" ]; then \
-    echo "deb $PVE_APT/proxmox/debian/pve ${DEBIAN_VERSION} pve-no-subscription" >> /etc/apt/sources.list;  \
-    echo "deb $PVE_APT/proxmox/debian/devel ${DEBIAN_VERSION} main" >> /etc/apt/sources.list; \
-    curl -l -o /etc/apt/trusted.gpg.d/proxmox-release-${DEBIAN_VERSION}.gpg $PVE_APT/proxmox/debian/proxmox-release-bookworm.gpg; \
-fi
+RUN ARCH=$(dpkg --print-architecture) && \
+    if [ "$ARCH" = "amd64" ]; then \
+      echo "deb $PVE_APT/proxmox/debian/pve ${DEBIAN_VERSION} pve-no-subscription" >> /etc/apt/sources.list;  \
+      echo "deb $PVE_APT/proxmox/debian/devel ${DEBIAN_VERSION} main" >> /etc/apt/sources.list; \
+      curl -l -o /etc/apt/trusted.gpg.d/proxmox-release-${DEBIAN_VERSION}.gpg $PVE_APT/proxmox/debian/proxmox-release-bookworm.gpg; \
+    fi
 
 RUN apt update && \
     apt -y install \

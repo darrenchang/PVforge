@@ -1,0 +1,13 @@
+diff --git a/patches/series b/patches/series
+index 6dd4562da..4d4014257 100644
+--- a/patches/series
++++ b/patches/series
+@@ -17,7 +17,7 @@
+ 0017-d-rules-disable-jaeger-telemetry.patch
+ 0018-fix-build-for-Apache-Arrow-15.0.0.-on-Debian.patch
+ 0019-Update-RGW-Arrow-Flight-code-to-adjust-to-API-change.patch
+-0020-d-install-systemd-unit-files-are-now-in-usr-lib.patch
++#0020-d-install-systemd-unit-files-are-now-in-usr-lib.patch
+ 0021-d-py3dist-drop-python3-distutils-not-available-in-De.patch
+ 0022-pybind-mgr-replace-imports-of-distutils.util.patch
+ 0023-debian-radosgw-add-media-types-packages-as-alternati.patch

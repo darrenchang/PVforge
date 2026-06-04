@@ -1,0 +1,152 @@
+diff --git a/ceph/cmake/modules/BuildSPDK.cmake b/ceph/cmake/modules/BuildSPDK.cmake
+index d6ce97e1d..c23cdcdc3 100644
+--- a/ceph/cmake/modules/BuildSPDK.cmake
++++ b/ceph/cmake/modules/BuildSPDK.cmake
+@@ -11,6 +11,10 @@ macro(build_spdk)
+   endif()
+   include(FindMake)
+   find_make("MAKE_EXECUTABLE" "make_cmd")
++  # Fix: Replace $(MAKE) with actual make executable to avoid shell expansion issues
++  if(make_cmd STREQUAL "$(MAKE)")
++    set(make_cmd "${MAKE_EXECUTABLE}")
++  endif()
+ 
+   set(spdk_CFLAGS "-fPIC")
+   include(CheckCCompilerFlag)
+diff --git a/ceph/debian/rules b/ceph/debian/rules
+index 442ea28d4..4da37b8c2 100755
+--- a/ceph/debian/rules
++++ b/ceph/debian/rules
+@@ -36,6 +36,15 @@ else
+   extraopts += -DWITH_RBD_RWL=OFF
+ endif
+ extraopts += -DWITH_RBD_SSD_CACHE=ON
++extraopts += -DWITH_BLUESTORE=ON
++extraopts += -DWITH_LIBURING=ON
++ifeq ($(DEB_HOST_ARCH), arm64)
++  extraopts += -DWITH_SPDK=ON
++else ifeq ($(DEB_HOST_ARCH), amd64)
++  extraopts += -DWITH_SPDK=ON
++else
++  extraopts += -DWITH_SPDK=OFF
++endif
+ # assumes that ceph is exmpt from multiarch support, so we override the libdir.
+ extraopts += -DCMAKE_INSTALL_LIBDIR=/usr/lib
+ extraopts += -DCMAKE_INSTALL_LIBEXECDIR=/usr/libexec
+diff --git a/ceph/src/spdk/CONFIG b/ceph/src/spdk/CONFIG
+index d947909e9..587a1ded7 100644
+--- a/ceph/src/spdk/CONFIG
++++ b/ceph/src/spdk/CONFIG
+@@ -170,3 +170,6 @@ CONFIG_RAID5=n
+ 
+ # Build with IDXD support
+ CONFIG_IDXD=n
++
++# arc4random is available in stdlib.h
++CONFIG_HAVE_ARC4RANDOM=n
+diff --git a/ceph/src/spdk/app/spdk_top/spdk_top.c b/ceph/src/spdk/app/spdk_top/spdk_top.c
+index 8531cd32a..199d16feb 100644
+--- a/ceph/src/spdk/app/spdk_top/spdk_top.c
++++ b/ceph/src/spdk/app/spdk_top/spdk_top.c
+@@ -655,7 +655,7 @@ print_max_len(WINDOW *win, int row, uint16_t col, uint16_t max_len, enum str_ali
+ 		snprintf(&tmp_str[max_str - DOTS_STR_LEN - 2], DOTS_STR_LEN, "%s", dots);
+ 	}
+ 
+-	mvwprintw(win, row, col, tmp_str);
++	mvwprintw(win, row, col, "%s", tmp_str);
+ 
+ 	refresh();
+ 	wrefresh(win);
+@@ -1861,13 +1861,13 @@ show_stats(void)
+ 			time_last = time_now.tv_sec;
+ 			rc = get_data();
+ 			if (rc) {
+-				mvprintw(g_max_row - 1, g_max_col - strlen(refresh_error) - 2, refresh_error);
++				mvprintw(g_max_row - 1, g_max_col - strlen(refresh_error) - 2, "%s", refresh_error);
+ 			}
+ 
+ 			max_pages = refresh_tab(active_tab, current_page);
+ 
+ 			snprintf(current_page_str, CURRENT_PAGE_STR_LEN - 1, "Page: %d/%d", current_page + 1, max_pages);
+-			mvprintw(g_max_row - 1, 1, current_page_str);
++			mvprintw(g_max_row - 1, 1, "%s", current_page_str);
+ 
+ 			free_data();
+ 
+diff --git a/ceph/src/spdk/configure b/ceph/src/spdk/configure
+index 4c9772adf..d9a6eb36d 100755
+--- a/ceph/src/spdk/configure
++++ b/ceph/src/spdk/configure
+@@ -779,6 +779,11 @@ if [[ "${CONFIG[TSAN]}" = "y" ]]; then
+ 	fi
+ fi
+ 
++if echo -e '#include <stdlib.h>\nint main(void) { arc4random(); return 0; }\n' \
++	| "${BUILD_CMD[@]}" - 2> /dev/null; then
++	CONFIG[HAVE_ARC4RANDOM]="y"
++fi
++
+ if [[ "${CONFIG[OCF]}" = "y" ]]; then
+ 	# If OCF_PATH is a file, assume it is a library and use it to compile with
+ 	if [ -f ${CONFIG[OCF_PATH]} ]; then
+diff --git a/ceph/src/spdk/lib/iscsi/iscsi.c b/ceph/src/spdk/lib/iscsi/iscsi.c
+index febf4cac4..0a319755f 100644
+--- a/ceph/src/spdk/lib/iscsi/iscsi.c
++++ b/ceph/src/spdk/lib/iscsi/iscsi.c
+@@ -64,7 +64,6 @@
+ 
+ #ifdef __FreeBSD__
+ #define HAVE_SRANDOMDEV 1
+-#define HAVE_ARC4RANDOM 1
+ #endif
+ 
+ struct spdk_iscsi_globals g_iscsi = {
+@@ -99,7 +98,7 @@ srandomdev(void)
+ }
+ #endif /* HAVE_SRANDOMDEV */
+ 
+-#ifndef HAVE_ARC4RANDOM
++#ifndef SPDK_CONFIG_HAVE_ARC4RANDOM
+ static int g_arc4random_initialized = 0;
+ 
+ static uint32_t
+@@ -117,7 +116,7 @@ arc4random(void)
+ 	r = (r1 << 16) | r2;
+ 	return r;
+ }
+-#endif /* HAVE_ARC4RANDOM */
++#endif /* SPDK_CONFIG_HAVE_ARC4RANDOM */
+ 
+ static void
+ gen_random(uint8_t *buf, size_t len)
+diff --git a/ceph/src/spdk/scripts/check_format.sh b/ceph/src/spdk/scripts/check_format.sh
+index f4df5c41b..4842fc15b 100755
+--- a/ceph/src/spdk/scripts/check_format.sh
++++ b/ceph/src/spdk/scripts/check_format.sh
+@@ -198,7 +198,7 @@ fi
+ rm -f eofnl.log
+ 
+ echo -n "Checking for POSIX includes..."
+-git grep -I -i -f scripts/posix.txt -- './*' ':!include/spdk/stdinc.h' ':!include/linux/**' ':!lib/rte_vhost*/**' ':!scripts/posix.txt' ':!*.patch' > scripts/posix.log || true
++git grep -I -i -f scripts/posix.txt -- './*' ':!include/spdk/stdinc.h' ':!include/linux/**' ':!lib/rte_vhost*/**' ':!scripts/posix.txt' ':!*.patch' ':!configure' > scripts/posix.log || true
+ if [ -s scripts/posix.log ]; then
+ 	echo "POSIX includes detected. Please include spdk/stdinc.h instead."
+ 	cat scripts/posix.log
+diff --git a/ceph/src/boost/libs/config/checks/architecture/loongarch.cpp b/ceph/src/boost/libs/config/checks/architecture/loongarch.cpp
+new file mode 100644
+index 000000000..2bf81f7a9
+--- /dev/null
++++ b/ceph/src/boost/libs/config/checks/architecture/loongarch.cpp
+@@ -0,0 +1,12 @@
++// loongarch.cppAdd commentMore actions
++//
++// Copyright (c) 2012 Steven Watanabe
++//
++// Distributed under the Boost Software License Version 1.0. (See
++// accompanying file LICENSE_1_0.txt or copy at
++// http://www.boost.org/LICENSE_1_0.txt)
++
++#if !defined(__loongarch) && !defined(__loongarch__) && !defined(__loongarch64__) \
++    && !defined(__loong) && !defined(__LOONGARCH__)
++#error "Not LOONGARCH"
++#endif
