@@ -15,6 +15,12 @@ RUST_LIBS=(
     "perlmod"
   )
 
+for i in `cat $SCRIPT_DIR/series`;
+  do patch -p1 < ../$i
+done
+
+export CARGO=/usr/local/bin/cargo
+export RUSTC=/usr/local/bin/rustc
 for rust_lib in "${RUST_LIBS[@]}"; do
   rm -rf ./build/*
   ./build.sh ${rust_lib}

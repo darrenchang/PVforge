@@ -810,6 +810,7 @@ RUST_LIBS=(
     "libudev-sys:libudev-sys:none:notvendor"
     "io-lifetimes:io-lifetimes:patches:notvendor"
     "udev:udev:patches:notvendor"
+    "openssl-probe-0.1:openssl-probe 0.1:patches:notvendor"
   )
 
 export CARGO=/usr/local/bin/cargo

@@ -4,7 +4,6 @@ title: pxvirt Package Compile Dependency tree
 graph LR
     %% Tier 1 - Foundations (no compile dependencies)
     subgraph T1["Tier 1 – Foundations"]
-        perlmod
         debcargo-conf
         proxmox
         chrony
@@ -38,10 +37,9 @@ graph LR
         pve-zsync
         pve-lxc-syscalld
         pve-vgpu-helper
-        pxvirt-spdk
-        proxmox-widget-toolkit
         ceph-20
         proxmox-perltidy
+        perlmod
     end
 
     %% Tier2
@@ -65,6 +63,7 @@ graph LR
     %% Tier 3 
     subgraph T3["Tier 3 – Cluster Infrastructure"]
         proxmox-perl-rs --> pve-common
+        proxmox-biome --> proxmox-widget-toolkit
     end
 
     %% Tier 4
@@ -82,10 +81,10 @@ graph LR
         pve-access-control --> pve-qemu
         pve-access-control --> librados2-perl
         pve-access-control --> pve-container
-        proxmox-acme --> roxmox-backup
-        proxmox-acme --> roxmox-backup-meta
-        proxmox-acme --> roxmox-backup-qemu
-        proxmox-acme --> roxmox-backup-restore-image
+        proxmox-acme --> proxmox-backup
+        proxmox-acme --> proxmox-backup-meta
+        proxmox-acme --> proxmox-backup-qemu
+        proxmox-acme --> proxmox-backup-restore-image
     end
 
     %% Tier 6
