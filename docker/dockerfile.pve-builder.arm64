@@ -10,6 +10,12 @@ COPY ./packages/build_all.sh ./packages/
 COPY ./docker/start.sh ./packages/
 COPY ./packages/common.sh ./packages/
 
+ENV PACKAGE=musl
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+ENV PATH=/usr/local/musl-cross/bin:${PATH}
+
 ENV PACKAGE=debcargo-conf
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";

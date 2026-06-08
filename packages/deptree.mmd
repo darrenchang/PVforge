@@ -4,7 +4,7 @@ title: pxvirt Package Compile Dependency tree
 graph LR
     %% Tier 1 - Foundations (no compile dependencies)
     subgraph T1["Tier 1 – Foundations"]
-        debcargo-conf
+        musl --> debcargo-conf
         proxmox
         chrony
         pve-apiclient
