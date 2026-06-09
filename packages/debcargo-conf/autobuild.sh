@@ -811,6 +811,16 @@ RUST_LIBS=(
     "io-lifetimes:io-lifetimes:patches:notvendor"
     "udev:udev:patches:notvendor"
     "openssl-probe-0.1:openssl-probe 0.1:patches:notvendor"
+    "nvml-sys:nvml-sys:patches:vendor"
+    "bitflags-1:bitflags 1:patches:notvendor"
+    "quick-error-1:quick-error 1:patches:notvendor"
+    "errno-dragonfly:errno-dragonfly:patches:notvendor"
+    "errno-0.2:errno 0.2:patches:notvendor"
+    "rust-extra:rust-extra:none:vendor"
+    "serde-repr:serde_repr:none:notvendor"
+    "syscalls:syscalls:none:notvendor"
+    "nvml:nvml:patches:vendor"
+    "nvml-wrapper:nvml-wrapper:none:notvendor"
   )
 
 export CARGO=/usr/local/bin/cargo
