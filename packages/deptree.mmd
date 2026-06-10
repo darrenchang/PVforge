@@ -46,10 +46,9 @@ graph LR
     subgraph T2["Tier 2 – Cluster Infrastructure"]
         debcargo-conf --> pxar
         debcargo-conf --> pve-xtermjs
-        debcargo-conf --> net-sriov-tools
+        debcargo-conf --> proxmox-offline-mirror
         proxmox --> proxmox-mail-forward
         proxmox --> proxmox-network-interface-pinning
-        proxmox --> proxmox-offline-mirror
         proxmox --> proxmox-rrd-migration-tool
         proxmox --> proxmox-websocket-tunnel
         proxmox --> proxmox-kernel-helper

@@ -820,7 +820,6 @@ RUST_LIBS=(
     "serde-repr:serde_repr:none:notvendor"
     "syscalls:syscalls:none:notvendor"
     "nvml:nvml:patches:vendor"
-    "nvml-wrapper:nvml-wrapper:none:notvendor"
   )
 
 export CARGO=/usr/local/bin/cargo
