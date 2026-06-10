@@ -828,6 +828,14 @@ RUST_LIBS=(
     "rrd-sys:rrd-sys:none:notvendor"
     "itertools-0.14:itertools 0.14:none:vendor"
     "rrd:rrd:none:notvendor"
+    "memo-map:memo-map:none:notvendor"
+    "object:object:patches:notvendor"
+    "ar-archive-writer:ar_archive_writer:patches:notvendor"
+    "psm:psm:patches:notvendor"
+    "stacker:stacker:none:notvendor"
+    "v-escape-base:v_escape-base:none:notvendor"
+    "v-htmlescape:v_htmlescape:none:notvendor"
+    "minijinja:minijinja:patches:notvendor"
   )
 
 export CARGO=/usr/local/bin/cargo
