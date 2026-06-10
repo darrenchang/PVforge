@@ -820,6 +820,14 @@ RUST_LIBS=(
     "serde-repr:serde_repr:none:notvendor"
     "syscalls:syscalls:none:notvendor"
     "nvml:nvml:patches:vendor"
+    "diff:diff:none:notvendor"
+    "is-terminal:is-terminal:patches:notvendor"
+    "yansi-0.5:yansi 0.5:patches:notvendor"
+    "yansi:yansi:patches:notvendor"
+    "pretty-assertions:pretty_assertions:none:notvendor"
+    "rrd-sys:rrd-sys:none:notvendor"
+    "itertools-0.14:itertools 0.14:none:vendor"
+    "rrd:rrd:none:notvendor"
   )
 
 export CARGO=/usr/local/bin/cargo

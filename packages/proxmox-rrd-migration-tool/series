@@ -1,1 +1,2 @@
-patch/001-add-pxvirt.patch
+patch/001-upgrade-librust-bindgen.diff
+patch/002-fix-syntax-for-arm64.diff

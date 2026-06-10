@@ -199,9 +199,9 @@ RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 # COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 # RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
-# ENV PACKAGE=proxmox-websocket-tunnel
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+ENV PACKAGE=proxmox-websocket-tunnel
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-kernel-helper
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
@@ -211,18 +211,18 @@ RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 # COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 # RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
-ENV PACKAGE=proxmox-biome
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+# ENV PACKAGE=proxmox-biome
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
-ENV PACKAGE=proxmox-mini-journalreader
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+# ENV PACKAGE=proxmox-mini-journalreader
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-i18n
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
-ENV PACKAGE=proxmox-ve-rs
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+# ENV PACKAGE=proxmox-ve-rs
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";

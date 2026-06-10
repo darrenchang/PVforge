@@ -113,6 +113,8 @@ RUN apt update && \
     libacl1-dev \
     # librust-proxmox-systemd \
     libsystemd-dev \
+    # librust-rrd-sys \
+    librrd-dev \
     # ceph-18 build dependencies \
     libopentracing-dev \
     libthrift-dev \
