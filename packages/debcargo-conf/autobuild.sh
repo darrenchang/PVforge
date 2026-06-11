@@ -836,6 +836,14 @@ RUST_LIBS=(
     "v-escape-base:v_escape-base:none:notvendor"
     "v-htmlescape:v_htmlescape:none:notvendor"
     "minijinja:minijinja:patches:notvendor"
+    "console:console:patches:notvendor"
+    "bstr:bstr:none:notvendor"
+    "similar:similar:none:notvendor"
+    "csv-core:csv-core:patches:notvendor"
+    "csv:csv:patches:notvendor"
+    "globset:globset:none:notvendor"
+    "ron:ron:none:notvendor"
+    "insta:insta:none:notvendor"
   )
 
 export CARGO=/usr/local/bin/cargo
