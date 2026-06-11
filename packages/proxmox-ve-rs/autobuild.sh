@@ -12,22 +12,21 @@ for i in `cat $SCRIPT_DIR/series`;
   do patch -p1 < ../$i
 done
 
+# Build frr-templates
+(
+  cd proxmox-frr-templates && \
+  make && \
+  apt install -y "$(pwd)/"*".deb";
+)
+
+# Build deb
+mkdir ./build-tmp
 for i in proxmox-sdn-types proxmox-frr proxmox-ve-config; do
   export CRATES=${i}
   exec_build_make &&
   apt install -y --allow-downgrades $(ls $SCRIPT_DIR/$PKGNAME/build/*.deb)
+  cp build/*.deb build-tmp/
+  make clean
   unset CRATES
 done
 
-
-# do
-# 	cd $SCRIPT_DIR/$PKGNAME/$i
-# 	exec_build_make
-# 	cp *.buildinfo *.changes *.dsc *.tar* *.deb $SCRIPT_DIR/$PKGNAME/ ||true
-#   mkdir -p "/tmp/proxmox/perl-rs/${i}/";
-#   pwd; ls
-#   echo $SCRIPT_DIR/$PKGNAME/${i}
-#   for deb_file in $(find $SCRIPT_DIR/$PKGNAME/${i} -name '*.deb'); do
-#     cp $deb_file "/tmp/proxmox/perl-rs/${i}/";
-#   done
-# done
