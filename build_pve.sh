@@ -3,5 +3,5 @@
 set -e
 
 BUILDKIT_PROGRESS=plain \
-docker buildx bake --load
+docker buildx bake --set "*.output=type=docker,compression=uncompressed,force-compression=true"
 
