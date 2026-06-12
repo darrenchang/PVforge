@@ -844,6 +844,13 @@ RUST_LIBS=(
     "globset:globset:none:notvendor"
     "ron:ron:none:notvendor"
     "insta:insta:none:notvendor"
+    "futures-0.1:futures 0.1:none:notvendor"
+    "iovec:iovec:patches:notvendor"
+    "bytes-0.4:bytes 0.4:none:notvendor"
+    "tokio-io:tokio-io:none:notvendor"
+    "bzip2-0.4:bzip2 0.4:none:notvendor"
+    "lzma-sys:lzma-sys:none:notvendor"
+    "xz2:xz2:patches:notvendor"
   )
 
 export CARGO=/usr/local/bin/cargo

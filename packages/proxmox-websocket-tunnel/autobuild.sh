@@ -7,8 +7,8 @@ echo "This is $PKGNAME build scripts"
 . ../common.sh
 
 cd $SCRIPT_DIR/$PKGNAME
+export ZSTD_SYS_USE_PKG_CONFIG=1
 apt update
-apt install librust-itertools-dev=0.10.3-1 -y
 yes |mk-build-deps --install --remove
 exec_build_make
 cd $SCRIPT_DIR/$PKGNAME/build

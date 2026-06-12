@@ -120,6 +120,9 @@ RUN apt update && \
     libthrift-dev \
     liblttng-ust-dev \
     default-jdk \
+    # proxmox-offline-mirror build dependencies \
+    latexmk \
+    fonts-open-sans \
     # pve-common build dependencies \
     libanyevent-perl \
     libdevel-cycle-perl \
