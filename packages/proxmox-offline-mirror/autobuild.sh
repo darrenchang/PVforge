@@ -24,4 +24,9 @@ SH_PATH=$(realpath "$0")
 SH_DIR=$(dirname $SH_PATH)
 
 cd $SH_DIR/$PKGNAME
+
+for i in `cat $SCRIPT_DIR/series`;
+  do patch -p1 < ../$i
+done
+
 exec_build
