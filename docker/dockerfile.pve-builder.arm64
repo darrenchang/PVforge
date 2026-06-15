@@ -183,9 +183,9 @@ ENV PACKAGE=pve-xtermjs
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
-# ENV PACKAGE=proxmox-offline-mirror
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+ENV PACKAGE=proxmox-offline-mirror
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-mail-forward
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
