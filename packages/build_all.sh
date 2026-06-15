@@ -50,11 +50,12 @@ if [[ ${PACKAGE_NAME} == "all" ]]; then
       log_build_name $PKGDIR
       sh -c './start.sh'
       # Install the compiled package
-      mkdir -p "/tmp/proxmox/${pkg_name}/"
+      mkdir -p "/deb/proxmox/${pkg_name}/"
       for i in $(find /workspace/packages/${pkg_name}/ -name '*.deb'); do
-        cp $i "/tmp/proxmox/${pkg_name}/";
+        cp $i "/deb/proxmox/${pkg_name}/";
       done
-      apt install -y --allow-downgrades $(ls /tmp/proxmox/${pkg_name}/*.deb | grep -v -- '-dbgsym_\|zfs-dracut_\|-test_');
+      apt install -y --allow-downgrades $(ls /deb/proxmox/${pkg_name}/*.deb | grep -v -- '-dbgsym_\|zfs-dracut_\|-test_');
+      rm -rf $PKGDIR/../*
     fi
   done
 else
@@ -63,11 +64,12 @@ else
   if [[ -d $PKGDIR ]]; then
     log_build_name $PKGDIR
     sh -c './start.sh'
-    mkdir -p "/tmp/proxmox/${PACKAGE_NAME}/"
+    mkdir -p "/deb/proxmox/${PACKAGE_NAME}/"
     for i in $(find /workspace/packages/${PACKAGE_NAME}/ -name '*.deb'); do
-      cp $i "/tmp/proxmox/${PACKAGE_NAME}/";
+      cp $i "/deb/proxmox/${PACKAGE_NAME}/";
     done
-    apt install -y --allow-downgrades $(ls /tmp/proxmox/${PACKAGE_NAME}/*.deb | grep -v -- '-dbgsym_\|zfs-dracut_\|-test_');
+    apt install -y --allow-downgrades $(ls /deb/proxmox/${PACKAGE_NAME}/*.deb | grep -v -- '-dbgsym_\|zfs-dracut_\|-test_');
+    rm -rf $PKGDIR/../*
   fi
 fi
 
