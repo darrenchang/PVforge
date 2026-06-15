@@ -851,6 +851,7 @@ RUST_LIBS=(
     "bzip2-0.4:bzip2 0.4:none:notvendor"
     "lzma-sys:lzma-sys:none:notvendor"
     "xz2:xz2:patches:notvendor"
+    "toml:toml:patches:notvendor"
   )
 
 export CARGO=/usr/local/bin/cargo

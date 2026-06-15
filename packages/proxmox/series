@@ -1,3 +1,5 @@
 patches/001-use-custom-cargo-rustc.diff
 patches/002-proxmox-fixed-string-relax-rustc-version.diff
 patches/003-skip-test_read_cgroup_pressure.diff
+patches/004-proxmox-api-macro-skip-tests.diff
+patches/005-proxmox-installer-types-skip-toml.diff

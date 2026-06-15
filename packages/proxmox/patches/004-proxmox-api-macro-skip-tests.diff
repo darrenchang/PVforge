@@ -1,0 +1,27 @@
+diff --git a/proxmox-api-macro/Cargo.toml b/proxmox-api-macro/Cargo.toml
+index 866aa4e3..36ce1509 100644
+--- a/proxmox-api-macro/Cargo.toml
++++ b/proxmox-api-macro/Cargo.toml
+@@ -23,15 +23,15 @@ syn = { workspace = true , features = [ "extra-traits" ] }
+ futures.workspace = true
+ serde = { workspace = true, features = [ "derive" ] }
+ serde_json.workspace = true
+-proxmox-section-config.workspace = true
++# proxmox-section-config.workspace = true
+ 
+-[dev-dependencies.proxmox-schema]
+-workspace = true
+-features = [ "test-harness", "api-macro" ]
++# [dev-dependencies.proxmox-schema]
++# workspace = true
++# features = [ "test-harness", "api-macro" ]
+ 
+-[dev-dependencies.proxmox-router]
+-workspace = true
+-features = [ "test-harness" ]
++# [dev-dependencies.proxmox-router]
++# workspace = true
++# features = [ "test-harness" ]
+ 
+ # [features]
+ # # Used to quickly filter out the serde derive noise when using `cargo expand` for debugging!

@@ -24,7 +24,7 @@ RUN apt update && \
     rm -rf /var/lib/apt/lists/*;
 
 # Install LLVM librust-llvm-sys
-ARG LLVM_VERSION="22.1.2"
+ARG LLVM_VERSION="22.1.7"
 RUN curl -LO https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-${LLVM_VERSION}.tar.gz && \
     tar -xzf llvmorg-${LLVM_VERSION}.tar.gz && \
     cd llvm-project-llvmorg-${LLVM_VERSION} && \
@@ -43,14 +43,6 @@ RUN curl -LO https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-${LL
     ninja -j$(nproc) && \
     ninja install;
 ENV LLVM_SYS_221_PREFIX="/usr/local/llvm-22"
-
-ARG ARCH
-RUN ARCH=$(dpkg --print-architecture) && \
-    if [ "$ARCH" = "amd64" ]; then \
-      echo "deb $PVE_APT/proxmox/debian/pve ${DEBIAN_VERSION} pve-no-subscription" >> /etc/apt/sources.list;  \
-      echo "deb $PVE_APT/proxmox/debian/devel ${DEBIAN_VERSION} main" >> /etc/apt/sources.list; \
-      curl -l -o /etc/apt/trusted.gpg.d/proxmox-release-${DEBIAN_VERSION}.gpg $PVE_APT/proxmox/debian/proxmox-release-bookworm.gpg; \
-    fi
 
 RUN apt update && \
     apt -y install \
@@ -81,40 +73,8 @@ COPY etc/apt/preferences.d/exclude-librust /etc/apt/preferences.d/
 RUN apt update && \
     apt -y install \
     libgit2-dev \
-    # librust-cmake \
-    cmake \
-    # librust-pulldown-cmark \
-    help2man \
-    # librust-zstd \
-    libzstd-dev \
-    # librust-pam-sys \
-    libpam-dev \
-    # lilbrust-openssl-sys \
-    libssl-dev \
-    # librust-clang-sys \
-    clang \
-    libclang-19-dev \
-    libclang-dev \
-    llvm \
-    llvm-runtime \
-    # librust-brotli \
-    brotli \
-    # librust-tower-http \
-    python3-inflate64 \
     # proxmox-i18n \
     liblocale-po-perl \
-    # librust-bzip2-sys \
-    libbz2-dev \
-    # librust-nettle-sys \
-    nettle-dev \
-    # librust-apt-native \
-    libapt-pkg-dev \
-    # librust-proxmox-sys \
-    libacl1-dev \
-    # librust-proxmox-systemd \
-    libsystemd-dev \
-    # librust-rrd-sys \
-    librrd-dev \
     # ceph-18 build dependencies \
     libopentracing-dev \
     libthrift-dev \
@@ -141,26 +101,54 @@ RUN apt update && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*;
 
-RUN apt update && \
-    apt-get -y --no-install-recommends install proxmox-ve || echo ok \
-    && \
-    apt autoremove --purge -y && \
-    apt clean && \
-    rm -rf /var/lib/apt/lists/*;
-
 # Install rust
-ARG RUST_VERSION="1.94.0"
+ARG RUST_VERSION="1.96.0"
 RUN curl -L "https://static.rust-lang.org/dist/rust-${RUST_VERSION}-$(arch)-unknown-linux-gnu.tar.xz" -o rust.tar.xz && \
     mkdir -p ./rust/ && \
     tar -xf rust.tar.xz -C ./rust/ --strip-components=1 && \
     /bin/bash -c "./rust/install.sh" && \
-    /usr/local/bin/cargo install debcargo && \
     rm -fr rust*;
 ENV PATH=/root/.cargo/bin/:${PATH}
 
-RUN rm -f /var/lib/dpkg/info/pve-manager.postinst && \
-    rm -f /var/lib/dpkg/info/proxmox-ve.postinst && \
-    dpkg --configure -a
+# Install build requirements for librust
+RUN apt update && \
+    apt -y install \
+    # librust-cmake \
+    cmake \
+    # librust-pulldown-cmark \
+    help2man \
+    # librust-zstd \
+    libzstd-dev \
+    # librust-pam-sys \
+    libpam-dev \
+    # lilbrust-openssl-sys \
+    libssl-dev \
+    # librust-clang-sys \
+    clang \
+    libclang-19-dev \
+    libclang-dev \
+    llvm \
+    llvm-runtime \
+    # librust-brotli \
+    brotli \
+    # librust-tower-http \
+    python3-inflate64 \
+    # librust-bzip2-sys \
+    # libbz2-dev \
+    # librust-nettle-sys \
+    nettle-dev \
+    # librust-apt-native \
+    libapt-pkg-dev \
+    # librust-proxmox-sys \
+    libacl1-dev \
+    # librust-proxmox-systemd \
+    libsystemd-dev \
+    # librust-rrd-sys \
+    librrd-dev \
+    && \
+    apt autoremove --purge -y && \
+    apt clean && \
+    rm -rf /var/lib/apt/lists/*;
 
 ADD ./start.sh /
 CMD ["/bin/bash"]

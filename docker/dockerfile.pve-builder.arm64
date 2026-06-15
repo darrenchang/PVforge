@@ -207,13 +207,13 @@ ENV PACKAGE=proxmox-kernel-helper
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
-ENV PACKAGE=proxmox-archive-keyring
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+# ENV PACKAGE=proxmox-archive-keyring
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
-ENV PACKAGE=proxmox-biome
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+# ENV PACKAGE=proxmox-biome
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-mini-journalreader
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
