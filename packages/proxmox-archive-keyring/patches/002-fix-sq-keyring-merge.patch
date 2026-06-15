@@ -1,0 +1,17 @@
+Description: Fix build with modern Sequoia sq (>= 1.0)
+ The old `sq keyring join --binary` subcommand/flag were removed in the
+ Sequoia sq 1.x CLI shipped by trixie. Use `sq keyring merge` instead, and
+ pipe through `sq packet dearmor` because modern sq emits ASCII-armored
+ output by default while we need a binary .gpg keyring.
+Forwarded: not-needed
+--- a/debian/rules
++++ b/debian/rules
+@@ -8,7 +8,7 @@
+ 	dh $@
+
+ override_dh_auto_build:
+-	sq keyring join --binary debian/proxmox-release*.gpg >proxmox-archive-keyring.gpg.tmp
++	sq keyring merge debian/proxmox-release*.gpg | sq packet dearmor >proxmox-archive-keyring.gpg.tmp
+ 	mv proxmox-archive-keyring.gpg.tmp proxmox-archive-keyring.gpg
+ 	dh_auto_build
+
