@@ -1,0 +1,17 @@
+diff --git a/Makefile b/Makefile
+index 18e5ce27..10686f5c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,9 +1,10 @@
+ include /usr/share/dpkg/pkg-info.mk
++include /usr/share/dpkg/architecture.mk
+ 
+ PACKAGE=proxmox-biome
+ 
+-DEB=$(PACKAGE)_$(DEB_VERSION_UPSTREAM_REVISION)_amd64.deb
+-DEB_DBG=$(PACKAGE)-dbgsym_$(DEB_VERSION_UPSTREAM_REVISION)_amd64.deb
++DEB=$(PACKAGE)_$(DEB_VERSION_UPSTREAM_REVISION)_$(DEB_HOST_ARCH).deb
++DEB_DBG=$(PACKAGE)-dbgsym_$(DEB_VERSION_UPSTREAM_REVISION)_$(DEB_HOST_ARCH).deb
+ 
+ BUILDDIR=$(PACKAGE)-$(DEB_VERSION_UPSTREAM)
+ 
