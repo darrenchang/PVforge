@@ -223,6 +223,14 @@ ENV PACKAGE=proxmox-offline-mirror
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
 
+ENV PACKAGE=proxmox-perl-rs
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
 ENV PACKAGE=proxmox-biome
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+
+# ENV PACKAGE=pve-common
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";

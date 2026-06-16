@@ -852,6 +852,9 @@ RUST_LIBS=(
     "lzma-sys:lzma-sys:none:notvendor"
     "xz2:xz2:patches:notvendor"
     "toml:toml:patches:notvendor"
+    "nvml-wrapper-sys:nvml-wrapper-sys:none:vendor"
+    "wrapcenum-derive:wrapcenum-derive:patches:notvendor"
+    "nvml-wrapper:nvml-wrapper:patches:notvendor"
   )
 
 export CARGO=/usr/local/bin/cargo
