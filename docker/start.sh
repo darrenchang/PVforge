@@ -8,44 +8,46 @@ errlog(){
 export dscflag="dsc"
 
 if [[  "$DEB_BUILD_OPTIONS" == *"nodsc"*   ]];then
-	dscflag="nodsc"
+  dscflag="nodsc"
 fi
 
 exec_build(){
-	echo "install depends"
-  yes |mk-build-deps --install --remove
-	mkdir /tmp/$PKGDIR -p
-        if [ -f "Makefile" ];then
-		echo "clean "
-		make clean || echo ok
-		echo "build deb in `pwd` "
-		if [ "$dscflag" == "dsc" ];then
-			make dsc || echo  "dsc build error but it is not  fatal error"
-			cp *.dsc *.tar.* /tmp/$PKGDIR
-		fi
-                make deb || errlog "build  deb error"
-		# We need copy deb files first beacuse of deb will be clean when dsc build
-		if [ "$dscflag" == "dsc" ];then
-			cp -r /tmp/$PKGDIR/* ./
-		fi
-        else
-		dpkg-buildpackage -b -us -uc ||errlog "build deb error"
-                mv ../*.deb ../*.buildinfo ../*.changes ../*.dsc ../*.tar.* $PKGDIR
-        fi
+  echo "install depends"
+  yes | mk-build-deps \
+    --install \
+    --tool 'apt-get -o APT::Get::Remove=false --yes'
+  mkdir /tmp/$PKGDIR -p
+  if [ -f "Makefile" ];then
+    echo "clean "
+    make clean || echo ok
+    echo "build deb in `pwd` "
+    if [ "$dscflag" == "dsc" ];then
+      make dsc || echo  "dsc build error but it is not  fatal error"
+      cp *.dsc *.tar.* /tmp/$PKGDIR
+    fi
+      make deb || errlog "build  deb error"
+    # We need copy deb files first beacuse of deb will be clean when dsc build
+    if [ "$dscflag" == "dsc" ];then
+      cp -r /tmp/$PKGDIR/* ./
+    fi
+  else
+    dpkg-buildpackage -b -us -uc ||errlog "build deb error"
+    mv ../*.deb ../*.buildinfo ../*.changes ../*.dsc ../*.tar.* $PKGDIR
+  fi
 }
 
 if [ ! -d "$PKGDIR" ];then
-        errlog "$PKGDIR dir is not existd,Exitting !"
+  errlog "$PKGDIR dir is not existd,Exitting !"
 fi
 
 
 if [ -f "$PKGDIR/../autobuild.sh" ];then
-        cd $PKGDIR/../
-        bash autobuild.sh
+  cd $PKGDIR/../
+  bash autobuild.sh
 else
-        cd $PKGDIR
-        rm .git &&
-        git init
-        git config --global --add safe.directory $(pwd)
-        exec_build
+  cd $PKGDIR
+  rm .git &&
+  git init
+  git config --global --add safe.directory $(pwd)
+  exec_build
 fi

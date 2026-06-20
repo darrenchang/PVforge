@@ -150,5 +150,4 @@ RUN apt update && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*;
 
-ADD ./start.sh /
 CMD ["/bin/bash"]

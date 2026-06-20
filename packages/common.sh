@@ -1,26 +1,30 @@
 #!/bin/bash
 copy_dir(){
-                rsync -ra $SH_DIR/$PKGNAME /build
-                cd /build/$PKGNAME
+  rsync -ra $SH_DIR/$PKGNAME /build
+  cd /build/$PKGNAME
 }
 
 exec_build_make(){
-        yes |mk-build-deps --install --remove
-        echo "clean "
-        make clean || echo ok
-        echo "build deb in `pwd` "
-        if [ $dscflag == "dsc" ];then
-                make dsc ||  "dsc build error but it is not  fatal error"
-        fi
-        DEB_BUILD_OPTIONS=nocheck DEB_CFLAGS_APPEND="-Wno-error=int-conversion" make deb || errlog "build deb error"
+  yes | mk-build-deps \
+    --install \
+    --tool 'apt-get -o APT::Get::Remove=false --yes'
+  echo "clean "
+  make clean || echo ok
+  echo "build deb in `pwd` "
+  if [ $dscflag == "dsc" ];then
+    make dsc ||  "dsc build error but it is not  fatal error"
+  fi
+  DEB_BUILD_OPTIONS=nocheck DEB_CFLAGS_APPEND="-Wno-error=int-conversion" make deb || errlog "build deb error"
 }
 
 exec_build_dpkg(){
-        yes |mk-build-deps --install --remove
-        echo "clean "
-        make clean || echo ok
-        echo "build deb in `pwd` "
-        dpkg-buildpackage -b -us -uc || errlog "build deb error"
+  yes | mk-build-deps \
+    --install \
+    --tool 'apt-get -o APT::Get::Remove=false --yes'
+  echo "clean "
+  make clean || echo ok
+  echo "build deb in `pwd` "
+  dpkg-buildpackage -b -us -uc || errlog "build deb error"
 }
 
 print_progress(){
@@ -49,19 +53,19 @@ print_progress(){
 }
 
 errlog(){
-   echo $1;
-   exit 1;
+  echo $1;
+  exit 1;
 }
 
 # Function to clean up on exit (Ctrl+C)
 cleanup() {
-    [ ! -t 1 ] && return
-    printf "\033[r"
-    printf "\033[${ROWS};1H"
-    tput cnorm
-    # Add a newline so the prompt appears BELOW the progress bar
-    echo ""
-    exit
+  [ ! -t 1 ] && return
+  printf "\033[r"
+  printf "\033[${ROWS};1H"
+  tput cnorm
+  # Add a newline so the prompt appears BELOW the progress bar
+  echo ""
+  exit
 }
 trap cleanup SIGINT EXIT
 

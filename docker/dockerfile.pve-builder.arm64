@@ -6,91 +6,112 @@ RUN apt update;
 
 WORKDIR /workspace/
 
-COPY ./packages/build_all.sh ./packages/
+COPY ./packages/build.sh ./packages/
+COPY ./packages/install.sh ./packages/
 COPY ./docker/start.sh ./packages/
 COPY ./packages/common.sh ./packages/
 
 ENV PACKAGE=musl
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PATH=/usr/local/musl-cross/bin:${PATH}
 
 ENV PACKAGE=debcargo-conf
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=chrony
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pve-apiclient
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=corosync-pve
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=corosync-qdevice
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=extjs
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=fonts-font-logos
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=frr
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=ifupdown2
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=kronosnet
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=ksm-control-daemon
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=libarchive-perl
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=libjs-qrcodejs
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=libpve-u2f-server-perl
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=libqb
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=libseccomp
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=libtpms
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=libxdgmime-perl
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=lxc
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
@@ -102,59 +123,73 @@ RUN ( \
       git config --global --add safe.directory /workspace/packages/lxc/lxc && \
       git submodule add https://git.proxmox.com/git/mirror_lxc ./lxc; \
     )
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 ENV PACKAGE=lxcfs
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=novnc-pve
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pathpatterns
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pixman
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=vncterm
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=smartmontools
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=swtpm
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=sencha-touch
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=zfsonlinux
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pve-eslint
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pve-zsync
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pve-lxc-syscalld
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pve-vgpu-helper
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=ceph-20
 RUN apt update && \
@@ -162,75 +197,98 @@ RUN apt update && \
     libsqlite3-mod-ceph-dev \
     libsqlite3-dev;
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-perltidy
 RUN apt update && \
     apt install -y \
     perltidy;
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=perlmod
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pxar
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pve-xtermjs
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-mail-forward
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-network-interface-pinning
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-rrd-migration-tool
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-websocket-tunnel
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-kernel-helper
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-archive-keyring
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-mini-journalreader
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-i18n
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-ve-rs
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-offline-mirror
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-perl-rs
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-biome
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
-# ENV PACKAGE=pve-common
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build_all.sh --package ${PACKAGE}";
+ENV PACKAGE=pve-common
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE} --force-install true";
+
+ENV PACKAGE=proxmox-acme
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE} --force-install true";
