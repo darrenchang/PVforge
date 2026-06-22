@@ -77,6 +77,10 @@ graph LR
         pve-common --> pve-http-server
         pve-common --> pve-installer
         pve-common --> pve-docs
+        proxmox-acme --> proxmox-backup
+        proxmox-acme --> proxmox-backup-meta
+        proxmox-acme --> proxmox-backup-qemu
+        proxmox-acme --> proxmox-backup-restore-image
     end
 
     %% Tier 6
@@ -85,10 +89,6 @@ graph LR
         pve-access-control --> pve-qemu
         pve-access-control --> librados2-perl
         pve-access-control --> pve-container
-        proxmox-acme --> proxmox-backup
-        proxmox-acme --> proxmox-backup-meta
-        proxmox-acme --> proxmox-backup-qemu
-        proxmox-acme --> proxmox-backup-restore-image
     end
 
     %% Tier 7

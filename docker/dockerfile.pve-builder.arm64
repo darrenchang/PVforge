@@ -10,6 +10,7 @@ COPY ./packages/build.sh ./packages/
 COPY ./packages/install.sh ./packages/
 COPY ./docker/start.sh ./packages/
 COPY ./packages/common.sh ./packages/
+COPY ./.git/ ./.git/
 
 ENV PACKAGE=musl
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
@@ -292,3 +293,45 @@ ENV PACKAGE=proxmox-acme
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE} --force-install true";
+
+ENV PACKAGE=proxmox-widget-toolkit
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-http-server
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+# ENV PACKAGE=pve-installer
+# RUN apt update && \
+#     apt install -y \
+#     geoip-bin \
+#     libgtk3-perl;
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+# ENV PACKAGE=pve-docs
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+# ENV PACKAGE=pve-access-control
+# RUN apt update && \
+#     apt install -y \
+#     libauthen-pam-perl \
+#     libuuid-perl;
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+# ENV PACKAGE=proxmox-backup
+# RUN apt update && \
+#     apt install -y \
+#     jq;
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
