@@ -304,14 +304,10 @@ COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
-# ENV PACKAGE=pve-installer
-# RUN apt update && \
-#     apt install -y \
-#     geoip-bin \
-#     libgtk3-perl;
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+ENV PACKAGE=pve-installer
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 # ENV PACKAGE=pve-docs
 # COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
