@@ -25,5 +25,5 @@ done
 if [ "$FORCE_INSTALL" = "true" ]; then
   dpkg -i --force-depends /deb/proxmox/${PACKAGE_NAME}/*.deb
 else
-  apt install -y --allow-downgrades $(ls /deb/proxmox/${PACKAGE_NAME}/*.deb | grep -v -- '-dbgsym_\|zfs-dracut_\|-test_');
+  apt install -y --allow-downgrades -o Dpkg::Options::="--force-confnew" $(ls /deb/proxmox/${PACKAGE_NAME}/*.deb | grep -v -- '-dbgsym_\|zfs-dracut_\|-test_');
 fi

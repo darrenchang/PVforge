@@ -46,5 +46,6 @@ if [ -f "$PKGDIR/../autobuild.sh" ];then
   bash autobuild.sh
 else
   cd $PKGDIR
+  git config --global --add safe.directory $(pwd) || true
   exec_build
 fi

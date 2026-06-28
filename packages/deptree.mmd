@@ -73,10 +73,10 @@ graph LR
 
     %% Tier 5
     subgraph T5["Tier 5 – Cluster Infrastructure"]
-        pve-common --> pve-access-control
         pve-common --> pve-http-server
         pve-common --> pve-installer
         pve-common --> pve-docs
+        pve-common --> pve-access-control
         proxmox-acme --> proxmox-backup
         proxmox-acme --> proxmox-backup-meta
         proxmox-acme --> proxmox-backup-qemu
