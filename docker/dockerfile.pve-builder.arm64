@@ -294,6 +294,11 @@ COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE} --force-install true";
 
+ENV PACKAGE=proxmox-fuse-rs
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
 ENV PACKAGE=proxmox-widget-toolkit
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
@@ -309,7 +314,33 @@ COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
-# ENV PACKAGE=pve-docs
+ENV PACKAGE=pve-docs
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=proxmox-backup
+RUN apt update && \
+    apt install -y \
+    jq \
+    libsgutils2-dev \
+    texlive-fonts-extra \
+    xindy;
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+# ENV PACKAGE=proxmox-backup-meta
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+# ENV PACKAGE=proxmox-backup-qemu
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+# ENV PACKAGE=proxmox-backup-restore-image
 # COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 # RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 # RUN bash -c "./packages/install.sh --package ${PACKAGE}";
@@ -319,14 +350,6 @@ RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 #     apt install -y \
 #     libauthen-pam-perl \
 #     libuuid-perl;
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
-
-# ENV PACKAGE=proxmox-backup
-# RUN apt update && \
-#     apt install -y \
-#     jq;
 # COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 # RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 # RUN bash -c "./packages/install.sh --package ${PACKAGE}";

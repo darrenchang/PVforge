@@ -253,3 +253,6 @@
 [submodule "packages/ceph-20/ceph-20"]
 	path = packages/ceph-20/ceph-20
 	url = https://git.proxmox.com/git/ceph.git
+[submodule "packages/proxmox-fuse-rs/proxmox-fuse-rs"]
+	path = packages/proxmox-fuse-rs/proxmox-fuse-rs
+	url = https://github.com/proxmox/proxmox-fuse-rs.git

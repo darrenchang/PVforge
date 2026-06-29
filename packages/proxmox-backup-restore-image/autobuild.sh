@@ -25,4 +25,5 @@ echo "This is $PKGNAME build scripts"
 update_submodule
 
 cd $SH_DIR/$PKGNAME
+git config --global --add safe.directory $(pwd) || true
 exec_build_make

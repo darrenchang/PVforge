@@ -22,10 +22,10 @@ exec_build(){
     make clean || echo ok
     echo "build deb in `pwd` "
     if [ "$dscflag" == "dsc" ];then
-      make dsc || echo  "dsc build error but it is not  fatal error"
+      make dsc || echo  "dsc build error but it is not fatal error"
       cp *.dsc *.tar.* /tmp/$PKGDIR
     fi
-      make deb || errlog "build  deb error"
+      make deb || errlog "build deb error"
     # We need copy deb files first beacuse of deb will be clean when dsc build
     if [ "$dscflag" == "dsc" ];then
       cp -r /tmp/$PKGDIR/* ./
