@@ -10,12 +10,6 @@
 [submodule "packages/pve-qemu/pve-qemu"]
   path = packages/pve-qemu/pve-qemu
   url = https://github.com/jiangcuo/pve-qemu.git
-[submodule "packages/pve-common/pve-common"]
-  path = packages/pve-common/pve-common
-  url = https://github.com/jiangcuo/pve-common
-[submodule "packages/pve-installer/pve-installer"]
-  path = packages/pve-installer/pve-installer
-  url = https://github.com/jiangcuo/pve-installer
 [submodule "packages/pve-container/pve-container"]
   path = packages/pve-container/pve-container
   url = https://github.com/jiangcuo/pve-container
@@ -43,9 +37,6 @@
 [submodule "packages/pve-http-server/pve-http-server"]
   path = packages/pve-http-server/pve-http-server
   url = https://git.proxmox.com/git/pve-http-server
-[submodule "packages/pve-docs/pve-docs"]
-  path = packages/pve-docs/pve-docs
-  url = https://github.com/jiangcuo/pve-docs
 [submodule "packages/libgit2/libgit2"]
   path = packages/libgit2/libgit2
   url = https://git.proxmox.com/git/libgit2
@@ -169,9 +160,6 @@
 [submodule "packages/proxmox-backup-restore-image/proxmox-backup-restore-image"]
   path = packages/proxmox-backup-restore-image/proxmox-backup-restore-image
   url = https://github.com/jiangcuo/proxmox-backup-restore-image
-[submodule "packages/pve-lxc-syscalld/pve-lxc-syscalld"]
-  path = packages/pve-lxc-syscalld/pve-lxc-syscalld
-  url = https://github.com/jiangcuo/pve-lxc-syscalld.git
 [submodule "packages/pixman/pixman"]
   path = packages/pixman/pixman
   url = https://salsa.debian.org/xorg-team/lib/pixman
@@ -256,3 +244,15 @@
 [submodule "packages/proxmox-fuse-rs/proxmox-fuse-rs"]
 	path = packages/proxmox-fuse-rs/proxmox-fuse-rs
 	url = https://github.com/proxmox/proxmox-fuse-rs.git
+[submodule "packages/pve-common/pve-common"]
+	path = packages/pve-common/pve-common
+	url = https://github.com/proxmox/pve-common.git
+[submodule "packages/pve-lxc-syscalld/pve-lxc-syscalled"]
+	path = packages/pve-lxc-syscalld/pve-lxc-syscalled
+	url = https://github.com/proxmox/pve-lxc-syscalld.git
+[submodule "packages/pve-installer/pve-installer"]
+	path = packages/pve-installer/pve-installer
+	url = https://github.com/proxmox/pve-installer.git
+[submodule "packages/pve-docs/pve-docs"]
+	path = packages/pve-docs/pve-docs
+	url = https://github.com/proxmox/pve-docs.git
