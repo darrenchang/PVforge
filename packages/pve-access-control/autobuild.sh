@@ -7,4 +7,6 @@ echo "This is $PKGNAME build scripts"
 . ../common.sh
 
 cd $SCRIPT_DIR/$PKGNAME
+git config --global --add safe.directory $(pwd)
+
 exec_build_make

@@ -27,5 +27,6 @@ docker exec -ti ${BUILDER_CONTAINER} bash -c "rm -rf /workspace/packages/${PACKA
 docker exec -ti ${BUILDER_CONTAINER} bash -c "rm -f /workspace/packages/build.sh";
 docker cp ./packages/${PACKAGE_NAME}/ ${BUILDER_CONTAINER}:/workspace/packages/${PACKAGE_NAME}/;
 docker cp ./packages/build.sh ${BUILDER_CONTAINER}:/workspace/packages/build.sh;
-docker exec -ti ${BUILDER_CONTAINER} bash -c "/workspace/packages/build.sh --package ${PACKAGE_NAME}"
+docker cp ./packages/install.sh ${BUILDER_CONTAINER}:/workspace/packages/install.sh;
+# docker exec -ti ${BUILDER_CONTAINER} bash -c "/workspace/packages/build.sh --package ${PACKAGE_NAME}"
 

@@ -312,24 +312,31 @@ RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 ENV PACKAGE=pve-installer
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# resolvconf's postinst fails inside Docker because /etc/resolv.conf is a
+# read-only bind mount and no resolvconf service is running. Tell debconf not
+# to linkify it, and block service invocation during build, so packages that
+# depend on it (e.g. pve-installer) configure cleanly instead of erroring out.
+RUN echo "resolvconf resolvconf/linkify-resolvconf boolean false" | debconf-set-selections && \
+    printf '#!/bin/sh\nexit 101\n' > /usr/sbin/policy-rc.d && \
+    chmod +x /usr/sbin/policy-rc.d
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
-ENV PACKAGE=pve-docs
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN cd ./packages/ \
-    bash -c "./build.sh --package ${PACKAGE}";
-RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+# ENV PACKAGE=pve-docs
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN cd ./packages/ \
+#     bash -c "./build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
-ENV PACKAGE=proxmox-backup
-RUN apt update && \
-    apt install -y \
-    jq \
-    libsgutils2-dev \
-    texlive-fonts-extra \
-    xindy;
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+# ENV PACKAGE=proxmox-backup
+# RUN apt update && \
+#     apt install -y \
+#     jq \
+#     libsgutils2-dev \
+#     texlive-fonts-extra \
+#     xindy;
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 # ENV PACKAGE=proxmox-backup-meta
 # COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
