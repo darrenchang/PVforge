@@ -138,7 +138,7 @@
   url = https://git.proxmox.com/git/proxmox-backup
 [submodule "packages/debcargo-conf/debcargo-conf"]
   path = packages/debcargo-conf/debcargo-conf
-  url = https://git.proxmox.com/git/debcargo-conf
+  url = https://github.com/darrenchang/debcargo-conf.git
 [submodule "packages/proxmox-offline-mirror/proxmox-offline-mirror"]
   path = packages/proxmox-offline-mirror/proxmox-offline-mirror
   url = https://git.proxmox.com/git/proxmox-offline-mirror
