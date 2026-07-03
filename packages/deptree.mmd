@@ -81,8 +81,8 @@ graph LR
         proxmox-acme --> proxmox-backup
         proxmox-acme --> proxmox-backup-meta
         proxmox-acme --> proxmox-backup-qemu
-        proxmox-acme --> proxmox-backup-restore-image
         pve-common --> pve-access-control
+        pve-firmware
     end
 
     %% Tier 6
@@ -101,7 +101,6 @@ graph LR
         pve-cluster --> pve-ha-manager
         pve-cluster --> proxmox-firewall
         pve-cluster --> pve-manager
-        pve-cluster --> pve-firmware
         pve-qemu --> pve-edk2-firmware
         pve-qemu --> proxmox-ve
         pve-qemu --> spiceterm

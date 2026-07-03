@@ -16,9 +16,6 @@
 [submodule "packages/proxmox-archive-keyring/proxmox-archive-keyring"]
   path = packages/proxmox-archive-keyring/proxmox-archive-keyring
   url = https://git.proxmox.com/git/proxmox-archive-keyring.git
-[submodule "packages/proxmox-ve/proxmox-ve"]
-  path = packages/proxmox-ve/proxmox-ve
-  url = https://github.com/jiangcuo/proxmox-ve.git
 [submodule "packages/pve-storage/pve-storage"]
   path = packages/pve-storage/pve-storage
   url = https://github.com/jiangcuo/pve-storage.git
@@ -157,9 +154,6 @@
 [submodule "packages/proxmox-backup-meta/proxmox-backup-meta"]
   path = packages/proxmox-backup-meta/proxmox-backup-meta
   url = https://git.proxmox.com/git/proxmox-backup-meta
-[submodule "packages/proxmox-backup-restore-image/proxmox-backup-restore-image"]
-  path = packages/proxmox-backup-restore-image/proxmox-backup-restore-image
-  url = https://github.com/jiangcuo/proxmox-backup-restore-image
 [submodule "packages/pixman/pixman"]
   path = packages/pixman/pixman
   url = https://salsa.debian.org/xorg-team/lib/pixman
@@ -256,3 +250,9 @@
 [submodule "packages/pve-docs/pve-docs"]
 	path = packages/pve-docs/pve-docs
 	url = https://github.com/proxmox/pve-docs.git
+[submodule "packages/proxmox-backup-restore-image/proxmox-backup-restore-image"]
+	path = packages/proxmox-backup-restore-image/proxmox-backup-restore-image
+	url = git://git.proxmox.com/git/proxmox-backup-restore-image.git
+[submodule "packages/proxmox-ve/proxmox-ve"]
+	path = packages/proxmox-ve/proxmox-ve
+	url = https://git.proxmox.com/git/proxmox-ve.git

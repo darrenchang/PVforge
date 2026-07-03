@@ -22,7 +22,6 @@ ENV PATH=/usr/local/musl-cross/bin:${PATH}
 ENV PACKAGE=debcargo-conf
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
@@ -345,23 +344,100 @@ RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-backup-qemu
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN apt update && \
+RUN apt update; \
     apt install -y \
     cbindgen;
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 # RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
-# ENV PACKAGE=proxmox-backup-restore-image
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+ENV PACKAGE=pve-firmware
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-access-control
+RUN apt update; \
+    apt install -y \
+    libauthen-pam-perl \
+    libuuid-perl;
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 # RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 # RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
-# ENV PACKAGE=pve-access-control
-# RUN apt update && \
-#     apt install -y \
-#     libauthen-pam-perl \
-#     libuuid-perl;
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+ENV PACKAGE=pve-cluster
+RUN apt update; \
+    apt install -y \
+    libdigest-hmac-perl \
+    librrds-perl \
+    rrdcached \
+    sqlite3;
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 # RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 # RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
+ENV PACKAGE=pve-qemu
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=librados2-perl
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-guest-common
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-network
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN apt update; \
+    apt install -y \
+    libnet-subnet-perl \
+    libtest-differences-perl;
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-firewall
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN apt update; \
+    apt install -y \
+    libnetfilter-conntrack-dev \
+    libnetfilter-log-dev;
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-ha-manager
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=proxmox-firewall
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-manager
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN apt update; \
+    apt install -y \
+    libfile-readbackwards-perl \
+    libtemplate-perl;
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-edk2-firmware
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=proxmox-ve
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=spiceterm
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";

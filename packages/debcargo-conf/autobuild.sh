@@ -941,6 +941,11 @@ RUST_LIBS=(
     "error-chain:error-chain:none:notvendor"
     "syslog:syslog:patches:notvendor"
     "xdg-2:xdg 2:none:notvendor"
+    "dashmap:dashmap:patches:notvendor"
+    "serial-test-derive:serial_test_derive:patches:notvendor"
+    "serial-test:serial_test:patches:notvendor"
+    "cbindgen:cbindgen:patches:notvendor"
+    "cbindgen-0.27:cbindgen 0.27:none:notvendor"
   )
 
 export CARGO=/usr/local/bin/cargo
@@ -949,8 +954,7 @@ export RUSTC=/usr/local/bin/rustc
 git config --global --add safe.directory $(pwd)
 
 # Update repos so rust can install dependencie libraries
-apt update;
-apt update;
+apt update || echo ok;
 
 build_rust_libs(){
   rust_lib=$1
