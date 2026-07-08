@@ -39,6 +39,7 @@ echo "This is $PKGNAME build scripts"
 SH_PATH=$(realpath "$0")
 SH_DIR=$(dirname $SH_PATH)
 
+git config --global --add safe.directory $SH_DIR/$PKGNAME
 update_submodule
 cd $SH_DIR/$PKGNAME
 exec_build

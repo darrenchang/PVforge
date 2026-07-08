@@ -1,4 +1,5 @@
 #!/bin/bash
+export ZSTD_SYS_USE_PKG_CONFIG=1
 SCRIPT_DIR=$(cd $(dirname ${BASH_SOURCE[0]}); pwd)
 PKGNAME=$(basename $SCRIPT_DIR)
 
