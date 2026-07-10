@@ -40,6 +40,8 @@ SH_PATH=$(realpath "$0")
 SH_DIR=$(dirname $SH_PATH)
 
 git config --global --add safe.directory $SH_DIR/$PKGNAME
+git config --global --add safe.directory $SH_DIR/$PKGNAME/qemu
+git config --global --add safe.directory $SH_DIR/$PKGNAME/qemu/roms/edk2
 update_submodule
 cd $SH_DIR/$PKGNAME
 exec_build

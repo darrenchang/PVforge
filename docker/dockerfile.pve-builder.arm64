@@ -348,7 +348,7 @@ RUN apt update; \
     apt install -y \
     cbindgen;
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pve-firmware
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
@@ -378,7 +378,7 @@ COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 ENV PACKAGE=pve-qemu
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=librados2-perl
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
@@ -444,10 +444,10 @@ RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 
 ENV PACKAGE=qemu-server
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 # RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pve-storage
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 # RUN bash -c "./packages/install.sh --package ${PACKAGE}";

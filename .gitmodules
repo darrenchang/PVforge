@@ -7,9 +7,6 @@
 [submodule "packages/zfsonlinux/zfsonlinux"]
   path = packages/zfsonlinux/zfsonlinux
   url = https://git.proxmox.com/git/zfsonlinux.git
-[submodule "packages/pve-qemu/pve-qemu"]
-  path = packages/pve-qemu/pve-qemu
-  url = https://github.com/jiangcuo/pve-qemu.git
 [submodule "packages/pve-container/pve-container"]
   path = packages/pve-container/pve-container
   url = https://github.com/jiangcuo/pve-container
@@ -256,3 +253,6 @@
 [submodule "packages/proxmox-ve/proxmox-ve"]
 	path = packages/proxmox-ve/proxmox-ve
 	url = https://git.proxmox.com/git/proxmox-ve.git
+[submodule "packages/pve-qemu/pve-qemu"]
+	path = packages/pve-qemu/pve-qemu
+	url = https://git.proxmox.com/git/pve-qemu.git
