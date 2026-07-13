@@ -322,8 +322,7 @@ RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pve-docs
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN cd ./packages/ \
-    bash -c "./build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=proxmox-backup
@@ -385,6 +384,11 @@ COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 # RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
+ENV PACKAGE=pve-container
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
 ENV PACKAGE=pve-guest-common
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 # RUN bash -c "./packages/build.sh --package ${PACKAGE}";
@@ -440,7 +444,7 @@ RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 ENV PACKAGE=spiceterm
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=qemu-server
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
