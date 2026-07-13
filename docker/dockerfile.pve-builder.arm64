@@ -382,26 +382,51 @@ RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 ENV PACKAGE=librados2-perl
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+
+ENV PACKAGE=spiceterm
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+# proxmox-ve is a metapackage; its install needs proxmox-default-kernel,
+# which is not built by this repo, so only build it.
+ENV PACKAGE=proxmox-ve
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 # RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
-ENV PACKAGE=pve-container
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+# =============================================================================
+# Bootstrap: pve-cluster <-> pve-access-control build-dependency cycle.
+#
+# pve-cluster Build-Depends on libpve-access-control only because manpage
+# generation loads PVE::RPCEnvironment (shipped by pve-access-control) and the
+# test suite uses PVE::AccessControl (tests are skipped, common.sh builds with
+# nocheck). pve-access-control in turn needs libpve-cluster-perl + pve-cluster
+# to build. Stage 1 builds pve-cluster with that build-dep stripped and a stub
+# PVE::RPCEnvironment; stage 2 builds pve-access-control normally.
+# =============================================================================
+ENV PACKAGE=pve-cluster
+RUN mkdir -p /usr/share/perl5/PVE && \
+    printf 'package PVE::RPCEnvironment;\nuse strict;\nuse warnings;\nuse base "PVE::RESTEnvironment";\nour $AUTOLOAD;\nsub AUTOLOAD { return; }\n1;\n' \
+      > /usr/share/perl5/PVE/RPCEnvironment.pm && \
+    sed -i '/^Build-Depends/,/^[A-Z][A-Za-z-]*:/{/libpve-access-control/d}' \
+      ./packages/${PACKAGE}/${PACKAGE}/debian/control && \
+    bash -c "./packages/build.sh --package ${PACKAGE}" && \
+    rm -f /usr/share/perl5/PVE/RPCEnvironment.pm
+# libpve-cluster-api-perl runtime-depends on libpve-access-control, which does
+# not exist yet -- defer it (force-installing would leave apt in a broken
+# state and fail every later mk-build-deps run).
+RUN bash -c 'apt install -y --allow-downgrades -o Dpkg::Options::="--force-confnew" $(ls /deb/proxmox/${PACKAGE}/*.deb | grep -v -- "-dbgsym_\|api-perl")';
 
-ENV PACKAGE=pve-guest-common
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+ENV PACKAGE=pve-access-control
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+# now the deferred libpve-cluster-api-perl is cleanly installable
+RUN apt install -y --allow-downgrades /deb/proxmox/pve-cluster/libpve-cluster-api-perl_*.deb;
 
-ENV PACKAGE=pve-network
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN apt update; \
-    apt install -y \
-    libnet-subnet-perl \
-    libtest-differences-perl;
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+# already built further up; runtime-depends on libpve-access-control
+ENV PACKAGE=librados2-perl
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pve-firewall
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
@@ -409,18 +434,79 @@ RUN apt update; \
     apt install -y \
     libnetfilter-conntrack-dev \
     libnetfilter-log-dev;
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-storage
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-guest-common
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-network
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN apt update; \
+    apt install -y \
+    libnet-subnet-perl \
+    libtest-differences-perl;
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+# =============================================================================
+# pve-container / pve-ha-manager / qemu-server runtime-depend on each other,
+# so they are built first and then installed in ONE apt transaction.
+# qemu-server's build-dep on pve-ha-manager is test-only (<!nocheck>) and is
+# dropped to break the build-order cycle.
+# =============================================================================
+ENV PACKAGE=pve-container
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pve-ha-manager
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+
+# qemu-server build-depends on pve-edk2-firmware-ovmf
+ENV PACKAGE=pve-edk2-firmware
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN apt update; \
+    apt install -y \
+    acpica-tools \
+    gcc-x86-64-linux-gnu \
+    gcc-i686-linux-gnu \
+    gcc-riscv64-linux-gnu \
+    nasm \
+    python3-virt-firmware \
+    python3-pexpect \
+    xorriso \
+    dosfstools \
+    mtools \
+    bc;
+# arm64: the x86 firmware images are cross-compiled; upstream rules only set
+# toolchain prefixes for a build host that is amd64.
+RUN sed -i \
+    -e '/AARCH64_PREFIX=aarch64-linux-gnu-/a export $(EDK2_TOOLCHAIN)_X64_PREFIX=x86_64-linux-gnu-' \
+    -e '/AARCH64_PREFIX=aarch64-linux-gnu-/a export $(EDK2_TOOLCHAIN)_IA32_PREFIX=i686-linux-gnu-' \
+    ./packages/${PACKAGE}/${PACKAGE}/debian/rules;
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=qemu-server
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN sed -i '/pve-ha-manager <!nocheck>/d' ./packages/${PACKAGE}/${PACKAGE}/debian/control;
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+
+# install the runtime-dependency triangle in one transaction
+RUN bash -c 'apt install -y --allow-downgrades -o Dpkg::Options::="--force-confnew" $(ls /deb/proxmox/pve-container/*.deb /deb/proxmox/pve-ha-manager/*.deb /deb/proxmox/qemu-server/*.deb | grep -v -- "-dbgsym_\|-test_")';
 
 ENV PACKAGE=proxmox-firewall
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pve-manager
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
@@ -428,30 +514,9 @@ RUN apt update; \
     apt install -y \
     libfile-readbackwards-perl \
     libtemplate-perl;
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
-
-ENV PACKAGE=pve-edk2-firmware
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
-
-ENV PACKAGE=proxmox-ve
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
-
-ENV PACKAGE=spiceterm
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-RUN bash -c "./packages/install.sh --package ${PACKAGE}";
-
-ENV PACKAGE=qemu-server
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
-
-ENV PACKAGE=pve-storage
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+# pve-manager runtime-depends on pve-yew-mobile-gui and
+# proxmox-enterprise-support-keyring, which are not built by this repo yet;
+# force-install it and keep this the LAST apt/dpkg step in the image (the
+# unmet deps would make any later apt operation fail).
+RUN bash -c "./packages/install.sh --package ${PACKAGE} --force-install true";

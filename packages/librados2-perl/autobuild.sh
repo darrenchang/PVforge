@@ -7,7 +7,9 @@ echo "This is $PKGNAME build scripts"
 
 exec_build(){
         apt update
-        apt install libpve-access-control librados2  librados-dev -y
+        # libpve-access-control is a runtime dep of the built package only;
+        # it does not exist yet at this point in the build order.
+        apt install librados2 librados-dev -y
         yes |mk-build-deps --install --remove
         echo "clean "
         make clean || echo ok

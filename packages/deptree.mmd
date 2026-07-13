@@ -81,34 +81,66 @@ graph LR
         proxmox-acme --> proxmox-backup
         proxmox-acme --> proxmox-backup-meta
         proxmox-acme --> proxmox-backup-qemu
-        pve-common --> pve-access-control
         pve-firmware
+        pve-qemu --> pve-edk2-firmware
+        pve-qemu --> spiceterm
+        pve-qemu --> proxmox-ve
     end
 
-    %% Tier 6
-    subgraph T6["Tier 6 – Cluster Infrastructure"]
-        pve-access-control --> pve-cluster
-        pve-access-control --> pve-qemu
-        pve-access-control --> librados2-perl
-        pve-access-control --> pve-container
+    %% Tier 6 – BUILD CYCLE: pve-cluster <-> pve-access-control.
+    %% pve-cluster is built first with its libpve-access-control build-dep
+    %% stripped (needed only for tests and manpage generation, satisfied by a
+    %% stub PVE::RPCEnvironment), then pve-access-control builds normally.
+    %% See docker/dockerfile.pve-builder.arm64.
+    subgraph T6["Tier 6 – Cluster core (bootstrap cycle)"]
+        pve-common --> pve-cluster
+        pve-cluster --> pve-access-control
+        pve-access-control -. build dep, broken via stub .-> pve-cluster
     end
 
     %% Tier 7
-    subgraph T7["Tier 7 – Cluster Infrastructure"]
-        pve-cluster --> pve-guest-common
-        pve-cluster --> pve-network
+    subgraph T7["Tier 7 – Access control dependents"]
+        pve-access-control -- runtime dep of package --> librados2-perl
+        pve-access-control --> pve-firewall
         pve-cluster --> pve-firewall
-        pve-cluster --> pve-ha-manager
-        pve-cluster --> proxmox-firewall
-        pve-cluster --> pve-manager
-        pve-qemu --> pve-edk2-firmware
-        pve-qemu --> proxmox-ve
-        pve-qemu --> spiceterm
+        librados2-perl --> pve-storage
+        pve-access-control --> pve-storage
+        pve-cluster --> pve-storage
     end
 
-    %% Tier 8
-    subgraph T8["Tier 8 – Cluster Infrastructure"]
+    %% Tier 8 – NOTE: pve-storage builds BEFORE pve-guest-common
+    %% (libpve-guest-common-perl build-depends on libpve-storage-perl)
+    subgraph T8["Tier 8 – Guest infrastructure"]
+        pve-storage --> pve-guest-common
+        pve-cluster --> pve-network
+        pve-firewall --> pve-network
+        pve-guest-common --> pve-container
+        pve-storage --> pve-container
+        pve-firewall --> pve-container
+        proxmox-ve-rs --> proxmox-firewall
+        pve-firewall -- runtime only --> proxmox-firewall
+    end
+
+    %% Tier 9 – RUNTIME CYCLE: pve-container <-> pve-ha-manager <-> qemu-server
+    %% all runtime-depend on each other; built separately (qemu-server's
+    %% test-only <!nocheck> build-dep on pve-ha-manager is dropped) and
+    %% installed in one apt transaction.
+    subgraph T9["Tier 9 – qemu-server / HA (runtime cycle)"]
         pve-guest-common --> qemu-server
-        pve-guest-common --> pve-storage
+        pve-network --> qemu-server
+        pve-storage --> qemu-server
+        pve-edk2-firmware --> qemu-server
+        pve-cluster --> pve-ha-manager
+        pve-container -. runtime .- pve-ha-manager
+        pve-ha-manager -. runtime .- qemu-server
+    end
+
+    %% Tier 10
+    subgraph T10["Tier 10 – Management"]
+        qemu-server --> pve-manager
+        pve-container --> pve-manager
+        pve-network --> pve-manager
+        proxmox-widget-toolkit --> pve-manager
+        proxmox-biome --> pve-manager
     end
 
