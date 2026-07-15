@@ -354,26 +354,6 @@ COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
-ENV PACKAGE=pve-access-control
-RUN apt update; \
-    apt install -y \
-    libauthen-pam-perl \
-    libuuid-perl;
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
-
-ENV PACKAGE=pve-cluster
-RUN apt update; \
-    apt install -y \
-    libdigest-hmac-perl \
-    librrds-perl \
-    rrdcached \
-    sqlite3;
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
-
 ENV PACKAGE=pve-qemu
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
@@ -406,6 +386,13 @@ RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 # PVE::RPCEnvironment; stage 2 builds pve-access-control normally.
 # =============================================================================
 ENV PACKAGE=pve-cluster
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN apt update; \
+    apt install -y \
+    libdigest-hmac-perl \
+    librrds-perl \
+    rrdcached \
+    sqlite3;
 RUN mkdir -p /usr/share/perl5/PVE && \
     printf 'package PVE::RPCEnvironment;\nuse strict;\nuse warnings;\nuse base "PVE::RESTEnvironment";\nour $AUTOLOAD;\nsub AUTOLOAD { return; }\n1;\n' \
       > /usr/share/perl5/PVE/RPCEnvironment.pm && \
@@ -419,6 +406,11 @@ RUN mkdir -p /usr/share/perl5/PVE && \
 RUN bash -c 'apt install -y --allow-downgrades -o Dpkg::Options::="--force-confnew" $(ls /deb/proxmox/${PACKAGE}/*.deb | grep -v -- "-dbgsym_\|api-perl")';
 
 ENV PACKAGE=pve-access-control
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN apt update; \
+    apt install -y \
+    libauthen-pam-perl \
+    libuuid-perl;
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 # now the deferred libpve-cluster-api-perl is cleanly installable
@@ -428,6 +420,22 @@ RUN apt install -y --allow-downgrades /deb/proxmox/pve-cluster/libpve-cluster-ap
 ENV PACKAGE=librados2-perl
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
+# pve-firewall runtime-depends on libpve-network-perl, while pve-network
+# build-depends on pve-firewall — but nothing in pve-network actually uses
+# PVE::Firewall, so that build-dep is stripped and pve-network is built first.
+ENV PACKAGE=pve-network
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN apt update; \
+    apt install -y \
+    libnet-subnet-perl \
+    libtest-differences-perl;
+RUN sed -i '/^Build-Depends/,/^[A-Z][A-Za-z-]*:/{/pve-firewall/d}' \
+      ./packages/${PACKAGE}/${PACKAGE}/debian/control && \
+    bash -c "./packages/build.sh --package ${PACKAGE}";
+# libpve-network-api-perl runtime-depends on pve-firewall, which does not
+# exist yet -- defer it (same pattern as libpve-cluster-api-perl above)
+RUN bash -c 'apt install -y --allow-downgrades -o Dpkg::Options::="--force-confnew" $(ls /deb/proxmox/${PACKAGE}/*.deb | grep -v -- "-dbgsym_\|api-perl")';
+
 ENV PACKAGE=pve-firewall
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN apt update; \
@@ -436,6 +444,8 @@ RUN apt update; \
     libnetfilter-log-dev;
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+# now the deferred libpve-network-api-perl is cleanly installable
+RUN apt install -y --allow-downgrades /deb/proxmox/pve-network/libpve-network-api-perl_*.deb;
 
 ENV PACKAGE=pve-storage
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
@@ -444,15 +454,6 @@ RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 ENV PACKAGE=pve-guest-common
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-RUN bash -c "./packages/install.sh --package ${PACKAGE}";
-
-ENV PACKAGE=pve-network
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN apt update; \
-    apt install -y \
-    libnet-subnet-perl \
-    libtest-differences-perl;
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
@@ -477,7 +478,8 @@ RUN apt update; \
     apt install -y \
     acpica-tools \
     gcc-x86-64-linux-gnu \
-    gcc-i686-linux-gnu \
+    gcc-multilib-x86-64-linux-gnu \
+    binutils-x86-64-linux-gnu \
     gcc-riscv64-linux-gnu \
     nasm \
     python3-virt-firmware \
@@ -487,10 +489,12 @@ RUN apt update; \
     mtools \
     bc;
 # arm64: the x86 firmware images are cross-compiled; upstream rules only set
-# toolchain prefixes for a build host that is amd64.
+# toolchain prefixes for a build host that is amd64. edk2's tools_def reads
+# the X64 and IA32 prefixes from the single GCC5_BIN env var (not from
+# GCC5_X64_PREFIX/GCC5_IA32_PREFIX), and the IA32 units compile with -m32,
+# hence the multilib cross-gcc.
 RUN sed -i \
-    -e '/AARCH64_PREFIX=aarch64-linux-gnu-/a export $(EDK2_TOOLCHAIN)_X64_PREFIX=x86_64-linux-gnu-' \
-    -e '/AARCH64_PREFIX=aarch64-linux-gnu-/a export $(EDK2_TOOLCHAIN)_IA32_PREFIX=i686-linux-gnu-' \
+    -e '/AARCH64_PREFIX=aarch64-linux-gnu-/a export GCC5_BIN=x86_64-linux-gnu-' \
     ./packages/${PACKAGE}/${PACKAGE}/debian/rules;
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
@@ -498,6 +502,8 @@ RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 ENV PACKAGE=qemu-server
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN sed -i '/pve-ha-manager <!nocheck>/d' ./packages/${PACKAGE}/${PACKAGE}/debian/control;
+# DEBUG probe (temporary): show the clean single-process Vnets.pm load error
+RUN perl -e 'use PVE::Network::SDN::Vnets; print "VNETS_OK\n";' 2>&1 | head -30; exit 1
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 
 # install the runtime-dependency triangle in one transaction
