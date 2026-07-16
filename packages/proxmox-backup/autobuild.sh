@@ -11,7 +11,14 @@ echo "This is $PKGNAME build scripts"
 . ../common.sh
 
 cd $SCRIPT_DIR/$PKGNAME
+rm -fr .git
+git init
 git config --global --add safe.directory $(pwd)
+git remote add origin https://git.proxmox.com/git/proxmox-backup && \
+git remote set-url --push origin https://git.proxmox.com/git/proxmox-backup && \
+git fetch origin && \
+git checkout -f master && \
+git pull origin master && \
 exec_build_make
 
 # Remove static deb

@@ -951,6 +951,8 @@ RUST_LIBS=(
 export CARGO=/usr/local/bin/cargo
 export RUSTC=/usr/local/bin/rustc
 
+rm -rf .git
+git init
 git config --global --add safe.directory $(pwd)
 
 # Update repos so rust can install dependencie libraries
