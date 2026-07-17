@@ -1,15 +1,9 @@
 [submodule "packages/zfsonlinux/zfsonlinux"]
   path = packages/zfsonlinux/zfsonlinux
   url = https://git.proxmox.com/git/zfsonlinux.git
-[submodule "packages/pve-container/pve-container"]
-  path = packages/pve-container/pve-container
-  url = https://github.com/jiangcuo/pve-container
 [submodule "packages/proxmox-archive-keyring/proxmox-archive-keyring"]
   path = packages/proxmox-archive-keyring/proxmox-archive-keyring
   url = https://git.proxmox.com/git/proxmox-archive-keyring.git
-[submodule "packages/pve-storage/pve-storage"]
-  path = packages/pve-storage/pve-storage
-  url = https://github.com/jiangcuo/pve-storage.git
 [submodule "packages/proxmox-mini-journalreader/proxmox-mini-journalreader"]
   path = packages/proxmox-mini-journalreader/proxmox-mini-journalreader
   url = https://git.proxmox.com/git/proxmox-mini-journalreader.git
@@ -31,9 +25,6 @@
 [submodule "packages/pve-xtermjs/pve-xtermjs"]
   path = packages/pve-xtermjs/pve-xtermjs
   url = https://git.proxmox.com/git/pve-xtermjs
-[submodule "packages/pve-access-control/pve-access-control"]
-  path = packages/pve-access-control/pve-access-control
-  url = https://github.com/jiangcuo/pve-access-control
 [submodule "packages/ifupdown2/ifupdown2"]
   path = packages/ifupdown2/ifupdown2
   url = https://git.proxmox.com/git/ifupdown2
@@ -250,3 +241,12 @@
 [submodule "packages/proxmox-kernel-helper/proxmox-kernel-helper"]
 	path = packages/proxmox-kernel-helper/proxmox-kernel-helper
 	url = https://git.proxmox.com/git/proxmox-kernel-helper.git
+[submodule "packages/pve-access-control/pve-access-control"]
+	path = packages/pve-access-control/pve-access-control
+	url = https://git.proxmox.com/git/pve-access-control.git
+[submodule "packages/pve-container/pve-container"]
+	path = packages/pve-container/pve-container
+	url = https://git.proxmox.com/git/pve-container.git
+[submodule "packages/pve-storage/pve-storage"]
+	path = packages/pve-storage/pve-storage
+	url = https://git.proxmox.com/git/pve-storage.git
