@@ -39,9 +39,20 @@ echo "This is $PKGNAME build scripts"
 SH_PATH=$(realpath "$0")
 SH_DIR=$(dirname $SH_PATH)
 
+rm -fr $SH_DIR/$PKGNAME/.git
+rm -fr $SH_DIR/$PKGNAME/qemu
+rm -fr $SH_DIR/$PKGNAME/qemu/roms/edk2
+cd $SH_DIR/$PKGNAME
+git init
 git config --global --add safe.directory $SH_DIR/$PKGNAME
+git config --global --add safe.directory $(pwd) && \
+git remote add origin https://git.proxmox.com/git/pve-qemu && \
+git remote set-url --push origin https://git.proxmox.com/git/pve-qemu && \
+git fetch origin && \
+git checkout -f master && \
+git submodule update --init --recursive && \
+git pull origin master && \
 git config --global --add safe.directory $SH_DIR/$PKGNAME/qemu
 git config --global --add safe.directory $SH_DIR/$PKGNAME/qemu/roms/edk2
-update_submodule
-cd $SH_DIR/$PKGNAME
+
 exec_build
