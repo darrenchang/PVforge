@@ -1,0 +1,17 @@
+diff --git a/src/PVE/Makefile b/src/PVE/Makefile
+index 0ccd2f8..3c6c31f 100644
+--- a/src/PVE/Makefile
++++ b/src/PVE/Makefile
+@@ -38,6 +38,12 @@ install: pvecm $(SOURCES) IPCC.so pvecm.1 pvecm.bash-completion pvecm.zsh-comple
+ Cluster/IPCConst.pm:
+ 	$(MAKE) -C Cluster IPCConst.pm
+ 
++# these generators load PVE::Cluster (via PVE::CLI::pvecm or
++# PVE::DataCenterConfig), which requires the compiled XS object and generated
++# constants; without this explicit ordering a parallel `make install` runs
++# them before IPCC.so exists
++generated/pvecm.1-synopsis.adoc generated/datacenter.cfg.5-opts.adoc pvecm.bash-completion pvecm.zsh-completion: IPCC.so Cluster/IPCConst.pm
++
+ check: IPCC.so Cluster/IPCConst.pm
+ 	perl $(PERL_DOC_INC) -T -e "use PVE::CLI::pvecm; PVE::CLI::pvecm->verify_api();"
+ 

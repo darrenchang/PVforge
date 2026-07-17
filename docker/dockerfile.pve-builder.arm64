@@ -385,13 +385,13 @@ RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 # PVE::RPCEnvironment; stage 2 builds pve-access-control normally.
 # =============================================================================
 ENV PACKAGE=pve-cluster
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN apt update; \
     apt install -y \
     libdigest-hmac-perl \
     librrds-perl \
     rrdcached \
     sqlite3;
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN mkdir -p /usr/share/perl5/PVE && \
     printf 'package PVE::RPCEnvironment;\nuse strict;\nuse warnings;\nuse base "PVE::RESTEnvironment";\nour $AUTOLOAD;\nsub AUTOLOAD { return; }\n1;\n' \
       > /usr/share/perl5/PVE/RPCEnvironment.pm && \
