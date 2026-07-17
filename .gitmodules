@@ -211,9 +211,6 @@
 [submodule "packages/pve-common/pve-common"]
 	path = packages/pve-common/pve-common
 	url = https://github.com/proxmox/pve-common.git
-[submodule "packages/pve-lxc-syscalld/pve-lxc-syscalled"]
-	path = packages/pve-lxc-syscalld/pve-lxc-syscalled
-	url = https://github.com/proxmox/pve-lxc-syscalld.git
 [submodule "packages/pve-installer/pve-installer"]
 	path = packages/pve-installer/pve-installer
 	url = https://github.com/proxmox/pve-installer.git
@@ -250,3 +247,6 @@
 [submodule "packages/pve-storage/pve-storage"]
 	path = packages/pve-storage/pve-storage
 	url = https://git.proxmox.com/git/pve-storage.git
+[submodule "packages/pve-lxc-syscalld/pve-lxc-syscalld"]
+	path = packages/pve-lxc-syscalld/pve-lxc-syscalld
+	url = https://git.proxmox.com/git/pve-lxc-syscalld.git
