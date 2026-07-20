@@ -250,3 +250,9 @@
 [submodule "packages/pve-lxc-syscalld/pve-lxc-syscalld"]
 	path = packages/pve-lxc-syscalld/pve-lxc-syscalld
 	url = https://git.proxmox.com/git/pve-lxc-syscalld.git
+[submodule "packages/proxmox-enterprise-support/proxmox-enterprise-support"]
+	path = packages/proxmox-enterprise-support/proxmox-enterprise-support
+	url = https://git.proxmox.com/git/proxmox-enterprise-support.git
+[submodule "packages/pve-yew-mobile-gui/pve-yew-mobile-gui"]
+	path = packages/pve-yew-mobile-gui/pve-yew-mobile-gui
+	url = https://git.proxmox.com/git/ui/pve-yew-mobile-gui.git

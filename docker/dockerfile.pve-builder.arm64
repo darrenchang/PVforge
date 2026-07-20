@@ -369,9 +369,9 @@ RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 # proxmox-ve is a metapackage; its install needs proxmox-default-kernel,
 # which is not built by this repo, so only build it.
-ENV PACKAGE=proxmox-ve
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# ENV PACKAGE=proxmox-ve
+# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 # RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 # =============================================================================
@@ -511,16 +511,27 @@ COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
+ENV PACKAGE=pve-yew-mobile-gui
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=proxmox-enterprise-support
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
 ENV PACKAGE=pve-manager
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN apt update; \
     apt install -y \
     libfile-readbackwards-perl \
-    libtemplate-perl;
+    libtemplate-perl \
+    dtach;
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 # pve-manager runtime-depends on pve-yew-mobile-gui and
 # proxmox-enterprise-support-keyring, which are not built by this repo yet;
 # force-install it and keep this the LAST apt/dpkg step in the image (the
 # unmet deps would make any later apt operation fail).
-RUN bash -c "./packages/install.sh --package ${PACKAGE} --force-install true";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
