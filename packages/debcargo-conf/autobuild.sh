@@ -946,6 +946,11 @@ RUST_LIBS=(
     "serial-test:serial_test:patches:notvendor"
     "cbindgen:cbindgen:patches:notvendor"
     "cbindgen-0.27:cbindgen 0.27:none:notvendor"
+    "pin-project-internal:pin-project-internal:none:notvendor"
+    "pin-project:pin-project:none:notvendor"
+    "gloo-utils:gloo-utils:none:notvendor"
+    "http-0.2:http 0.2:none:notvendor"
+    "gloo-net:gloo-net:none:vendor"
   )
 
 export CARGO=/usr/local/bin/cargo
