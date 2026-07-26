@@ -1,0 +1,22 @@
+--- grass.orig/Cargo.toml
++++ grass/Cargo.toml
+@@ -73,10 +73,6 @@
+ version = "=0.13.4"
+ default-features = false
+ 
+-[dependencies.include_sass]
+-version = "0.13.4"
+-optional = true
+-
+ [dependencies.wasm-bindgen]
+ version = "0.2"
+ optional = true
+@@ -93,8 +89,6 @@
+     "commandline",
+     "random",
+ ]
+-macro = ["include_sass"]
+-nightly = ["include_sass/nightly"]
+ random = ["grass_compiler/random"]
+ wasm-exports = [
+     "grass_compiler/wasm-exports",

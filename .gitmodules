@@ -256,3 +256,12 @@
 [submodule "packages/pve-yew-mobile-gui/pve-yew-mobile-gui"]
 	path = packages/pve-yew-mobile-gui/pve-yew-mobile-gui
 	url = https://git.proxmox.com/git/ui/pve-yew-mobile-gui.git
+[submodule "packages/proxmox-yew-widget-toolkit/proxmox-yew-widget-toolkit"]
+	path = packages/proxmox-yew-widget-toolkit/proxmox-yew-widget-toolkit
+	url = https://git.proxmox.com/git/ui/proxmox-yew-widget-toolkit.git
+[submodule "packages/proxmox-yew-comp/proxmox-yew-comp"]
+	path = packages/proxmox-yew-comp/proxmox-yew-comp
+	url = https://git.proxmox.com/git/ui/proxmox-yew-comp.git
+[submodule "packages/proxmox-wasm-builder/proxmox-wasm-builder"]
+	path = packages/proxmox-wasm-builder/proxmox-wasm-builder
+	url = https://git.proxmox.com/git/ui/proxmox-wasm-builder.git

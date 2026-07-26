@@ -13,4 +13,3 @@ rm -rf .git
 git init
 git config --global --add safe.directory $(pwd)
 exec_build_make
-

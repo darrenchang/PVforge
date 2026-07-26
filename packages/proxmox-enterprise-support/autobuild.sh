@@ -9,5 +9,10 @@ echo "This is $PKGNAME build scripts"
 
 cd $SCRIPT_DIR/$PKGNAME
 pwd
+rm -rf .git
+git init
+git config --global --add safe.directory $(pwd)
+# the keyring package lives in the support-keyring subdirectory
+cd support-keyring
 exec_build_make
 
