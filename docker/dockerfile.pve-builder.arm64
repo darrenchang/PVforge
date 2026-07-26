@@ -330,10 +330,15 @@ RUN apt update && \
     jq \
     libsgutils2-dev \
     texlive-fonts-extra \
-    xindy;
+    xindy \
+    libjs-mathjax \
+    qrencode \
+    openssh-server \
+    dmidecode \
+    pciutils;
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE} --force-install true";
 
 ENV PACKAGE=proxmox-backup-meta
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
@@ -511,27 +516,27 @@ COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
-# ENV PACKAGE=pve-yew-mobile-gui
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
-#
-# ENV PACKAGE=proxmox-enterprise-support
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
-#
-# ENV PACKAGE=pve-manager
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN apt update; \
-#     apt install -y \
-#     libfile-readbackwards-perl \
-#     libtemplate-perl \
-#     dtach;
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# # pve-manager runtime-depends on pve-yew-mobile-gui and
-# # proxmox-enterprise-support-keyring, which are not built by this repo yet;
-# # force-install it and keep this the LAST apt/dpkg step in the image (the
-# # unmet deps would make any later apt operation fail).
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
-#
+ENV PACKAGE=pve-yew-mobile-gui
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=proxmox-enterprise-support
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
+ENV PACKAGE=pve-manager
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN apt update; \
+    apt install -y \
+    libfile-readbackwards-perl \
+    libtemplate-perl \
+    dtach;
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
+# pve-manager runtime-depends on pve-yew-mobile-gui and
+# proxmox-enterprise-support-keyring, which are not built by this repo yet;
+# force-install it and keep this the LAST apt/dpkg step in the image (the
+# unmet deps would make any later apt operation fail).
+RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+
