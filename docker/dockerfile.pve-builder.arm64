@@ -527,17 +527,11 @@ RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
 # =============================================================================
-# yew GUI stack: extra rust libs (debcargo-conf-extra) + pwt/pwt-macros
-# (proxmox-yew-widget-toolkit) + proxmox-yew-comp + proxmox-wasm-builder are
-# build dependencies of pve-yew-mobile-gui. The extra rust libs are built
-# from a fresh copy of the debcargo-conf tree so the main (expensive)
-# debcargo-conf layer stays untouched.
+# yew GUI stack: pwt/pwt-macros (proxmox-yew-widget-toolkit) +
+# proxmox-yew-comp + proxmox-wasm-builder are build dependencies of
+# pve-yew-mobile-gui; their rust library dependencies are built by the
+# debcargo-conf step above.
 # =============================================================================
-ENV PACKAGE=debcargo-conf-extra
-COPY ./packages/debcargo-conf/ ./packages/debcargo-conf/
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-
 ENV PACKAGE=proxmox-yew-widget-toolkit
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
