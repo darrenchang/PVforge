@@ -26,9 +26,13 @@ for rust_lib in "${RUST_LIBS[@]}"; do
   ./build.sh ${rust_lib}
   mkdir -p /tmp/${PKGNAME}-temp
   mkdir -p /tmp/${PKGNAME}
+  # ./build is wiped for each lib, so keep a copy under the package dir where
+  # build.sh's deb collection (find + cp to /deb/proxmox/) can still see it.
+  mkdir -p $SCRIPT_DIR/deb
   for deb_pkg in $(find $(pwd)/build/ -name '*.deb'); do
     cp ${deb_pkg} "/tmp/${PKGNAME}-temp/"
     cp ${deb_pkg} "/tmp/${PKGNAME}/"
+    cp ${deb_pkg} "$SCRIPT_DIR/deb/"
   done
   apt install -y --allow-downgrades /tmp/${PKGNAME}-temp/*.deb --reinstall
   rm -rf /tmp/${PKGNAME}-temp
