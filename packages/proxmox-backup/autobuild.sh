@@ -19,6 +19,7 @@ git remote set-url --push origin https://git.proxmox.com/git/proxmox-backup && \
 git fetch origin && \
 git checkout -f master && \
 git pull origin master && \
+git checkout be67219cb && \
 exec_build_make
 
 # Remove static deb
