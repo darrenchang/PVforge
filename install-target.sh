@@ -45,6 +45,48 @@ if ! find "$DEB_DIR" -name '*.deb' | grep -q .; then
   exit 1
 fi
 
+# pmxcfs (pve-cluster) refuses to start when the hostname resolves only to a
+# loopback address, which is exactly what Debian's installer writes
+# (127.0.1.1). Map the hostname to the machine's real IP before installing so
+# the PVE services can start.
+configure_hosts() {
+  local hn cur ip
+  hn=$(hostname)
+  cur=$(getent hosts "$hn" 2>/dev/null | awk '{print $1; exit}')
+  case "$cur" in
+    127.*|::1|"") ;;
+    *)
+      echo "Hostname $hn resolves to $cur - /etc/hosts is fine."
+      return
+      ;;
+  esac
+
+  ip=$(ip -4 route get 1.1.1.1 2>/dev/null \
+    | awk '{for(i=1;i<=NF;i++) if($i=="src") {print $(i+1); exit}}')
+  [ -z "$ip" ] && ip=$(hostname -I 2>/dev/null | awk '{print $1}')
+  case "$ip" in
+    ''|127.*)
+      echo "WARNING: hostname $hn resolves to '$cur' and no usable IP was found." >&2
+      echo "WARNING: pve-cluster (pmxcfs) will not start until /etc/hosts maps $hn to a real IP." >&2
+      return
+      ;;
+  esac
+
+  cp -a /etc/hosts /etc/hosts.pxvirt-bak
+  # rewrite in place (no rename) so this also works where /etc/hosts is a
+  # bind mount, e.g. in containers
+  local content
+  if grep -qE '^127\.0\.1\.1[[:space:]]' /etc/hosts; then
+    content=$(sed "s/^127\.0\.1\.1[[:space:]].*/$ip\t$hn/" /etc/hosts)
+  else
+    content=$(cat /etc/hosts; printf '%s\t%s' "$ip" "$hn")
+  fi
+  printf '%s\n' "$content" > /etc/hosts
+  echo "Mapped hostname $hn to $ip in /etc/hosts (backup: /etc/hosts.pxvirt-bak)"
+  echo "so pve-cluster (pmxcfs) can start. If this address is a plain DHCP"
+  echo "lease, give the machine a static IP or DHCP reservation."
+}
+
 configure_network() {
   if dpkg -s network-manager >/dev/null 2>&1; then
     echo "NetworkManager is installed - leaving network configuration to it."
@@ -100,7 +142,13 @@ configure_network() {
 mapfile -t DEBS < <(find "$DEB_DIR" -name '*.deb' \
   | grep -v -- '-dbgsym_\|zfs-dracut_\|zfs-test_\|proxmox-backup-client-static_\|-build-deps_\|/librust-\|proxmox-wasm-builder_\|/pve-installer/')
 
+configure_hosts
+
 apt update
-apt install -y --allow-downgrades -o Dpkg::Options::="--force-confnew" "${DEBS[@]}"
+# polkitd (from the Debian repos) ships /usr/bin/pkttyagent, which systemctl
+# and the PVE services expect to exist; desktop installs have it via
+# NetworkManager, but fresh minimal/server systems do not, and pve-manager
+# does not declare the dependency.
+apt install -y --allow-downgrades -o Dpkg::Options::="--force-confnew" "${DEBS[@]}" polkitd
 
 configure_network
