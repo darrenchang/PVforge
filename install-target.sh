@@ -1,7 +1,11 @@
 #!/bin/bash
-# Install the built Proxmox debs on a (clean) arm64 Debian machine.
+# Install the built Proxmox debs on a (clean) arm64 Debian machine and set up
+# everything a Proxmox VE node needs (proxmox-ve meta package, /etc/hosts,
+# polkitd, network config).
 #
-# Usage: ./install-target.sh <dir with the debs copied from the image's /deb/proxmox/>
+# build_pve.sh ships this script as ./target/install.sh next to the debs;
+# there it runs without arguments. It can also be pointed at a deb tree:
+#   ./install-target.sh <dir with the debs copied from the image's /deb/proxmox/>
 #
 # The full deb tree is not co-installable as-is, so a few packages are
 # skipped, mirroring packages/install.sh used inside the builder image:
@@ -25,6 +29,9 @@
 #                                 be installed on a running system — its
 #                                 rdnssd dependency Conflicts with
 #                                 network-manager, killing desktop networking
+#   pve-headers                   transitional package depending on
+#                                 proxmox-default-headers, which this arm64
+#                                 port does not build
 #
 # After installing, the script makes sure the machine keeps a working network
 # configuration:
@@ -38,7 +45,7 @@
 #     with 'systemctl restart networking'.
 set -e
 
-DEB_DIR=$(realpath "${1:-.}")
+DEB_DIR=$(realpath "${1:-$(dirname "$0")}")
 
 if ! find "$DEB_DIR" -name '*.deb' | grep -q .; then
   echo "No .deb files found under $DEB_DIR" >&2
@@ -140,7 +147,7 @@ configure_network() {
 }
 
 mapfile -t DEBS < <(find "$DEB_DIR" -name '*.deb' \
-  | grep -v -- '-dbgsym_\|zfs-dracut_\|zfs-test_\|proxmox-backup-client-static_\|-build-deps_\|/librust-\|proxmox-wasm-builder_\|/pve-installer/')
+  | grep -v -- '-dbgsym_\|zfs-dracut_\|zfs-test_\|proxmox-backup-client-static_\|-build-deps_\|/librust-\|proxmox-wasm-builder_\|/pve-installer/\|/pve-headers_')
 
 configure_hosts
 

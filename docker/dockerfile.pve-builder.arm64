@@ -378,12 +378,8 @@ COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
-# proxmox-ve is a metapackage; its install needs proxmox-default-kernel,
-# which is not built by this repo, so only build it.
-# ENV PACKAGE=proxmox-ve
-# COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-# RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-# RUN bash -c "./packages/install.sh --package ${PACKAGE}";
+# proxmox-ve (metapackage) is built at the end of this file, after all of its
+# runtime dependencies; its autobuild.sh drops the proxmox-default-kernel dep.
 
 # =============================================================================
 # Bootstrap: pve-cluster <-> pve-access-control build-dependency cycle.
@@ -576,3 +572,11 @@ RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 # proxmox-enterprise-support-keyring, both built above.
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
+# proxmox-ve is the "everything needed" metapackage. Its autobuild.sh drops
+# the proxmox-default-kernel dependency (no Proxmox kernel is built for this
+# arm64 port; the host distro provides one). Build only: installing it
+# in-image would fail on the transitional pve-headers package, which depends
+# on the unbuilt proxmox-default-headers.
+ENV PACKAGE=proxmox-ve
+COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
+RUN bash -c "./packages/build.sh --package ${PACKAGE}";
