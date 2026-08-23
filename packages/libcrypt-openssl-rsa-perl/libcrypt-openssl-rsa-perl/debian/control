@@ -1,0 +1,37 @@
+Source: libcrypt-openssl-rsa-perl
+Maintainer: Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>
+Uploaders: Damyan Ivanov <dmn@debian.org>,
+           Salvatore Bonaccorso <carnil@debian.org>
+Section: perl
+Testsuite: autopkgtest-pkg-perl
+Priority: optional
+Build-Depends: debhelper-compat (= 13),
+               dh-sequence-perl-openssl,
+               libcrypt-openssl-bignum-perl <!nocheck>,
+               libcrypt-openssl-guess-perl,
+               libcrypt-openssl-random-perl <!nocheck>,
+               libssl-dev,
+               perl-openssl-defaults,
+               perl-xs-dev,
+               perl:native
+Standards-Version: 4.7.2
+Vcs-Browser: https://salsa.debian.org/perl-team/modules/packages/libcrypt-openssl-rsa-perl
+Vcs-Git: https://salsa.debian.org/perl-team/modules/packages/libcrypt-openssl-rsa-perl.git
+Homepage: https://metacpan.org/release/Crypt-OpenSSL-RSA
+Rules-Requires-Root: no
+
+Package: libcrypt-openssl-rsa-perl
+Architecture: any
+Multi-Arch: same
+Depends: ${misc:Depends},
+         ${perl:Depends},
+         ${shlibs:Depends},
+         libcrypt-openssl-bignum-perl,
+         libcrypt-openssl-random-perl
+Description: module for RSA encryption using OpenSSL
+ Crypt::OpenSSL::RSA is a Perl module that provides glue to the RSA functions
+ in the OpenSSL library. It provides the following functionalities: create a
+ key from a string, make a new key, save key to a string, save public portion
+ of key to a string using format compatible with OpenSSL's command-line rsa
+ tool, encrypt, decrypt, sign, verify, return the size in bytes of a key,
+ check the validity of a key.

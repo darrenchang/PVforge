@@ -1,0 +1,66 @@
+Description: fix sign/verify padding handling with OpenSSL 3.x
+ Two problems, mirroring Proxmox's 0.35-1.1 rebuild of this package:
+ .
+ 1. Upstream 0.35 made use_pkcs1_padding() croak to mitigate the Marvin
+    attack (CVE-2024-2467). The Marvin attack only concerns PKCS#1 v1.5
+    *decryption*; signatures are unaffected, and callers (e.g. Proxmox VE
+    ticket signing) legitimately use PKCS#1 v1.5 signatures. Revert to
+    setting the padding mode.
+ .
+ 2. sign() and verify() passed the object's padding mode (default:
+    RSA_PKCS1_OAEP_PADDING, an encryption-only mode) to
+    EVP_PKEY_CTX_set_rsa_padding() on a signature context and ignored the
+    failure. The failed call leaves "illegal or unsupported padding mode"
+    on OpenSSL's thread-local error queue even though the operation then
+    succeeds with the default PKCS#1 v1.5 padding. Long-lived callers that
+    share the error queue with TLS (Proxmox VE's pveproxy) then abort TLS
+    connections on the stale error: ISO/file uploads larger than one TLS
+    record died with "problem with client ... illegal or unsupported
+    padding mode". Only pass padding modes that are actually valid for
+    signatures, and check the result instead of ignoring it.
+Author: pxvirt
+Bug: https://github.com/SaumonNet/proxmox-nixos/issues/217
+Forwarded: not-needed
+--- a/RSA.xs
++++ b/RSA.xs
+@@ -922,7 +922,7 @@ void
+ use_pkcs1_padding(p_rsa)
+     rsaData* p_rsa;
+   CODE:
+-    croak("PKCS#1 1.5 is disabled as it is known to be vulnerable to marvin attacks.");
++    p_rsa->padding = RSA_PKCS1_PADDING;
+
+ void
+ use_pkcs1_oaep_padding(p_rsa)
+@@ -967,8 +967,13 @@ CODE:
+     ctx = EVP_PKEY_CTX_new(p_rsa->rsa, NULL /* no engine */);
+     CHECK_OPEN_SSL(ctx);
+     CHECK_OPEN_SSL(EVP_PKEY_sign_init(ctx));
+-    /* FIXME: Issue setting padding in some cases */
+-    EVP_PKEY_CTX_set_rsa_padding(ctx, p_rsa->padding);
++    /* Only pass on padding modes valid for signatures; passing e.g. the
++     * default OAEP mode fails and pollutes the OpenSSL error queue. */
++    if (p_rsa->padding == RSA_PKCS1_PADDING ||
++        p_rsa->padding == RSA_PKCS1_PSS_PADDING ||
++        p_rsa->padding == RSA_NO_PADDING) {
++        CHECK_OPEN_SSL(EVP_PKEY_CTX_set_rsa_padding(ctx, p_rsa->padding) > 0);
++    }
+
+     EVP_MD* md = get_md_bynid(p_rsa->hashMode);
+     CHECK_OPEN_SSL(md != NULL);
+@@ -1024,8 +1029,13 @@ PPCODE:
+     ctx = EVP_PKEY_CTX_new(p_rsa->rsa, NULL /* no engine */);
+     CHECK_OPEN_SSL(ctx);
+     CHECK_OPEN_SSL(EVP_PKEY_verify_init(ctx) == 1);
+-    /* FIXME: Issue setting padding in some cases */
+-    EVP_PKEY_CTX_set_rsa_padding(ctx, p_rsa->padding);
++    /* Only pass on padding modes valid for signatures; passing e.g. the
++     * default OAEP mode fails and pollutes the OpenSSL error queue. */
++    if (p_rsa->padding == RSA_PKCS1_PADDING ||
++        p_rsa->padding == RSA_PKCS1_PSS_PADDING ||
++        p_rsa->padding == RSA_NO_PADDING) {
++        CHECK_OPEN_SSL(EVP_PKEY_CTX_set_rsa_padding(ctx, p_rsa->padding) > 0);
++    }
+
+     EVP_MD* md = get_md_bynid(p_rsa->hashMode);
+     CHECK_OPEN_SSL(md != NULL);

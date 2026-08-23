@@ -22,18 +22,18 @@ docker rm "$CID" >/dev/null
 # the shipped set (zfs-dracut, proxmox-backup-client-static), the
 # transitional pve-headers (needs the unbuilt proxmox-default-headers), the
 # zfs test suite, and the ISO installer environment.
-find target \( \
-  -name '*-dbgsym_*.deb' -o \
-  -name '*-build-deps_*.deb' -o \
-  -name 'librust-*.deb' -o \
-  -name 'proxmox-wasm-builder_*.deb' -o \
-  -name 'zfs-dracut_*.deb' -o \
-  -name 'zfs-test_*.deb' -o \
-  -name 'proxmox-backup-client-static_*.deb' -o \
-  -name 'pve-headers_*.deb' \
-  \) -delete
-rm -rf target/pve-installer
-find target -type d -empty -delete
+# find target \( \
+#   -name '*-dbgsym_*.deb' -o \
+#   -name '*-build-deps_*.deb' -o \
+#   -name 'librust-*.deb' -o \
+#   -name 'proxmox-wasm-builder_*.deb' -o \
+#   -name 'zfs-dracut_*.deb' -o \
+#   -name 'zfs-test_*.deb' -o \
+#   -name 'proxmox-backup-client-static_*.deb' -o \
+#   -name 'pve-headers_*.deb' \
+#   \) -delete
+# rm -rf target/pve-installer
+# find target -type d -empty -delete
 
 cp install-target.sh target/install.sh
 

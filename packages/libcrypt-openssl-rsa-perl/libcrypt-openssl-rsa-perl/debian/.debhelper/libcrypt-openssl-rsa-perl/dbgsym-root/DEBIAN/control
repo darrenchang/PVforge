@@ -1,0 +1,13 @@
+Package: libcrypt-openssl-rsa-perl-dbgsym
+Source: libcrypt-openssl-rsa-perl
+Version: 0.35-1.1+pxvirt1
+Auto-Built-Package: debug-symbols
+Architecture: arm64
+Maintainer: Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>
+Installed-Size: 74
+Depends: libcrypt-openssl-rsa-perl (= 0.35-1.1+pxvirt1)
+Section: debug
+Priority: optional
+Multi-Arch: same
+Description: debug symbols for libcrypt-openssl-rsa-perl
+Build-Ids: 5ab778b9cd3f07438d12b7d093345af636106ccb
