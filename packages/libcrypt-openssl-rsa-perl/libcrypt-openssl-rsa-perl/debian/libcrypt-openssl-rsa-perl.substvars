@@ -1,4 +1,0 @@
-perl:Depends=perl (>= 5.40.1-6), perl-openssl-abi-3, perlapi-5.40.1
-shlibs:Depends=libc6 (>= 2.17), libssl3t64 (>= 3.0.0)
-misc:Depends=
-misc:Pre-Depends=

@@ -82,15 +82,6 @@ COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";
 RUN bash -c "./packages/install.sh --package ${PACKAGE}";
 
-# Debian trixie's 0.35-1 leaves a stale "illegal or unsupported padding
-# mode" error on the OpenSSL error queue during ticket verification, which
-# makes pveproxy abort TLS connections on uploads >16KB (ISO upload
-# failure). Rebuild with the same fixes as Proxmox's own 0.35-1.1.
-ENV PACKAGE=libcrypt-openssl-rsa-perl
-COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
-RUN bash -c "./packages/build.sh --package ${PACKAGE}";
-RUN bash -c "./packages/install.sh --package ${PACKAGE}";
-
 ENV PACKAGE=libjs-qrcodejs
 COPY ./packages/${PACKAGE}/ ./packages/${PACKAGE}/
 RUN bash -c "./packages/build.sh --package ${PACKAGE}";

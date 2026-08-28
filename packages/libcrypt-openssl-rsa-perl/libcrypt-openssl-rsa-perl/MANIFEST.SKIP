@@ -1,8 +1,0 @@
-\.perltidyrc
-cpanfile
-^MANIFEST.bak
-^Makefile$
-^.github/
-^.git/
-^MYMETA.*
-^.gitignore
