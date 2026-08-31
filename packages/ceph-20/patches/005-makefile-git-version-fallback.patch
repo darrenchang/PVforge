@@ -1,0 +1,22 @@
+Description: fall back to the recorded upstream commit when git is unavailable
+ In the pxvirt Docker build the ceph packaging repo is a git submodule whose
+ .git is a gitfile pointing into the parent repository, which is not part of
+ the build context. `git rev-parse HEAD` therefore prints nothing, the
+ Makefile writes an empty first line into src/.git_version and every binary
+ reports "ceph version 20.2.1 () tentacle". Proxmox VE's parser
+ (PVE::Ceph::Tools::parse_ceph_version) requires a commit hash inside the
+ parentheses; with the empty one, get_local_version() returns undef and the
+ GUI/API refuse to set up Ceph with "Ceph Nautilus required - please run
+ 'pveceph install'". Use the commit recorded in ceph/src/.git_version instead.
+Author: pxvirt
+--- a/Makefile
++++ b/Makefile
+@@ -9,7 +9,7 @@ SRCDIR=ceph
+ BUILDSRC=${SRCDIR}-${VER}
+ 
+ ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
+-GITVERSION:=$(shell git rev-parse HEAD)
++GITVERSION:=$(shell git rev-parse HEAD 2>/dev/null || head -n1 ${SRCDIR}/src/.git_version)
+ 
+ DBG_DEBS=ceph-common-dbg_${PKGVER}_${ARCH}.deb \
+ ceph-fuse-dbg_${PKGVER}_${ARCH}.deb \

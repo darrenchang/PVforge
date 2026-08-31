@@ -15,7 +15,15 @@ if [ "$arch" == "loongarch64" ];then
 	done
 elif [ "$arch" == "aarch64" ]; then
 	patch -p1 -d "$SCRIPT_DIR/$PKGNAME" < "$SCRIPT_DIR/patches/002-remove-lintian.patch"
+	# GCC 14 stack-clash probe loop CFI bug -> SIGILL of ceph-mon/osd/mgr/mds
+	# on FPAC CPUs; see the patch header.
+	patch -p1 -d "$SCRIPT_DIR/$PKGNAME" < "$SCRIPT_DIR/patches/006-rules-arm64-no-stack-clash-protection.patch"
 fi
+# The packaging repo is a submodule whose .git is a gitfile into the parent
+# repo, which is not in the Docker build context: 'git rev-parse HEAD' fails
+# and the binaries report "ceph version 20.2.1 ()", which PVE rejects as
+# "Ceph Nautilus required". Fall back to the recorded upstream commit.
+patch -p1 -d "$SCRIPT_DIR/$PKGNAME" < "$SCRIPT_DIR/patches/005-makefile-git-version-fallback.patch"
 apt update
 apt install usr-is-merged usrmerge -y
 yes |mk-build-deps --install --remov

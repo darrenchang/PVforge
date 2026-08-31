@@ -1,0 +1,29 @@
+Description: arm64: build without -fstack-clash-protection
+ GCC 14 emits wrong CFI for the stack-clash probing loop it generates for
+ very large stack frames: the CFA rules after the loop miss the size of the
+ callee-save push (96 bytes for get_global_options() in libceph-common,
+ whose frame is ~750 KiB). Unwinding through such a frame then reads the
+ wrong return-address slot and uses the wrong PAC modifier. On CPUs with
+ FEAT_FPAC (Cortex-A520/A720, ...) the libgcc unwinder faults with SIGILL
+ ("autia1716") - tcmalloc's allocation-sampling stack trace hits it during
+ static initialisation, so ceph-mon, ceph-osd, ceph-mgr and ceph-mds die
+ with exit code 132 even for --version. Dropping stack clash protection
+ removes the probe loop and yields correct CFI, keeping -mbranch-protection.
+Author: pxvirt
+--- a/ceph/debian/rules
++++ b/ceph/debian/rules
+@@ -3,6 +3,14 @@
+ export DH_VERBOSE=1
+ export DESTDIR=$(CURDIR)/debian/tmp
+ 
++# pxvirt: GCC 14 generates wrong CFI for the stack-clash probing loop of very
++# large frames (get_global_options() has a ~750 KiB frame). On FPAC-capable
++# arm64 CPUs the libgcc unwinder then SIGILLs while authenticating the return
++# address, killing ceph-mon/osd/mgr/mds at startup. Must be set before
++# default.mk (buildflags.mk) is included.
++ifeq ($(shell dpkg-architecture -qDEB_HOST_ARCH),arm64)
++  export DEB_BUILD_MAINT_OPTIONS = hardening=-stackclash
++endif
+ include /usr/share/dpkg/default.mk
+ 
+ ifneq (,$(findstring WITH_STATIC_LIBSTDCXX,$(CEPH_EXTRA_CMAKE_ARGS)))
