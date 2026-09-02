@@ -9,14 +9,14 @@ Description: arm64: build without -fstack-clash-protection
  static initialisation, so ceph-mon, ceph-osd, ceph-mgr and ceph-mds die
  with exit code 132 even for --version. Dropping stack clash protection
  removes the probe loop and yields correct CFI, keeping -mbranch-protection.
-Author: pxvirt
+Author: VEforge
 --- a/ceph/debian/rules
 +++ b/ceph/debian/rules
 @@ -3,6 +3,14 @@
  export DH_VERBOSE=1
  export DESTDIR=$(CURDIR)/debian/tmp
  
-+# pxvirt: GCC 14 generates wrong CFI for the stack-clash probing loop of very
++# VEforge: GCC 14 generates wrong CFI for the stack-clash probing loop of very
 +# large frames (get_global_options() has a ~750 KiB frame). On FPAC-capable
 +# arm64 CPUs the libgcc unwinder then SIGILLs while authenticating the return
 +# address, killing ceph-mon/osd/mgr/mds at startup. Must be set before

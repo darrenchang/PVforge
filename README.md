@@ -1,85 +1,160 @@
-# PXVIRT (Formerly Proxmox-Port)
+# VEforge — a build system for Proxmox VE
 
-A fork of Proxmox VE for ARM and LoongArch architectures
-AGPL-3.0 Licensed | Community-Driven Project
+VEforge takes the source code from [Proxmox](https://git.proxmox.com/) and
+compiles the complete Proxmox VE stack for **arm64** machines running
+**Debian 13 (trixie)** — including **Ceph** (20.x "Tentacle"), **Proxmox
+Backup Server**, and **pve-manager** (the web UI), plus everything they
+depend on (pve-cluster/pmxcfs, qemu-server, pve-container/LXC, pve-firewall,
+pve-network/SDN, pve-ha-manager, ifupdown2, ZFS, the Rust and yew GUI
+stacks, …). In total ~96 source packages are built inside a Docker buildx
+pipeline and collected into a ready-to-install `./target/` folder.
 
-## NOTE!
+Upstream Proxmox only ships amd64 packages; this project rebuilds them
+(with a small set of arm64/bootstrapping patches under `packages/`) so the
+full PVE experience runs on arm64 boards and servers. No Proxmox kernel is
+built — the stack runs on Debian's stock arm64 kernel.
 
-The project has received some donations, but these donations (please refer to the donation list in SUPPORT.md) are not sufficient to cover our expenses on warehouse servers, compilation servers, and other related costs. Therefore, we will stop the distribution of pveport's deb files and ISO images to free up more space for PXVIRT.
+## Requirements
 
-The original Proxmox-Port repository will be cancelled.
-If you want to get updates, please visit docs.pxvirt.lierfang.com to get the latest documentation information!
+- **Build host:** an arm64 Linux machine with Docker + buildx, plenty of
+  CPU/RAM, and >100 GB free disk. A full build takes several hours (Ceph
+  alone is a big chunk); subsequent builds reuse the Docker layer cache.
+- **Target machine:** a fresh arm64 **Debian 13** installation (netinst is
+  fine). 4 GB RAM is enough for the base stack.
 
-[English docs](https://docs.pxvirt.lierfang.com/en/README.html) | [中文文档](https://docs.pxvirt.lierfang.com/zh/README.html)
+## Building
 
-## Community
+1. Clone the repository and all submodules:
 
-- Discord: [https://discord.gg/cYZEpUx5QJ](https://discord.gg/cYZEpUx5QJ)
+   ```bash
+   git clone https://github.com/darrenchang/veforge.git
+   cd veforge
+   git submodule update --init --recursive
+   ```
 
-- QQ 群组: 102166071/904754537/940488655/750937440
+2. Build all `.deb` packages:
 
-## 📖 Overview
+   ```bash
+   ./build_pve.sh 2>&1 | tee log.txt
+   ```
 
-PXVIRT is an open-source virtualization platform derived from Proxmox VE, specifically adapted to support ARM and LoongArch architectures. This project originally began as "Proxmox-Port" and has now evolved into a fully independent fork under the new name PXVIRT.
+   When the build finishes, `./target/` holds every installable deb plus
+   `install.sh`.
 
-## 🚀 Why PXVIRT?
+   To rebuild a single package inside a running builder container, see
+   `quick-run.sh`.
 
-###  Historical Context
+## Installing on a target machine
 
-Original Mission: The project started as "Proxmox-Port" to port Proxmox VE to non-x86 architectures.
-Rebranding: Due to trademark restrictions ("Proxmox" is a registered trademark of Proxmox Server Solutions GmbH), we renamed the project to PXVIRT to comply with legal requirements while preserving its core purpose.
+Copy the `target/` folder to the arm64 Debian 13 machine and run:
 
+```bash
+sudo ./install.sh
+```
 
-### Technical Value
+The script installs the whole Proxmox VE stack (including the `proxmox-ve`
+meta package) and takes care of the pitfalls of a fresh Debian install:
 
-- 🖥️ Multi-Arch Support: Brings Proxmox VE's powerful virtualization tools to ARM64 and LoongArch platforms. We also provide x86 versions of the software to achieve compatibility among three different architectures within the same cluster.
+- rewrites the Debian-installer `127.0.1.1` `/etc/hosts` entry to the
+  machine's real IP so pve-cluster (pmxcfs) can start;
+- installs `polkitd` (needed by the PVE services, missing on minimal
+  installs);
+- rewrites `allow-hotplug` interfaces to `auto` (ifupdown2, which replaces
+  ifupdown, ignores `allow-hotplug` at boot);
+- converts a DHCP-configured default interface into a PVE-style `vmbr0`
+  bridge with the current address pinned statically (machines managed by
+  NetworkManager or systemd-networkd are left alone);
+- removes the stale `/etc/network/interfaces.new` snapshot left by the
+  ifupdown2 postinst, which `pvenetcommit.service` would otherwise install
+  over the network config on the next boot.
 
-- 🔄 Upstream Sync: Maintains compatibility with Proxmox VE upstream features while adding architecture-specific optimizations.
+Non-co-installable or build-only packages (`zfs-dracut`,
+`proxmox-backup-client-static`, the ISO installer environment, `librust-*`
+dev packages, …) are excluded automatically.
 
-- 📜 License Compliance: Fully open-source under AGPLv3, respecting upstream licensing terms.
+Reboot when the install finishes, then open the web UI at
+`https://<machine-ip>:8006` (login `root@pam` with the system root
+password). If the machine's IP came from a plain DHCP lease, give it a
+static lease/reservation — the address is now pinned in
+`/etc/network/interfaces` and `/etc/hosts`.
 
-- 🔄 Migration Notice: Proxmox-Port → PXVIRT
+## Notes and known quirks
 
+### Containers and VMs
 
-Proxmox-Port is now deprecated and will no longer receive updates.
-All future development will focus on PXVIRT. Users are strongly advised to:
+- LXC containers need **arm64 templates**. The stock template list is
+  mostly amd64; `pveam available | grep arm64` lists usable ones (e.g.
+  `debian-13-standard_*_arm64.tar.zst`). An amd64 template fails at start
+  with `Exec format error`.
+- KVM acceleration requires bare metal (or a host CPU/kernel with arm64
+  nested virtualization, which most boards do not have). Inside a VM,
+  create guests with `qm set <vmid> --kvm 0` (software emulation).
 
-Migrate to PXVIRT for continued support
-Benefit from upstream feature synchronization
-Receive ARM/LoongArch-specific improvements
+### Mounting CephFS with a kernel older than Linux 7.0
 
-###  🛠️ Features
+Ceph Tentacle generates the new **AES-256 (aes256k)** cephx keys by
+default. The in-kernel CephFS client only learned this key type in
+**Linux 7.0** — on older kernels (Debian 13 ships 6.12) a kernel mount
+fails with `libceph: secret too big 32`. If you want to mount CephFS
+there, use a legacy **AES-128** key for the mount client.
 
-Full virtualization stack for ARM/LoongArch servers
-Web-based management interface
-Container and KVM virtualization support
-Storage management integration
-Network configuration tools
-Note: Features are inherited from Proxmox VE and extended for target architectures.
+One-time setup on the Ceph cluster — allow the legacy cipher and create a
+dedicated client key (keep `aes256k` as the preferred cipher for
+everything else):
 
-### Roadmap
+```bash
+ceph mon set auth_allowed_ciphers aes,aes256k
+ceph config set mon mon_auth_allow_insecure_key true
+ceph auth get-or-create client.cephfs-legacy \
+    mon 'allow r' mds 'allow rw fsname=cephfs' osd 'allow rw tag cephfs data=cephfs' \
+    --key-type aes
+ceph config set mon mon_auth_allow_insecure_key false
+```
 
-- Easy DPDK
-- Datacenter Manager 
-- Integrate more hardware tools, such as IPMI, StorCLI, etc., and provide access interfaces.
-- Integrate more system management tools, such as automatic diagnosis, SAN management, SR-IOV management, VIP, etc.
+Then add the storage. `--keyring` is required — without it PVE silently
+uses the admin key (which is aes256k) no matter which `--username` you
+pass:
 
-## ⚙️ Installation & Documentation
-For installation instructions and documentation, please refer to:
-[PXVIRT Documentation](https://docs.pxvirt.lierfang.com)
+```bash
+ceph auth print-key client.cephfs-legacy > /root/cephfs-legacy.secret
+pvesm add cephfs ceph-fs --monhost 192.168.102.30 --content iso \
+    --username cephfs-legacy --keyring /root/cephfs-legacy.secret; \
+rm /root/cephfs-legacy.secret
+```
 
-If you would like to build your own packages, please refer to:
-[Build.md](./BUILD.md)
+Replace the IP with your own Ceph monitor address.
 
-## ⚖️ Legal Disclaimer
+Alternatives: add `--fuse 1` to mount via `ceph-fuse` (userspace, supports
+aes256k, somewhat slower), or run a ≥ 7.0 kernel and skip all of this.
+RBD storages with `krbd 0` (the default) are unaffected. The same applies
+to `krbd 1`, which uses the kernel client too.
 
-- PXVIRT is not affiliated with Proxmox Server Solutions GmbH
-- Proxmox® is a registered trademark of Proxmox Server Solutions GmbH
-- Original Proxmox VE code is licensed under AGPLv3
-- PXVIRT exists to expand virtualization accessibility, not replace Proxmox VE. Consider supporting both projects where appropriate.
+## Repository layout
 
-## 💰 Support & Donation
+| Path | Purpose |
+| --- | --- |
+| `build_pve.sh` | one-shot build: buildx bake + assemble `./target/` |
+| `docker-bake.hcl`, `docker/` | builder images (`builder-base`, `pve-builder`) |
+| `packages/<name>/` | one directory per source package: upstream source as a git submodule plus `autobuild.sh` and arm64 patches |
+| `packages/deptree.mmd` | build-order dependency notes |
+| `install-target.sh` | shipped as `target/install.sh` |
+| `quick-run.sh` | rebuild a single package in a running builder container |
 
-For commercial support services and donation information, please see:
+## License
 
-📄 **[Support & Commercial Services](./SUPPORT.md)**
+AGPL-3.0 (see `LICENSE`), matching the upstream Proxmox sources this
+project builds.
+
+## Origins and credits
+
+This project is a fork of [jiangcuo/pxvirt](https://github.com/jiangcuo/pxvirt)
+by jiangcuo and the Lierfang Support Team, which pioneered porting Proxmox VE
+to non-amd64 architectures (arm64 and loong64) and provides the foundation of
+the packaging and patch tree used here. This fork builds on that work with its
+own Docker buildx pipeline, the `./target/` + `install.sh` install flow, and
+additional arm64 fixes. Both projects ultimately build the AGPL-licensed
+sources published by [Proxmox](https://git.proxmox.com/).
+
+This fork is an independent community project: it is not affiliated with or
+endorsed by Proxmox Server Solutions GmbH, and it does not provide the
+commercial support offered by the upstream PXVIRT project.

@@ -1,5 +1,5 @@
 Description: fall back to the recorded upstream commit when git is unavailable
- In the pxvirt Docker build the ceph packaging repo is a git submodule whose
+ In the VEforge Docker build the ceph packaging repo is a git submodule whose
  .git is a gitfile pointing into the parent repository, which is not part of
  the build context. `git rev-parse HEAD` therefore prints nothing, the
  Makefile writes an empty first line into src/.git_version and every binary
@@ -8,7 +8,7 @@ Description: fall back to the recorded upstream commit when git is unavailable
  parentheses; with the empty one, get_local_version() returns undef and the
  GUI/API refuse to set up Ceph with "Ceph Nautilus required - please run
  'pveceph install'". Use the commit recorded in ceph/src/.git_version instead.
-Author: pxvirt
+Author: VEforge
 --- a/Makefile
 +++ b/Makefile
 @@ -9,7 +9,7 @@ SRCDIR=ceph

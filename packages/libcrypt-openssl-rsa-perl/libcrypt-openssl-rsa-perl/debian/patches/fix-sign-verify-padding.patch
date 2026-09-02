@@ -18,7 +18,7 @@ Description: fix sign/verify padding handling with OpenSSL 3.x
     record died with "problem with client ... illegal or unsupported
     padding mode". Only pass padding modes that are actually valid for
     signatures, and check the result instead of ignoring it.
-Author: pxvirt
+Author: VEforge
 Bug: https://github.com/SaumonNet/proxmox-nixos/issues/217
 Forwarded: not-needed
 --- a/RSA.xs

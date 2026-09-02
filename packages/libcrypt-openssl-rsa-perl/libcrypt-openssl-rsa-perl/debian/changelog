@@ -1,4 +1,4 @@
-libcrypt-openssl-rsa-perl (0.35-1.1+pxvirt1) unstable; urgency=medium
+libcrypt-openssl-rsa-perl (0.35-1.1+veforge1) unstable; urgency=medium
 
   * Re-enable PKCS#1 v1.5 padding for signatures (revert upstream's
     blanket croak; the Marvin attack only affects decryption).

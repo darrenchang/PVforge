@@ -98,7 +98,7 @@ configure_hosts() {
       ;;
   esac
 
-  cp -a /etc/hosts /etc/hosts.pxvirt-bak
+  cp -a /etc/hosts /etc/hosts.veforge-bak
   # rewrite in place (no rename) so this also works where /etc/hosts is a
   # bind mount, e.g. in containers. Only the address is swapped so the FQDN
   # alias Debian's installer writes ("127.0.1.1 host.domain host") survives.
@@ -109,7 +109,7 @@ configure_hosts() {
     content=$(cat /etc/hosts; printf '%s\t%s' "$ip" "$hn")
   fi
   printf '%s\n' "$content" > /etc/hosts
-  echo "Mapped hostname $hn to $ip in /etc/hosts (backup: /etc/hosts.pxvirt-bak)"
+  echo "Mapped hostname $hn to $ip in /etc/hosts (backup: /etc/hosts.veforge-bak)"
   echo "so pve-cluster (pmxcfs) can start. If this address is a plain DHCP"
   echo "lease, give the machine a static IP or DHCP reservation."
 }
@@ -127,10 +127,10 @@ configure_hosts() {
 drop_stale_interfaces_new() {
   local f=/etc/network/interfaces.new
   [ -e "$f" ] || return 0
-  mkdir -p /etc/network/.pxvirt-bak
-  mv -f "$f" /etc/network/.pxvirt-bak/interfaces.new
+  mkdir -p /etc/network/.veforge-bak
+  mv -f "$f" /etc/network/.veforge-bak/interfaces.new
   echo "Removed $f left behind by the ifupdown2 postinst (kept in"
-  echo "/etc/network/.pxvirt-bak/): pvenetcommit.service would have installed"
+  echo "/etc/network/.veforge-bak/): pvenetcommit.service would have installed"
   echo "it over /etc/network/interfaces on the next boot."
 }
 
@@ -148,7 +148,7 @@ configure_network() {
   # Backups must NOT be placed in /etc/network/interfaces.d/: Debian's
   # 'source /etc/network/interfaces.d/*' line would source them too,
   # resurrecting the very stanzas that were rewritten.
-  local bakdir=/etc/network/.pxvirt-bak
+  local bakdir=/etc/network/.veforge-bak
   mkdir -p "$bakdir"
 
   # ifupdown2 (which replaces ifupdown during the install) ignores
@@ -218,11 +218,11 @@ configure_network() {
         return l ~ /^(auto|allow-hotplug|iface|mapping|source|source-directory)([ \t]|$)/
       }
       {
-        if ($0 ~ "^(auto|allow-hotplug)[ \t]+" ifn "[ \t]*$") { print "#pxvirt# " $0; next }
-        if ($0 ~ "^iface[ \t]+" ifn "[ \t]") { skip = 1; print "#pxvirt# " $0; next }
+        if ($0 ~ "^(auto|allow-hotplug)[ \t]+" ifn "[ \t]*$") { print "#veforge# " $0; next }
+        if ($0 ~ "^iface[ \t]+" ifn "[ \t]") { skip = 1; print "#veforge# " $0; next }
         if (skip) {
           if (is_hdr($0)) { skip = 0 }
-          else { if ($0 ~ /^[ \t]*$/) print; else print "#pxvirt# " $0; next }
+          else { if ($0 ~ /^[ \t]*$/) print; else print "#veforge# " $0; next }
         }
         print
       }' "$f" > "$tmp" && cat "$tmp" > "$f"
@@ -237,7 +237,7 @@ configure_network() {
     echo ""
     echo "# Added by install-target.sh: keep the current connection ($iface) working"
     echo "# under ifupdown2 via a PVE-style bridge. The previous ($method) config for"
-    echo "# $iface was commented out ('#pxvirt#'); its address is pinned statically"
+    echo "# $iface was commented out ('#veforge#'); its address is pinned statically"
     echo "# here so it stays in sync with the /etc/hosts entry pmxcfs relies on."
     echo "auto $iface"
     echo "iface $iface inet manual"
