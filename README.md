@@ -145,6 +145,12 @@ to `krbd 1`, which uses the kernel client too.
 AGPL-3.0 (see `LICENSE`), matching the upstream Proxmox sources this
 project builds.
 
+## Support
+
+If VEforge saves you time, you can support its development:
+
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://www.buymeacoffee.com/darrenchang)
+
 ## Origins and credits
 
 This project is a fork of [jiangcuo/pxvirt](https://github.com/jiangcuo/pxvirt)
