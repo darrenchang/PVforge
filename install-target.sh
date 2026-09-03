@@ -48,6 +48,13 @@
 # Debian kernel a real board's watchdog (e.g. sbsa_gwdt, dw_wdt, bcm2835_wdt)
 # would be armed for real and reset the machine whenever watchdog-mux or the
 # kernel stalls - a bare-metal-only reboot loop that a VM never shows.
+# A blacklist cannot cover drivers compiled into the kernel (e.g. sbsa_gwdt on
+# some arm64 vendor kernels), so watchdog-mux.service additionally gets an
+# ExecStartPre drop-in running /usr/local/sbin/veforge-softdog-watchdog, which
+# stops (magic close) and detaches every hardware watchdog still bound and
+# loads softdog, refusing to let watchdog-mux start if /dev/watchdog is still
+# hardware. The helper also runs once before apt, so the pve-ha-manager
+# postinst - which starts watchdog-mux mid-install - cannot arm the hardware.
 #
 # After installing, the script makes sure the machine keeps a working network
 # configuration (the install replaces ifupdown with ifupdown2):
@@ -338,11 +345,100 @@ blacklist_hw_watchdogs() {
   fi
 
   if [ -e /dev/watchdog ] && ! grep -q '^softdog ' /proc/modules 2>/dev/null; then
-    echo "WARNING: /dev/watchdog is provided by a driver built into the running" >&2
-    echo "WARNING: kernel, which a modprobe blacklist cannot block. watchdog-mux" >&2
-    echo "WARNING: will arm that hardware watchdog. To avoid it, run" >&2
-    echo "WARNING:   systemctl mask watchdog-mux.service" >&2
-    echo "WARNING: after the install (HA fencing is then unavailable)." >&2
+    echo "NOTE: /dev/watchdog is provided by a driver built into the running kernel,"
+    echo "NOTE: which a modprobe blacklist cannot block; it is detached at runtime"
+    echo "NOTE: instead (see prefer_softdog)."
+  fi
+}
+
+# Force watchdog-mux onto softdog even when a hardware watchdog driver is
+# compiled into the kernel: install a helper that stops and unbinds every
+# hardware watchdog and loads softdog, hook it into watchdog-mux.service as
+# ExecStartPre (so it runs at every boot and when the pve-ha-manager postinst
+# starts the service during this install), and run it once right now.
+#
+# The helper fails - and thereby keeps watchdog-mux from starting - if
+# /dev/watchdog is still backed by hardware afterwards, e.g. a driver with
+# nowayout=1 or without magic-close support, which cannot be stopped safely.
+# Losing watchdog-mux only disables HA fencing; everything else keeps working.
+prefer_softdog() {
+  local helper=/usr/local/sbin/veforge-softdog-watchdog
+  local dropin_dir=/etc/systemd/system/watchdog-mux.service.d
+
+  mkdir -p /usr/local/sbin "$dropin_dir"
+  cat > "$helper" <<'EOF'
+#!/bin/sh
+# Installed by VEforge install.sh; runs as ExecStartPre of watchdog-mux.service.
+#
+# Make sure /dev/watchdog is the kernel software watchdog (softdog) before
+# watchdog-mux opens it, so the HA stack never arms a real hardware watchdog
+# (which would hard-reset the machine whenever watchdog-mux or the kernel
+# stalls). Hardware watchdog drivers compiled into the kernel cannot be
+# blacklisted, so they are stopped (magic close) and detached from their
+# device here. Exit status 1 keeps watchdog-mux from starting.
+set -u
+
+for w in /sys/class/watchdog/watchdog*; do
+  [ -e "$w" ] || continue
+  # softdog has no parent device; anything with one is a hardware watchdog
+  [ -e "$w/device/driver" ] || continue
+  name=$(basename "$w")
+  dev=$(basename "$(readlink -f "$w/device")")
+  drv=$(basename "$(readlink -f "$w/device/driver")")
+  options=$(cat "$w/options" 2>/dev/null || echo 0)
+  if [ "$(cat "$w/nowayout" 2>/dev/null)" = 1 ]; then
+    echo "$name ($drv): nowayout=1, cannot be stopped safely - leaving it bound" >&2
+    continue
+  fi
+  # WDIOF_MAGICCLOSE = 0x0100: without it, closing the device does not stop
+  # the timer and detaching the driver would let it expire -> reset.
+  if [ $(( options & 0x0100 )) -eq 0 ]; then
+    echo "$name ($drv): no magic-close support, cannot be stopped safely - leaving it bound" >&2
+    continue
+  fi
+  # open + magic close: stops the hardware timer (also if firmware started it)
+  if ! printf V > "/dev/$name" 2>/dev/null; then
+    echo "$name ($drv): device busy, leaving it bound" >&2
+    continue
+  fi
+  if echo "$dev" > "$w/device/driver/unbind" 2>/dev/null; then
+    echo "detached hardware watchdog $dev ($drv) so watchdog-mux uses softdog"
+  else
+    echo "$name ($drv): unbind failed - leaving it bound" >&2
+  fi
+done
+
+modprobe -q softdog 2>/dev/null || true
+i=0
+while [ ! -e /dev/watchdog ] && [ "$i" -lt 30 ]; do sleep 0.1; i=$((i + 1)); done
+
+# watchdog-mux opens the legacy /dev/watchdog node, which always belongs to
+# watchdog0; softdog is the only watchdog without a parent device.
+if [ -e /sys/class/watchdog/watchdog0/device ]; then
+  echo "/dev/watchdog is still a hardware watchdog - refusing to let watchdog-mux arm it" >&2
+  exit 1
+fi
+exit 0
+EOF
+  chmod 0755 "$helper"
+
+  cat > "$dropin_dir/veforge-softdog.conf" <<EOF
+# Installed by VEforge install.sh: detach hardware watchdogs and load softdog
+# before watchdog-mux opens /dev/watchdog. See $helper.
+[Service]
+ExecStartPre=$helper
+EOF
+  if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload || true
+  fi
+  echo "Installed $helper and $dropin_dir/veforge-softdog.conf"
+  echo "so watchdog-mux always runs on softdog."
+
+  if "$helper"; then
+    echo "/dev/watchdog is softdog for this session."
+  else
+    echo "WARNING: /dev/watchdog is still a hardware watchdog; watchdog-mux will" >&2
+    echo "WARNING: refuse to start (HA fencing unavailable) - see messages above." >&2
   fi
 }
 
@@ -351,6 +447,7 @@ mapfile -t DEBS < <(find "$DEB_DIR" -name '*.deb' \
 
 configure_hosts
 blacklist_hw_watchdogs
+prefer_softdog
 
 apt update
 # polkitd (from the Debian repos) ships /usr/bin/pkttyagent, which systemctl
