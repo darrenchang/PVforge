@@ -32,6 +32,22 @@
 #   pve-headers                   transitional package depending on
 #                                 proxmox-default-headers, which this arm64
 #                                 port does not build
+#   pve-firmware                  firmware selected for the x86 Proxmox kernel
+#                                 (no Proxmox kernel exists on this port); it
+#                                 Conflicts with/Replaces every Debian firmware-*
+#                                 package, so on real hardware it would remove
+#                                 the firmware the machine's NIC/WiFi/GPU need
+#                                 and ship next to nothing for arm64 SoCs.
+#                                 Nothing in the tree depends on it.
+#
+# Before installing, all hardware watchdog kernel modules are blacklisted
+# (/etc/modprobe.d/veforge-blacklist-watchdog.conf). pve-ha-manager's
+# watchdog-mux opens /dev/watchdog with a 10 s timeout at every boot and only
+# falls back to softdog when no watchdog device exists. Proxmox ships that
+# blacklist with its kernel package, which this port does not build, so on the
+# Debian kernel a real board's watchdog (e.g. sbsa_gwdt, dw_wdt, bcm2835_wdt)
+# would be armed for real and reset the machine whenever watchdog-mux or the
+# kernel stalls - a bare-metal-only reboot loop that a VM never shows.
 #
 # After installing, the script makes sure the machine keeps a working network
 # configuration (the install replaces ifupdown with ifupdown2):
@@ -266,10 +282,75 @@ configure_network() {
   fi
 }
 
+# Blacklist every hardware watchdog driver shipped with the installed kernels,
+# mirroring what the proxmox-kernel package does (this port has no such
+# package). watchdog-mux (pve-ha-manager) only loads softdog when /dev/watchdog
+# is absent; with a real watchdog driver loaded it arms the hardware with a
+# 10 s timeout, so any stall of watchdog-mux or the kernel hard-resets the
+# machine. softdog stays allowed - it is what watchdog-mux is meant to use.
+#
+# Runs before apt so the blacklist is in place when watchdog-mux is first
+# started by the pve-ha-manager postinst, and gets picked up by the initramfs
+# the install regenerates. Watchdog modules that are already loaded (and not in
+# use) are unloaded so the current session also ends up on softdog.
+blacklist_hw_watchdogs() {
+  local conf=/etc/modprobe.d/veforge-blacklist-watchdog.conf
+  local mods mod kdir loaded
+
+  mods=$(find /lib/modules/*/kernel/drivers/watchdog/ -type f \
+           -name '*.ko*' 2>/dev/null \
+         | sed 's|.*/||; s/\.ko.*$//; s/-/_/g' | sort -u)
+  if [ -z "$mods" ]; then
+    echo "WARNING: no watchdog kernel modules found under /lib/modules;" >&2
+    echo "WARNING: not writing $conf." >&2
+  else
+    {
+      echo "# Written by install-target.sh (VEforge)."
+      echo "# Hardware watchdog modules are blocked so pve-ha-manager's watchdog-mux"
+      echo "# falls back to softdog instead of arming the real hardware watchdog with"
+      echo "# a 10 s timeout. The upstream proxmox-kernel package ships the same"
+      echo "# blacklist; this arm64 port has no Proxmox kernel. To use a hardware"
+      echo "# watchdog on purpose, remove its line here and set WATCHDOG_MODULE in"
+      echo "# /etc/default/pve-ha-manager."
+      for mod in $mods; do
+        [ "$mod" = softdog ] && continue
+        echo "blacklist $mod"
+      done
+    } > "$conf"
+    echo "Blacklisted $(grep -c '^blacklist ' "$conf") hardware watchdog modules in $conf."
+  fi
+
+  # unload watchdog drivers that are loaded right now but not yet in use
+  kdir=/lib/modules/$(uname -r)/kernel/drivers/watchdog
+  if [ -d "$kdir" ]; then
+    loaded=$(find "$kdir" -type f -name '*.ko*' \
+               | sed 's|.*/||; s/\.ko.*$//; s/-/_/g' | sort -u)
+    for mod in $loaded; do
+      [ "$mod" = softdog ] && continue
+      grep -qE "^$mod " /proc/modules 2>/dev/null || continue
+      if modprobe -r "$mod" 2>/dev/null; then
+        echo "Unloaded watchdog module $mod for this session."
+      else
+        echo "WARNING: watchdog module $mod is loaded and in use; it stays" >&2
+        echo "WARNING: active until the next reboot." >&2
+      fi
+    done
+  fi
+
+  if [ -e /dev/watchdog ] && ! grep -q '^softdog ' /proc/modules 2>/dev/null; then
+    echo "WARNING: /dev/watchdog is provided by a driver built into the running" >&2
+    echo "WARNING: kernel, which a modprobe blacklist cannot block. watchdog-mux" >&2
+    echo "WARNING: will arm that hardware watchdog. To avoid it, run" >&2
+    echo "WARNING:   systemctl mask watchdog-mux.service" >&2
+    echo "WARNING: after the install (HA fencing is then unavailable)." >&2
+  fi
+}
+
 mapfile -t DEBS < <(find "$DEB_DIR" -name '*.deb' \
-  | grep -v -- '-dbgsym_\|zfs-dracut_\|zfs-test_\|proxmox-backup-client-static_\|-build-deps_\|/librust-\|proxmox-wasm-builder_\|/pve-installer/\|/pve-headers_')
+  | grep -v -- '-dbgsym_\|zfs-dracut_\|zfs-test_\|proxmox-backup-client-static_\|-build-deps_\|/librust-\|proxmox-wasm-builder_\|/pve-installer/\|/pve-headers_\|/pve-firmware_')
 
 configure_hosts
+blacklist_hw_watchdogs
 
 apt update
 # polkitd (from the Debian repos) ships /usr/bin/pkttyagent, which systemctl

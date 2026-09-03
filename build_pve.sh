@@ -21,7 +21,8 @@ docker rm "$CID" >/dev/null
 # only dependent proxmox-wasm-builder, the alternatives that conflict with
 # the shipped set (zfs-dracut, proxmox-backup-client-static), the
 # transitional pve-headers (needs the unbuilt proxmox-default-headers), the
-# zfs test suite, and the ISO installer environment.
+# zfs test suite, the ISO installer environment, and pve-firmware (x86
+# Proxmox-kernel firmware set that would replace Debian's firmware-* packages).
 # find target \( \
 #   -name '*-dbgsym_*.deb' -o \
 #   -name '*-build-deps_*.deb' -o \
@@ -30,7 +31,8 @@ docker rm "$CID" >/dev/null
 #   -name 'zfs-dracut_*.deb' -o \
 #   -name 'zfs-test_*.deb' -o \
 #   -name 'proxmox-backup-client-static_*.deb' -o \
-#   -name 'pve-headers_*.deb' \
+#   -name 'pve-headers_*.deb' -o \
+#   -name 'pve-firmware_*.deb' \
 #   \) -delete
 # rm -rf target/pve-installer
 find target -type d -empty -delete
