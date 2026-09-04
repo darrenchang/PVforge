@@ -10,5 +10,11 @@ SH_DIR=$(dirname $SH_PATH)
 . ../common.sh
 
 copy_dir
+# The Proxmox git tree ships a packaging-only GNUmakefile at the source root.
+# GNU make prefers it over the autotools-generated Makefile, so an in-tree
+# dpkg-buildpackage would run its empty 'all' target and debhelper would skip
+# the (non-existent) 'install' target, leaving debian/tmp empty. Proxmox's own
+# 'make deb' removes it before building; do the same here.
+rm -f GNUmakefile
 exec_build_dpkg
 cp -r /build/*.changes /build/*.buildinfo /build/*.deb /build/*.tar.* /build/*.dsc $SH_DIR/$PKGNAME ||true

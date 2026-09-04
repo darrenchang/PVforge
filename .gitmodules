@@ -85,12 +85,6 @@
 [submodule "packages/spiceterm/spiceterm"]
   path = packages/spiceterm/spiceterm
   url = https://git.proxmox.com/git/spiceterm
-[submodule "packages/swtpm/swtpm"]
-  path = packages/swtpm/swtpm
-  url = https://github.com/stefanberger/swtpm.git
-[submodule "packages/libtpms/libtpms"]
-  path = packages/libtpms/libtpms
-  url = https://github.com/stefanberger/libtpms
 [submodule "packages/libjs-qrcodejs/libjs-qrcodejs"]
   path = packages/libjs-qrcodejs/libjs-qrcodejs
   url = https://git.proxmox.com/git/libjs-qrcodejs
@@ -265,3 +259,9 @@
 [submodule "packages/proxmox-wasm-builder/proxmox-wasm-builder"]
 	path = packages/proxmox-wasm-builder/proxmox-wasm-builder
 	url = https://git.proxmox.com/git/ui/proxmox-wasm-builder.git
+[submodule "packages/swtpm/swtpm"]
+	path = packages/swtpm/swtpm
+	url = git://git.proxmox.com/git/swtpm.git
+[submodule "packages/libtpms/libtpms"]
+	path = packages/libtpms/libtpms
+	url = git://git.proxmox.com/git/libtpms.git
