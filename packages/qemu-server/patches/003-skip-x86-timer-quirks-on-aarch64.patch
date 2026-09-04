@@ -1,0 +1,60 @@
+diff --git a/src/PVE/QemuServer/Cfg2Cmd.pm b/src/PVE/QemuServer/Cfg2Cmd.pm
+index 433d5050..c6962c66 100644
+--- a/src/PVE/QemuServer/Cfg2Cmd.pm
++++ b/src/PVE/QemuServer/Cfg2Cmd.pm
+@@ -17,6 +17,7 @@ sub new {
+     }, $class;
+ 
+     $self->{ostype} = $self->get_prop('ostype');
++    $self->{arch} = PVE::QemuServer::Helpers::get_vm_arch($conf);
+     $self->{'windows-version'} = PVE::QemuServer::Helpers::windows_version($self->{ostype});
+ 
+     $self->{'machine-type'} =
+@@ -115,6 +116,12 @@ sub windows_version {
+     return $self->{'windows-version'};
+ }
+ 
++sub arch {
++    my ($self) = @_;
++
++    return $self->{arch};
++}
++
+ sub version_guard {
+     my ($self, $major, $minor, $pve) = @_;
+ 
+diff --git a/src/PVE/QemuServer/Cfg2Cmd/Timer.pm b/src/PVE/QemuServer/Cfg2Cmd/Timer.pm
+index d03715a0..f5af2ed5 100644
+--- a/src/PVE/QemuServer/Cfg2Cmd/Timer.pm
++++ b/src/PVE/QemuServer/Cfg2Cmd/Timer.pm
+@@ -18,14 +18,18 @@ sub generate {
+         $time_drift_fix = 1 if $acpi && !defined($time_drift_fix);
+     }
+ 
++    # the i8254 PIT and the RTC driftfix are x86 only; the aarch64 'virt' machine has a PL031 RTC
++    # and no PIT, so QEMU would only warn about (or ignore) these flags
++    my $is_x86 = $cfg2cmd->arch() eq 'x86_64';
++
+     if ($cfg2cmd->windows_version() >= 6) {
+-        $cfg2cmd->add_global_flag('kvm-pit.lost_tick_policy=discard');
++        $cfg2cmd->add_global_flag('kvm-pit.lost_tick_policy=discard') if $is_x86;
+         $cfg2cmd->add_machine_flag_if_supported('hpet', 'off');
+     } elsif ($cfg2cmd->is_linux() && $cfg2cmd->version_guard(10, 1, 0)) {
+         $cfg2cmd->add_machine_flag_if_supported('hpet', 'off');
+     }
+ 
+-    $cfg2cmd->add_rtc_flag('driftfix=slew') if $time_drift_fix;
++    $cfg2cmd->add_rtc_flag('driftfix=slew') if $time_drift_fix && $is_x86;
+ 
+     if ($startdate ne 'now') {
+         $cfg2cmd->add_rtc_flag("base=$startdate");
+diff --git a/src/test/cfg2cmd/aarch64/simple-arm-win-ramfb.conf.cmd b/src/test/cfg2cmd/aarch64/simple-arm-win-ramfb.conf.cmd
+index 6908a134..c8a9bf10 100644
+--- a/src/test/cfg2cmd/aarch64/simple-arm-win-ramfb.conf.cmd
++++ b/src/test/cfg2cmd/aarch64/simple-arm-win-ramfb.conf.cmd
+@@ -38,4 +38,5 @@
+   -device 'scsi-hd,bus=scsihw0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0,id=scsi0,device_id=drive-scsi0,bootindex=100,write-cache=on' \
+   -netdev 'type=tap,id=net0,ifname=tap8006i0,script=/usr/libexec/qemu-server/pve-bridge,downscript=/usr/libexec/qemu-server/pve-bridgedown' \
+   -device 'virtio-net-pci,mac=A2:C0:43:77:08:A0,netdev=net0,bus=pcie.0,addr=0x12,id=net0,rx_queue_size=1024,tx_queue_size=256,bootindex=300,host_mtu=1500,host_tunnel=off' \
++  -rtc 'base=localtime' \
+   -machine 'pflash0=pflash0,pflash1=drive-efidisk0,accel=tcg,type=virt+pve0'

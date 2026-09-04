@@ -1,0 +1,107 @@
+diff --git a/src/PVE/QemuServer.pm b/src/PVE/QemuServer.pm
+index cf4328ee..32e8b686 100644
+--- a/src/PVE/QemuServer.pm
++++ b/src/PVE/QemuServer.pm
+@@ -3114,6 +3114,22 @@ my sub get_vga_properties {
+     return ($vga, $qxlnum);
+ }
+ 
++sub derived_pmu_affinity_cpuset {
++    my ($conf) = @_;
++
++    # Windows on ARM calibrates its timers from the PMU cycle counter. On a host with more than one
++    # CPU PMU (big.LITTLE), KVM freezes that counter whenever a vCPU is scheduled onto the other
++    # cluster, and the Windows boot manager then traps on a divide-by-zero. Pin such guests to a
++    # single PMU cluster. An explicit 'affinity' always wins. This is applied to the VM's systemd
++    # scope (AllowedCPUs), not via a taskset(1) command prefix: a prefixed command inherits the
++    # tainted cpu-list and fails under the pvedaemon worker's taint mode ('perl -T').
++    return if $conf->{affinity};
++    my $arch = PVE::QemuServer::Helpers::get_vm_arch($conf);
++    return if $arch ne 'aarch64' || !is_native_arch($arch);
++    return if !windows_version($conf->{ostype});
++    return PVE::QemuServer::Helpers::heterogeneous_pmu_cpuset();
++}
++
+ sub config_to_command {
+     my ($storecfg, $vmid, $conf, $defaults, $options) = @_;
+ 
+@@ -5822,6 +5838,18 @@ sub vm_start_nolock {
+             PVE::Systemd::enter_systemd_scope($vmid, "Proxmox VE VM $vmid",
+                 %systemd_properties);
+ 
++            if (my $cpuset = derived_pmu_affinity_cpuset($conf)) {
++                log_warn(
++                    "host has CPU cores with different PMUs, pinning Windows VM to CPUs $cpuset so"
++                    . " the guest cycle counter works - set 'affinity' explicitly to override");
++                eval {
++                    run_command(
++                        ['/bin/systemctl', 'set-property', '--runtime', "$vmid.scope",
++                         "AllowedCPUs=$cpuset"]);
++                };
++                log_warn("failed to pin VM to CPUs $cpuset: $@") if $@;
++            }
++
+             my $virtiofs_sockets = start_all_virtiofsd($conf, $vmid);
+ 
+             my $tpmpid;
+diff --git a/src/PVE/QemuServer/Helpers.pm b/src/PVE/QemuServer/Helpers.pm
+index dd17eef5..6e61ff04 100644
+--- a/src/PVE/QemuServer/Helpers.pm
++++ b/src/PVE/QemuServer/Helpers.pm
+@@ -21,6 +21,7 @@ our @EXPORT_OK = qw(
+     parse_number_sets
+     windows_version
+     get_host_arch
++    heterogeneous_pmu_cpuset
+ );
+ 
+ my $nodename = PVE::INotify::nodename();
+@@ -35,6 +36,48 @@ sub get_host_arch {
+     return PVE::Tools::get_host_arch();
+ }
+ 
++my $pmu_sysfs_dir = '/sys/bus/event_source/devices';
++
++=head3 heterogeneous_pmu_cpuset
++
++    my $cpuset = heterogeneous_pmu_cpuset();
++
++On aarch64 hosts with more than one kind of CPU core (e.g. big.LITTLE), each core type comes with
++its own PMU. KVM binds a guest's PMU to the PMU of the core the VM happened to be created on, and a
++vCPU that is later scheduled onto a core of the other type sees a cycle counter that does not
++advance. Windows relies on that cycle counter to calibrate its timers at boot and traps on a
++resulting divide-by-zero in the boot manager, so such guests need to be pinned to the cores of a
++single PMU. Returns the (untainted) cpu-list of the PMU covering the most cores if the host exposes
++more than one CPU PMU, C<undef> otherwise (including on hosts without the sysfs interface).
++
++=cut
++
++sub heterogeneous_pmu_cpuset {
++    my @pmus;
++    for my $cpus_file (glob("$pmu_sysfs_dir/*/cpus")) {
++        my ($name) = $cpus_file =~ m!/([^/]+)/cpus$!;
++        # only CPU PMUs, skip software/breakpoint/uncore (arm_smmuv3_pmcg, arm_dsu, ...) ones
++        next if $name !~ /^armv\d+_/;
++        my $cpus = eval { PVE::Tools::file_read_firstline($cpus_file) } // next;
++        $cpus =~ s/\s+//g;
++        next if $cpus eq '';
++        my $count = 0;
++        for my $range (split(/,/, $cpus)) {
++            my ($start, $end) = split(/-/, $range);
++            $count += defined($end) ? $end - $start + 1 : 1;
++        }
++        push @pmus, { name => $name, cpus => $cpus, count => $count };
++    }
++    return if scalar(@pmus) < 2;
++
++    my ($largest) = sort { $b->{count} <=> $a->{count} || $a->{name} cmp $b->{name} } @pmus;
++    # untaint: the value came from sysfs, and pvedaemon runs under taint mode ('perl -T'), so it
++    # must be laundered before it can reach exec (e.g. systemctl set-property)
++    my ($cpus) = $largest->{cpus} =~ /^([0-9,\-]+)$/
++        or return;
++    return $cpus;
++}
++
+ sub get_command_for_arch($) {
+     my ($arch) = @_;
+     return '/usr/bin/kvm' if get_host_arch() eq $arch; # i.e. native arch

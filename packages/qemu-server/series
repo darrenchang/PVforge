@@ -1,1 +1,4 @@
 patches/001-tpm-tis-device-on-aarch64.patch
+patches/002-ramfb-display-type.patch
+patches/003-skip-x86-timer-quirks-on-aarch64.patch
+patches/004-pin-aarch64-windows-to-one-pmu-cluster.patch
