@@ -18,4 +18,9 @@ git checkout -f master && \
 git submodule update --init --recursive && \
 sed -i '/pve-ha-manager <!nocheck>/d' $SCRIPT_DIR/$PKGNAME/debian/control;
 
+# local fixes on top of upstream master (see patches/ and series)
+for i in `cat $SCRIPT_DIR/series`;
+  do patch -p1 < ../$i || errlog "failed to apply $i"
+done
+
 exec_build_make
