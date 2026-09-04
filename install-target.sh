@@ -455,6 +455,7 @@ apt update
 # NetworkManager, but fresh minimal/server systems do not, and pve-manager
 # does not declare the dependency.
 apt install -y --allow-downgrades -o Dpkg::Options::="--force-confnew" "${DEBS[@]}" polkitd
+apt-get update && apt-get install --reinstall lvm2 dmeventd thin-provisioning-tools
 
 drop_stale_interfaces_new
 configure_network
